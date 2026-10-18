@@ -1491,14 +1491,28 @@ button:active{transform:scale(.97);}
       <button class="btn block" id="pw-buy">Get Pro — $19.99</button>
       <div class="fineprint">Secure checkout · Instant access · Yours forever<br>No subscription, no renewals. 30-day pass guarantee.</div>
       <div class="keyrow">
-        <input id="pw-key" type="text" placeholder="Already purchased? Enter license key" autocomplete="off">
+        <input id="pw-key" type="text" placeholder="BB19-XXXXXX-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" style="font-family:ui-monospace,Menlo,monospace; letter-spacing:.04em;">
         <button class="btn ghost" id="pw-activate" style="padding:12px 18px; font-size:14px;">Activate</button>
       </div>
+      <div class="fineprint" style="margin-top:8px; text-align:left;">Have a key? Enter it to unlock Pro — or restore it on a new device.<br>Lost your key? It's in your Payhip purchase email.</div>
       <div class="fineprint" id="pw-msg" style="min-height:20px;"></div>
-      <!-- PREVIEW-ONLY demo unlock (remove before production) -->
-      <div class="fineprint" style="margin-top:6px;"><a href="#" id="pw-demo" style="color:var(--cyan);">Preview demo: unlock without paying →</a></div>
     </div>
   </div></div>
+</div>
+
+<!-- ================= WELCOME TO PRO ================= -->
+<div id="prowelcomeov" class="unlockov hidden">
+  <div class="unlockcard">
+    <div class="uk">Pro activated</div>
+    <div id="prow-mascot" class="resmascot"></div>
+    <span class="ubi">🎓</span>
+    <h2>Welcome to Pro!</h2>
+    <p>All 12 exams are unlocked — full question banks, exam-realistic simulations, terminal tasks, custom quiz builder, and performance analytics. Yours forever.</p>
+    <div class="xp">Lifetime access · No subscription</div>
+    <div class="btnrow" style="justify-content:center;margin-top:18px;">
+      <button class="btn" id="prow-ok" style="padding:12px 34px;font-size:15px;">Start exploring</button>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -2961,18 +2975,37 @@ function closePaywall(){ $("paywall").classList.add("hidden"); }
 $("pw-close").addEventListener("click",closePaywall);
 $("paywall").addEventListener("click",e=>{ if(e.target.id==="paywall") closePaywall(); });
 $("pw-buy").addEventListener("click",()=>{ window.open(CONFIG.PAYMENT_URL,"_blank"); });
-$("pw-activate").addEventListener("click",()=>{
-  const k=$("pw-key").value.trim();
-  /* Production validation: checksum-verified pre-generated keys (see keygen.py).
-     NOTE: the "Preview demo: unlock without paying" link below is preview-only
-     and MUST be removed (body.html) before the production build. */
-  if(verifyKey(k)){ localStorage.setItem("bb_pro","1"); closePaywall(); refreshBadges();
-    if(curExam) renderBrief(curExam.slug);
-  } else { $("pw-msg").textContent="That key doesn't look right — check it and try again."; $("pw-msg").style.color="var(--red)"; }
+/* Key entry: auto-uppercase + dash formatting as they type (mobile-friendly).
+   Keys look like BB19-XXXXXX-XXXXXX. */
+$("pw-key").addEventListener("input",e=>{
+  const el=e.target;
+  let v=el.value.toUpperCase().replace(/[^A-Z0-9]/g,"");
+  /* strip a leading BB19 if the user pastes the full key, then re-add it */
+  if(v.startsWith("BB19")) v=v.slice(4);
+  v=v.slice(0,12);
+  let out="BB19";
+  if(v.length>0) out+="-"+v.slice(0,6);
+  if(v.length>6) out+="-"+v.slice(6,12);
+  el.value=out;
 });
-$("pw-demo").addEventListener("click",e=>{
-  e.preventDefault();
-  localStorage.setItem("bb_pro","1"); closePaywall(); refreshBadges();
+$("pw-activate").addEventListener("click",()=>{
+  const k=$("pw-key").value.trim().toUpperCase();
+  const msg=$("pw-msg");
+  /* Production validation: checksum-verified pre-generated keys (see keygen.py). */
+  if(!k || k==="BB19"){ msg.textContent="Enter your license key \u2014 you'll find it in your Payhip purchase email."; msg.style.color="var(--amber)"; return; }
+  if(!/^BB19-[A-Z0-9]{6}-[A-Z0-9]{6}$/.test(k)){ msg.textContent="Keys look like BB19-XXXXXX-XXXXXX \u2014 check for typos and try again."; msg.style.color="var(--red)"; return; }
+  if(verifyKey(k)){
+    localStorage.setItem("bb_pro","1");
+    localStorage.setItem("bb_pro_key",k); /* stored for future "restore" reference */
+    closePaywall(); refreshBadges();
+    /* Welcome-to-Pro celebration -- a HAPPY moment, not a sales moment */
+    $("prow-mascot").innerHTML='<span class="mascot floaty">'+mascotSVG("celebrate",78)+"</span>";
+    $("prowelcomeov").classList.remove("hidden");
+    burstConfetti(130);
+  } else { msg.textContent="That key didn't check out. Double-check it, or find it in your Payhip purchase email."; msg.style.color="var(--red)"; }
+});
+$("prow-ok").addEventListener("click",()=>{
+  $("prowelcomeov").classList.add("hidden");
   if(curExam) renderBrief(curExam.slug);
 });
 
