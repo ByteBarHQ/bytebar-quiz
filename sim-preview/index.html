@@ -1281,7 +1281,7 @@ button:active{transform:scale(.97);}
   .endbtn:active, .modecard:active, .examcard:active{transform:none;}
   .opt.sel, .opt.correct, .opt.wrong{transform:none;}
   .examcard{animation:none;}
-  /* Sprout life system: freeze all motion; lids stay open */
+  /* Pip life system: freeze all motion; lids stay open */
   .bb-mroot,.bb-mbreathe,.bb-pupil,.bb-sproutwig{animation:none !important;}
   .bb-lid{animation:none !important; transform:scaleY(0) !important;}
   .opt.correct{animation:none;}
@@ -1351,16 +1351,16 @@ button:active{transform:scale(.97);}
 .mascot-slot{transition:transform .25s var(--ease-spring);}
 .mascot-slot:hover{transform:scale(1.08) rotate(-3deg);}
 
-/* ============ Sprout life system (2026-10-18) ============
+/* ============ Pip life system (2026-10-18) ============
    Texture lives in the SVG (grain filter + layered gradients).
-   These keyframes give Sprout weight, breath, and presence:
+   These keyframes give Pip weight, breath, and presence:
    - bbMSway: the whole body sways gently, like it's standing
    - bbMBreathe: slow squash-and-stretch breath (never a flat float)
    - bbMBlink: lids snap shut every ~5s — the single biggest "alive" cue
    - bbMDrift: pupils wander almost imperceptibly — subliminal life
-   - bbMWig: the head-sprout leaves tremble in a breeze
+   - bbMWig: the head-sprig leaves tremble in a breeze
    - bbMPop: one-shot anticipation squash → stretch on reactions
-   Per-instance negative delays (set inline) keep multiple Sprouts
+   Per-instance negative delays (set inline) keep multiple Pips
    on one screen from moving in lockstep. */
 .bb-mroot{transform-box:fill-box; transform-origin:50% 90%; animation:bbMSway 5.2s ease-in-out infinite;}
 .bb-mroot.bb-react{animation:bbMSway 5.2s ease-in-out infinite, bbMPop .55s cubic-bezier(.2,.9,.25,1.25);}
@@ -1536,7 +1536,7 @@ html,body{overscroll-behavior-x:none;}
         <div class="hero-orbs" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span></div>
         <div class="hero-mascot mascot-pop">
           <span class="mascot-slot" data-mascot="idle" data-size="132"></span>
-          <div class="speech"><b>Hi, I'm Sprout! 🌱</b><span>Ready to pass your exam? Pick one below — I'll grow right alongside you.</span></div>
+          <div class="speech"><b>Hi, I'm Pip! 🌱</b><span>Ready to pass your exam? Pick one below — I'll grow right alongside you.</span></div>
         </div>
       </div>
       <h1>Practice like it's <span class="cy">test day.</span></h1>
@@ -3359,21 +3359,18 @@ function refreshBadges(){
 }
 
 /* ============================================================
-   SPROUT — the ByteBar study buddy (mascot redesign 2026-10-18)
-   Cori: "can't use dot... needs to be more adorable, do your homework"
+   PIP — the ByteBar study buddy (mascot redesign 2026-10-18)
+   Cori: "can't use dot... needs to be more adorable" then
+   "cooler name... still pretty idk flat"
 
-   Research-backed cute design (see README.md "Mascot design research"):
-   - Kindchenschema: huge eyes, round chubby body, protruding cheeks
-   - Kawaii: centralized features, open smiles + blush (top-ranked),
-     pastel-warm palette, simple shapes, slight head tilt = endearing
-   - Duo lesson: radical simplicity (body + eyes + one accent), full
-     emotional range, chubby frame, no sharp edges
-   - Warm peach body (not cold navy), soft brown outlines (not harsh
-     black), no face-screen barrier, no mechanical antenna — a tiny
-     sprout gives a distinctive silhouette and ties to the name.
+   Pip: a seed (plant tie-in), tech nod (pip = Python installer —
+   the IT-cert audience gets it), short, punchy, cool.
+   "Hi, I'm Pip!" / "My Pip helped me pass!"
 
-   Sprout is a little creature who's growing right alongside you —
-   every question you answer helps them grow too.
+   Dimensional upgrade: 5-stop body gradient with real core shadow,
+   ambient occlusion in crevices, rim light opposite key light,
+   layered eyes (lid shadow + iris ring + pupil + catchlights),
+   veined leaves, inset belly, stronger grain. Squishable, not flat.
 
    States: idle, happy, proud, sympathetic, encourage, excited,
    thoughtful, sleep, determined, surprised, celebrate, nervous,
@@ -3384,36 +3381,73 @@ function mascotSVG(state, size){
   const s=size||56;
   const st=state||"idle";
   const u="bbm"+(++bbUID);
-  /* phase offsets so multiple Sprouts on one screen don't move in lockstep */
+  /* phase offsets so multiple Pips on one screen don't move in lockstep */
   const rootPh=((bbUID*1.37)%5.2).toFixed(2), breathPh=((bbUID*2.11)%3.8).toFixed(2),
         lidPh=((bbUID*0.93)%4.8).toFixed(2), lidPh2=(((bbUID*0.93)%4.8)+0.05).toFixed(2);
-  /* warm, soft palette — nothing harsh or cold */
-  const BODY="#FFDDB8", BELLY="#FFE9D1", LINE="#8B5A3B",
-        CHEEK="#FF9EAA", PUPIL="#3A3340",
-        LEAF="#58B368", LEAFD="#3E8E4F";
-  /* ---- texture + depth defs: layered gradients + film grain (per-instance ids) ---- */
+  /* warm, rich palette — deep shadows, glowing highlights */
+  const BODY_HI="#FFFCF5", BODY_LT="#FFE7C4", BODY_MID="#FFCF9E",
+        BODY_SH="#EE9F5E", BODY_DEEP="#C97A3E",
+        BELLY_HI="#FFFBF2", BELLY_MID="#FFE9CD", BELLY_SH="#F5C48E",
+        LINE="#7A4A26",
+        CHEEK="#FF8B9D", PUPIL="#2E2838",
+        LEAF="#5CBC70", LEAFD="#2F7A40", LEAF_HI="#9AE5AB";
+  /* ---- dimensional defs: 5-stop gradients, AO, rim light, grain ---- */
   const defs='<defs>'+
-    '<radialGradient id="'+u+'-bodyG" cx="0.42" cy="0.3" r="0.9">'+
-      '<stop offset="0" stop-color="#FFF1DE"/><stop offset="0.55" stop-color="#FFDDB8"/><stop offset="1" stop-color="#F0B985"/></radialGradient>'+
-    '<radialGradient id="'+u+'-bellyG" cx="0.5" cy="0.35" r="0.8">'+
-      '<stop offset="0" stop-color="#FFF6E8"/><stop offset="1" stop-color="#FFE3C2"/></radialGradient>'+
-    '<radialGradient id="'+u+'-eyeG" cx="0.5" cy="0.38" r="0.75">'+
-      '<stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCE3F1"/></radialGradient>'+
-    '<radialGradient id="'+u+'-pupG" cx="0.38" cy="0.32" r="0.85">'+
-      '<stop offset="0" stop-color="#6E657F"/><stop offset="1" stop-color="#2B2733"/></radialGradient>'+
+    /* body: bright key-light top-left -> deep warm core shadow bottom-right */
+    '<radialGradient id="'+u+'-bodyG" cx="0.38" cy="0.28" r="0.95">'+
+      '<stop offset="0" stop-color="'+BODY_HI+'"/><stop offset="0.32" stop-color="'+BODY_LT+'"/>'+
+      '<stop offset="0.58" stop-color="'+BODY_MID+'"/><stop offset="0.82" stop-color="'+BODY_SH+'"/>'+
+      '<stop offset="1" stop-color="'+BODY_DEEP+'"/></radialGradient>'+
+    /* belly: soft inset patch with its own shading */
+    '<radialGradient id="'+u+'-bellyG" cx="0.5" cy="0.3" r="0.85">'+
+      '<stop offset="0" stop-color="'+BELLY_HI+'"/><stop offset="0.6" stop-color="'+BELLY_MID+'"/>'+
+      '<stop offset="1" stop-color="'+BELLY_SH+'"/></radialGradient>'+
+    /* eye: bright sclera with subtle cool depth */
+    '<radialGradient id="'+u+'-eyeG" cx="0.5" cy="0.35" r="0.8">'+
+      '<stop offset="0" stop-color="#FFFFFF"/><stop offset="0.7" stop-color="#F2F5FB"/>'+
+      '<stop offset="1" stop-color="#D5DCEB"/></radialGradient>'+
+    /* iris ring: warm amber halo between sclera and pupil */
+    '<radialGradient id="'+u+'-irisG" cx="0.5" cy="0.5" r="0.5">'+
+      '<stop offset="0.62" stop-color="#C98F4E" stop-opacity="0"/>'+
+      '<stop offset="0.78" stop-color="#C98F4E" stop-opacity="0.55"/>'+
+      '<stop offset="1" stop-color="#8A5A28" stop-opacity="0.7"/></radialGradient>'+
+    /* pupil: rich 3-stop depth */
+    '<radialGradient id="'+u+'-pupG" cx="0.38" cy="0.3" r="0.9">'+
+      '<stop offset="0" stop-color="#7E7594"/><stop offset="0.55" stop-color="#3E364E"/>'+
+      '<stop offset="1" stop-color="#1E1A26"/></radialGradient>'+
+    /* cheek: saturated center fading out */
     '<radialGradient id="'+u+'-cheekG" cx="0.5" cy="0.5" r="0.5">'+
-      '<stop offset="0" stop-color="#FF9EAA" stop-opacity="0.9"/><stop offset="1" stop-color="#FF9EAA" stop-opacity="0"/></radialGradient>'+
-    '<linearGradient id="'+u+'-leafG" x1="0" y1="0" x2="0" y2="1">'+
-      '<stop offset="0" stop-color="#86D694"/><stop offset="1" stop-color="#3E8E4F"/></linearGradient>'+
-    '<linearGradient id="'+u+'-shadeG" x1="0" y1="0" x2="0" y2="1">'+
-      '<stop offset="0" stop-color="#A06838" stop-opacity="0"/><stop offset="1" stop-color="#A06838" stop-opacity="0.35"/></linearGradient>'+
+      '<stop offset="0" stop-color="'+CHEEK+'" stop-opacity="0.95"/>'+
+      '<stop offset="0.55" stop-color="'+CHEEK+'" stop-opacity="0.5"/>'+
+      '<stop offset="1" stop-color="'+CHEEK+'" stop-opacity="0"/></radialGradient>'+
+    /* leaf: highlight -> mid -> deep with vein shadow */
+    '<linearGradient id="'+u+'-leafG" x1="0" y1="0" x2="0.3" y2="1">'+
+      '<stop offset="0" stop-color="'+LEAF_HI+'"/><stop offset="0.5" stop-color="'+LEAF+'"/>'+
+      '<stop offset="1" stop-color="'+LEAFD+'"/></linearGradient>'+
+    /* ambient occlusion: warm dark pool for crevices */
+    '<radialGradient id="'+u+'-aoG" cx="0.5" cy="0.5" r="0.5">'+
+      '<stop offset="0" stop-color="#6E3F1D" stop-opacity="0.34"/>'+
+      '<stop offset="1" stop-color="#6E3F1D" stop-opacity="0"/></radialGradient>'+
+    /* rim light: cool-white kiss on the shadow-side edge */
+    '<linearGradient id="'+u+'-rimG" x1="0" y1="0" x2="1" y2="1">'+
+      '<stop offset="0" stop-color="#FFFFFF" stop-opacity="0"/>'+
+      '<stop offset="0.55" stop-color="#FFFFFF" stop-opacity="0"/>'+
+      '<stop offset="1" stop-color="#FFF3DC" stop-opacity="0.65"/></linearGradient>'+
+    /* top sheen: soft key-light bloom */
     '<radialGradient id="'+u+'-hiG" cx="0.5" cy="0.5" r="0.5">'+
-      '<stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>'+
+      '<stop offset="0" stop-color="#FFFFFF" stop-opacity="0.6"/>'+
+      '<stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>'+
+    /* lid shadow: darkens top of eye under the brow */
+    '<linearGradient id="'+u+'-lidshG" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#5A3A1E" stop-opacity="0.28"/>'+
+      '<stop offset="0.45" stop-color="#5A3A1E" stop-opacity="0"/></linearGradient>'+
     '<radialGradient id="'+u+'-shadG" cx="0.5" cy="0.5" r="0.5">'+
-      '<stop offset="0" stop-color="#0B1E42" stop-opacity="0.22"/><stop offset="1" stop-color="#0B1E42" stop-opacity="0"/></radialGradient>'+
+      '<stop offset="0" stop-color="#0B1E42" stop-opacity="0.24"/>'+
+      '<stop offset="1" stop-color="#0B1E42" stop-opacity="0"/></radialGradient>'+
+    /* film grain: warm speckle texture */
     '<filter id="'+u+'-grain" x="-20%" y="-20%" width="140%" height="140%">'+
-      '<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" stitchTiles="stitch" result="n"/>'+
-      '<feColorMatrix in="n" type="matrix" values="0 0 0 0 0.42 0 0 0 0 0.27 0 0 0 0 0.15 0 0 0 0.55 0" result="g"/>'+
+      '<feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="3" seed="7" stitchTiles="stitch" result="n"/>'+
+      '<feColorMatrix in="n" type="matrix" values="0 0 0 0 0.45 0 0 0 0 0.28 0 0 0 0 0.14 0 0 0 0.6 0" result="g"/>'+
       '<feComposite in="g" in2="SourceGraphic" operator="in"/></filter>'+
     '</defs>';
   /* blink lids — body-toned covers that snap shut every few seconds */
@@ -3427,58 +3461,71 @@ function mascotSVG(state, size){
     return '<path d="M0,-7 C1,-2.1 2.1,-1 7,0 C2.1,1 1,2.1 0,7 C-1,2.1 -2.1,1 -7,0 C-2.1,-1 -1,-2.1 0,-7 Z"'+
       ' transform="translate('+cx+' '+cy+') scale('+k+')" fill="'+fill+'"/>';
   };
-  /* big kawaii eyes with depth: gradient sclera, dimensional pupil,
-     double catchlight, drifting pupils, blinking lids */
+  /* dimensional eyes: lid shadow at top, iris ring, deep pupil,
+     double catchlight + bottom rim reflection, drifting pupils, lids */
   const bigEyes=(ex1,ex2,ey,rx,ry,pr,px,py)=>{
-    return '<ellipse cx="'+ex1+'" cy="'+ey+'" rx="'+rx+'" ry="'+ry+'" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
-      '<ellipse cx="'+ex2+'" cy="'+ey+'" rx="'+rx+'" ry="'+ry+'" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
-      '<circle class="bb-pupil" cx="'+(ex1+px)+'" cy="'+(ey+py)+'" r="'+pr+'" fill="url(#'+u+'-pupG)"/>'+
-      '<circle class="bb-pupil" cx="'+(ex2+px)+'" cy="'+(ey+py)+'" r="'+pr+'" fill="url(#'+u+'-pupG)"/>'+
-      '<circle cx="'+(ex1+px+pr*0.45)+'" cy="'+(ey+py-pr*0.55)+'" r="'+(pr*0.42).toFixed(1)+'" fill="#fff"/>'+
-      '<circle cx="'+(ex2+px+pr*0.45)+'" cy="'+(ey+py-pr*0.55)+'" r="'+(pr*0.42).toFixed(1)+'" fill="#fff"/>'+
-      '<circle cx="'+(ex1+px-pr*0.35)+'" cy="'+(ey+py+pr*0.42)+'" r="'+(pr*0.2).toFixed(1)+'" fill="#fff" opacity="0.75"/>'+
-      '<circle cx="'+(ex2+px-pr*0.35)+'" cy="'+(ey+py+pr*0.42)+'" r="'+(pr*0.2).toFixed(1)+'" fill="#fff" opacity="0.75"/>'+
-      lids(ex1,ex2,ey,rx,ry);
+    const eye=(ex)=>{
+      return '<ellipse cx="'+ex+'" cy="'+ey+'" rx="'+rx+'" ry="'+ry+'" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+        '<ellipse cx="'+ex+'" cy="'+ey+'" rx="'+rx+'" ry="'+ry+'" fill="url(#'+u+'-lidshG)"/>'+
+        '<circle class="bb-pupil" cx="'+(ex+px)+'" cy="'+(ey+py)+'" r="'+(pr+2.2).toFixed(1)+'" fill="url(#'+u+'-irisG)"/>'+
+        '<circle class="bb-pupil" cx="'+(ex+px)+'" cy="'+(ey+py)+'" r="'+pr+'" fill="url(#'+u+'-pupG)"/>'+
+        '<circle cx="'+(ex+px+pr*0.45)+'" cy="'+(ey+py-pr*0.55)+'" r="'+(pr*0.42).toFixed(1)+'" fill="#fff"/>'+
+        '<circle cx="'+(ex+px-pr*0.35)+'" cy="'+(ey+py+pr*0.42)+'" r="'+(pr*0.2).toFixed(1)+'" fill="#fff" opacity="0.75"/>'+
+        '<ellipse cx="'+(ex+px)+'" cy="'+(ey+py+pr*0.72)+'" rx="'+(pr*0.5).toFixed(1)+'" ry="'+(pr*0.16).toFixed(1)+'" fill="#fff" opacity="0.35"/>';
+    };
+    return eye(ex1)+eye(ex2)+lids(ex1,ex2,ey,rx,ry);
   };
-  /* blush cheeks — soft radial, no hard edge */
+  /* blush cheeks — saturated center, soft falloff */
   const cheeks=(op)=>{
-    const o=op||0.55;
-    return '<ellipse cx="28" cy="61" rx="7.5" ry="5" fill="url(#'+u+'-cheekG)" opacity="'+o+'"/>'+
-           '<ellipse cx="68" cy="61" rx="7.5" ry="5" fill="url(#'+u+'-cheekG)" opacity="'+o+'"/>';
+    const o=op||0.6;
+    return '<ellipse cx="27" cy="62" rx="8" ry="5.5" fill="url(#'+u+'-cheekG)" opacity="'+o+'"/>'+
+           '<ellipse cx="69" cy="62" rx="8" ry="5.5" fill="url(#'+u+'-cheekG)" opacity="'+o+'"/>';
   };
-  /* tiny sprout on head — leaves wiggle with life */
-  const sprout=(droop)=>{
+  /* head sprig: stem + veined leaves with highlight streaks */
+  const sprig=(droop)=>{
     const tip=droop?22:14, bend=droop?6:0;
+    const leaf=(cx,cy,rot)=>{
+      return '<g transform="rotate('+rot+' '+cx+' '+cy+')">'+
+        '<ellipse cx="'+cx+'" cy="'+cy+'" rx="6.5" ry="3.6" fill="url(#'+u+'-leafG)" stroke="'+LEAFD+'" stroke-width="1.4"/>'+
+        '<path d="M'+(cx-4.5)+','+cy+' Q'+cx+','+(cy-1.2)+' '+(cx+4.5)+','+cy+'" stroke="'+LEAFD+'" stroke-width="1" fill="none" opacity="0.7"/>'+
+        '<ellipse cx="'+(cx-1.5)+'" cy="'+(cy-1.2)+'" rx="2.6" ry="1.1" fill="#fff" opacity="0.35"/>'+
+        '</g>';
+    };
     return '<path d="M48,29 Q'+(48+bend)+','+(29-(29-tip)/2)+' 48,'+tip+'" stroke="'+LEAFD+'" stroke-width="3" fill="none" stroke-linecap="round"/>'+
       '<g class="bb-sproutwig">'+
-      '<ellipse cx="'+(41-bend*0.4)+'" cy="'+(tip+7)+'" rx="6" ry="3.4" fill="url(#'+u+'-leafG)" stroke="'+LEAFD+'" stroke-width="1.4" transform="rotate(-28 '+(41-bend*0.4)+' '+(tip+7)+')"/>'+
-      '<ellipse cx="'+(55+bend*0.4)+'" cy="'+(tip+7)+'" rx="6" ry="3.4" fill="url(#'+u+'-leafG)" stroke="'+LEAFD+'" stroke-width="1.4" transform="rotate(28 '+(55+bend*0.4)+' '+(tip+7)+')"/>'+
+      leaf(41-bend*0.4, tip+7, -28)+leaf(55+bend*0.4, tip+7, 28)+
       '</g>';
   };
-  /* stubby little arms with soft shading */
-  const armL='<ellipse cx="18" cy="60" rx="5" ry="9" fill="url(#'+u+'-bodyG)" stroke="'+LINE+'" stroke-width="2"/>';
-  const armR='<ellipse cx="78" cy="60" rx="5" ry="9" fill="url(#'+u+'-bodyG)" stroke="'+LINE+'" stroke-width="2"/>';
+  /* stubby arms with shaded underside */
+  const arm=(cx)=>{
+    return '<ellipse cx="'+cx+'" cy="60" rx="5" ry="9" fill="url(#'+u+'-bodyG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="'+cx+'" cy="64" rx="3.2" ry="5" fill="url(#'+u+'-aoG)" opacity="0.5"/>';
+  };
+  const armL=arm(18), armR=arm(78);
   const raise='<g transform="rotate(140 18 60)">'+armL+'</g><g transform="rotate(-140 78 60)">'+armR+'</g>';
   const cheer='<g transform="rotate(155 18 60)">'+armL+'</g><g transform="rotate(-155 78 60)">'+armR+'</g>';
   const spread='<g transform="rotate(80 18 60)">'+armL+'</g><g transform="rotate(-80 78 60)">'+armR+'</g>';
 
-  let arms=armL+armR, tilt=0, squash=0, react=0, face="", behind="", topper=sprout(false);
+  let arms=armL+armR, tilt=0, squash=0, react=0, face="", behind="", topper=sprig(false);
   switch(st){
     case "happy": /* closed happy arcs + open smile — the plushie look */
       face='<path d="M28,50 Q37,41 46,50" stroke="'+PUPIL+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
            '<path d="M50,50 Q59,41 68,50" stroke="'+PUPIL+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
-           '<path d="M38,63 Q48,76 58,63 Q48,68.5 38,63Z" fill="'+LINE+'"/>'+cheeks(0.7);
+           '<path d="M38,63 Q48,76 58,63 Q48,68.5 38,63Z" fill="'+LINE+'"/>'+cheeks(0.75);
       react=1;
       break;
     case "proud": /* confident half-lids, gaze up, smirk */
       face='<ellipse cx="37" cy="52" rx="9" ry="9" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
            '<ellipse cx="59" cy="52" rx="9" ry="9" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="37" cy="52" rx="9" ry="9" fill="url(#'+u+'-lidshG)"/>'+
+           '<ellipse cx="59" cy="52" rx="9" ry="9" fill="url(#'+u+'-lidshG)"/>'+
+           '<circle class="bb-pupil" cx="37" cy="49" r="7.2" fill="url(#'+u+'-irisG)"/><circle class="bb-pupil" cx="59" cy="49" r="7.2" fill="url(#'+u+'-irisG)"/>'+
            '<circle class="bb-pupil" cx="37" cy="49" r="5" fill="url(#'+u+'-pupG)"/><circle class="bb-pupil" cx="59" cy="49" r="5" fill="url(#'+u+'-pupG)"/>'+
            '<circle cx="38.8" cy="47.2" r="1.9" fill="#fff"/><circle cx="60.8" cy="47.2" r="1.9" fill="#fff"/>'+
            '<circle cx="35.5" cy="50.5" r="1" fill="#fff" opacity="0.7"/><circle cx="57.5" cy="50.5" r="1" fill="#fff" opacity="0.7"/>'+
            '<path d="M29,45 Q37,42.5 45,45" stroke="'+LINE+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+
            '<path d="M51,45 Q59,42.5 67,45" stroke="'+LINE+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+
-           '<path d="M42,67 Q51,69.5 56,65" stroke="'+LINE+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+cheeks(0.5)+
+           '<path d="M42,67 Q51,69.5 56,65" stroke="'+LINE+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+cheeks(0.55)+
            lids(37,59,52,9,9);
       tilt=-4;
       behind=star(74,26,6,"#f0ad3c");
@@ -3486,24 +3533,28 @@ function mascotSVG(state, size){
     case "sympathetic": /* droopy gentle eyes, soft tilt — feels WITH you */
       face='<ellipse cx="37" cy="52" rx="9" ry="9.5" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
            '<ellipse cx="59" cy="52" rx="9" ry="9.5" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="37" cy="52" rx="9" ry="9.5" fill="url(#'+u+'-lidshG)"/>'+
+           '<ellipse cx="59" cy="52" rx="9" ry="9.5" fill="url(#'+u+'-lidshG)"/>'+
+           '<circle class="bb-pupil" cx="37" cy="54.5" r="7.2" fill="url(#'+u+'-irisG)"/><circle class="bb-pupil" cx="59" cy="54.5" r="7.2" fill="url(#'+u+'-irisG)"/>'+
            '<circle class="bb-pupil" cx="37" cy="54.5" r="5" fill="url(#'+u+'-pupG)"/><circle class="bb-pupil" cx="59" cy="54.5" r="5" fill="url(#'+u+'-pupG)"/>'+
            '<circle cx="38.8" cy="52.7" r="1.9" fill="#fff"/><circle cx="60.8" cy="52.7" r="1.9" fill="#fff"/>'+
            '<path d="M30,47 Q37,45 44,47" stroke="'+LINE+'" stroke-width="2.2" fill="none" stroke-linecap="round"/>'+
            '<path d="M52,47 Q59,45 66,47" stroke="'+LINE+'" stroke-width="2.2" fill="none" stroke-linecap="round"/>'+
            '<path d="M43,68 Q48,70 53,68" stroke="'+LINE+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
-           '<ellipse cx="28" cy="61" rx="8" ry="5.4" fill="url(#'+u+'-cheekG)" opacity="0.7"/>'+
-           '<ellipse cx="68" cy="61" rx="8" ry="5.4" fill="url(#'+u+'-cheekG)" opacity="0.7"/>'+
+           '<ellipse cx="27" cy="62" rx="8.5" ry="5.8" fill="url(#'+u+'-cheekG)" opacity="0.75"/>'+
+           '<ellipse cx="69" cy="62" rx="8.5" ry="5.8" fill="url(#'+u+'-cheekG)" opacity="0.75"/>'+
            lids(37,59,52,9,9.5);
       tilt=4;
       break;
     case "encourage": /* warm open eyes + open smile — "you've got this" */
       face=bigEyes(37,59,50,10,12,5.5,0,2.5)+
-           '<path d="M39,63 Q48,74 57,63 Q48,68 39,63Z" fill="'+LINE+'"/>'+cheeks(0.6);
+           '<path d="M39,63 Q48,74 57,63 Q48,68 39,63Z" fill="'+LINE+'"/>'+cheeks(0.65);
       tilt=3;
       break;
     case "excited": /* sparkle eyes, big open mouth, arms up */
       face=star(37,50,8,PUPIL)+star(59,50,8,PUPIL)+
-           '<ellipse cx="48" cy="68" rx="7" ry="6" fill="'+LINE+'"/>'+cheeks(0.7);
+           '<ellipse cx="48" cy="68" rx="7" ry="6" fill="'+LINE+'"/>'+
+           '<ellipse cx="48" cy="66.5" rx="4" ry="3" fill="#5A3A22" opacity="0.6"/>'+cheeks(0.75);
       arms=raise; squash=1; react=1;
       behind='<path d="M8,44 q-3,7 0,14" stroke="#7fd4f7" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
              '<path d="M88,44 q3,7 0,14" stroke="#7fd4f7" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
@@ -3511,19 +3562,22 @@ function mascotSVG(state, size){
     case "thoughtful": /* gaze drifts up, flat thinking mouth */
       face='<ellipse cx="37" cy="50" rx="10" ry="12" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
            '<ellipse cx="59" cy="50" rx="10" ry="12" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="37" cy="50" rx="10" ry="12" fill="url(#'+u+'-lidshG)"/>'+
+           '<ellipse cx="59" cy="50" rx="10" ry="12" fill="url(#'+u+'-lidshG)"/>'+
+           '<circle class="bb-pupil" cx="34.5" cy="46.5" r="7.7" fill="url(#'+u+'-irisG)"/><circle class="bb-pupil" cx="56.5" cy="46.5" r="7.7" fill="url(#'+u+'-irisG)"/>'+
            '<circle class="bb-pupil" cx="34.5" cy="46.5" r="5.5" fill="url(#'+u+'-pupG)"/><circle class="bb-pupil" cx="56.5" cy="46.5" r="5.5" fill="url(#'+u+'-pupG)"/>'+
            '<circle cx="36.3" cy="44.7" r="2" fill="#fff"/><circle cx="58.3" cy="44.7" r="2" fill="#fff"/>'+
-           '<path d="M43,68 L53,67" stroke="'+LINE+'" stroke-width="2.5" stroke-linecap="round"/>'+cheeks(0.4)+
+           '<path d="M43,68 L53,67" stroke="'+LINE+'" stroke-width="2.5" stroke-linecap="round"/>'+cheeks(0.45)+
            lids(37,59,50,10,12);
       behind='<circle cx="70" cy="32" r="2.2" fill="#b9c6e4"/><circle cx="76" cy="25" r="3" fill="#b9c6e4"/>'+
              '<ellipse cx="84" cy="15" rx="8" ry="6" fill="#fff" stroke="#b9c6e4" stroke-width="1.5"/>';
       tilt=-3;
       break;
-    case "sleep": /* closed lashes, drooping sprout, floating z's */
+    case "sleep": /* closed lashes, drooping sprig, floating z's */
       face='<path d="M29,50 Q37,54 45,50" stroke="'+PUPIL+'" stroke-width="3" fill="none" stroke-linecap="round"/>'+
            '<path d="M51,50 Q59,54 67,50" stroke="'+PUPIL+'" stroke-width="3" fill="none" stroke-linecap="round"/>'+
-           '<path d="M45,67 Q48,68.5 51,67" stroke="'+LINE+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+cheeks(0.5);
-      topper=sprout(true);
+           '<path d="M45,67 Q48,68.5 51,67" stroke="'+LINE+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+cheeks(0.55);
+      topper=sprig(true);
       behind='<text x="70" y="36" font-size="14" font-weight="800" fill="#7fd4f7" font-family="sans-serif">z</text>'+
              '<text x="78" y="24" font-size="18" font-weight="800" fill="#7fd4f7" font-family="sans-serif">z</text>';
       break;
@@ -3532,25 +3586,32 @@ function mascotSVG(state, size){
            '<path d="M69,40 L51,44.5" stroke="'+PUPIL+'" stroke-width="3" stroke-linecap="round"/>'+
            '<ellipse cx="37" cy="53" rx="9.5" ry="10.5" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
            '<ellipse cx="59" cy="53" rx="9.5" ry="10.5" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="37" cy="53" rx="9.5" ry="10.5" fill="url(#'+u+'-lidshG)"/>'+
+           '<ellipse cx="59" cy="53" rx="9.5" ry="10.5" fill="url(#'+u+'-lidshG)"/>'+
+           '<circle class="bb-pupil" cx="37" cy="54" r="7.7" fill="url(#'+u+'-irisG)"/><circle class="bb-pupil" cx="59" cy="54" r="7.7" fill="url(#'+u+'-irisG)"/>'+
            '<circle class="bb-pupil" cx="37" cy="54" r="5.5" fill="url(#'+u+'-pupG)"/><circle class="bb-pupil" cx="59" cy="54" r="5.5" fill="url(#'+u+'-pupG)"/>'+
            '<circle cx="38.9" cy="52.1" r="2" fill="#fff"/><circle cx="60.9" cy="52.1" r="2" fill="#fff"/>'+
            '<circle cx="35.5" cy="55.5" r="1.1" fill="#fff" opacity="0.7"/><circle cx="57.5" cy="55.5" r="1.1" fill="#fff" opacity="0.7"/>'+
-           '<path d="M41,68 L55,68" stroke="'+LINE+'" stroke-width="2.8" stroke-linecap="round"/>'+cheeks(0.35)+
+           '<path d="M41,68 L55,68" stroke="'+LINE+'" stroke-width="2.8" stroke-linecap="round"/>'+cheeks(0.4)+
            lids(37,59,53,9.5,10.5);
       break;
     case "surprised": /* huge eyes, tiny pupils, little "o" mouth */
       face='<ellipse cx="37" cy="50" rx="11.5" ry="13.5" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
            '<ellipse cx="59" cy="50" rx="11.5" ry="13.5" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="37" cy="50" rx="11.5" ry="13.5" fill="url(#'+u+'-lidshG)"/>'+
+           '<ellipse cx="59" cy="50" rx="11.5" ry="13.5" fill="url(#'+u+'-lidshG)"/>'+
+           '<circle class="bb-pupil" cx="37" cy="51" r="6.2" fill="url(#'+u+'-irisG)"/><circle class="bb-pupil" cx="59" cy="51" r="6.2" fill="url(#'+u+'-irisG)"/>'+
            '<circle class="bb-pupil" cx="37" cy="51" r="4" fill="url(#'+u+'-pupG)"/><circle class="bb-pupil" cx="59" cy="51" r="4" fill="url(#'+u+'-pupG)"/>'+
            '<circle cx="38.4" cy="49.4" r="1.6" fill="#fff"/><circle cx="60.4" cy="49.4" r="1.6" fill="#fff"/>'+
-           '<ellipse cx="48" cy="69" rx="4.2" ry="5" fill="none" stroke="'+LINE+'" stroke-width="2.6"/>'+cheeks(0.5)+
+           '<ellipse cx="48" cy="69" rx="4.2" ry="5" fill="none" stroke="'+LINE+'" stroke-width="2.6"/>'+cheeks(0.55)+
            lids(37,59,50,11.5,13.5);
       arms=spread; react=1;
       break;
     case "celebrate": /* party hat, happy arcs, confetti */
       face='<path d="M28,50 Q37,41 46,50" stroke="'+PUPIL+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
            '<path d="M50,50 Q59,41 68,50" stroke="'+PUPIL+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
-           '<path d="M37,62 Q48,77 59,62 Q48,68 37,62Z" fill="'+LINE+'"/>'+cheeks(0.75);
+           '<path d="M37,62 Q48,77 59,62 Q48,68 37,62Z" fill="'+LINE+'"/>'+
+           '<ellipse cx="48" cy="64" rx="6" ry="4" fill="#5A3A22" opacity="0.5"/>'+cheeks(0.8);
       arms=raise; react=1;
       topper='<g transform="rotate(12 48 28)">'+
         '<polygon points="36,30 60,30 48,4" fill="#f472b6" stroke="'+LINE+'" stroke-width="1.6"/>'+
@@ -3563,48 +3624,61 @@ function mascotSVG(state, size){
     case "nervous": /* darting eyes, wavy mouth, sweat drop */
       face='<ellipse cx="37" cy="51" rx="8.5" ry="10" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
            '<ellipse cx="59" cy="51" rx="8.5" ry="10" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="37" cy="51" rx="8.5" ry="10" fill="url(#'+u+'-lidshG)"/>'+
+           '<ellipse cx="59" cy="51" rx="8.5" ry="10" fill="url(#'+u+'-lidshG)"/>'+
+           '<circle class="bb-pupil" cx="40" cy="52" r="6.7" fill="url(#'+u+'-irisG)"/><circle class="bb-pupil" cx="62" cy="52" r="6.7" fill="url(#'+u+'-irisG)"/>'+
            '<circle class="bb-pupil" cx="40" cy="52" r="4.5" fill="url(#'+u+'-pupG)"/><circle class="bb-pupil" cx="62" cy="52" r="4.5" fill="url(#'+u+'-pupG)"/>'+
            '<circle cx="41.6" cy="50.4" r="1.7" fill="#fff"/><circle cx="63.6" cy="50.4" r="1.7" fill="#fff"/>'+
-           '<path d="M40,68 q3,-3 6,0 t6,0" stroke="'+LINE+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+cheeks(0.45)+
+           '<path d="M40,68 q3,-3 6,0 t6,0" stroke="'+LINE+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+cheeks(0.5)+
            lids(37,59,51,8.5,10);
       behind='<path d="M73,32 q6.5,8.5 0,14 q-6.5,-5.5 0,-14" fill="#7fd4f7" stroke="'+LINE+'" stroke-width="1.2"/>';
       break;
     case "cheering": /* star eyes, huge grin, arms sky-high */
       face=star(37,50,8.5,PUPIL)+star(59,50,8.5,PUPIL)+
-           '<ellipse cx="48" cy="69" rx="8.5" ry="7.5" fill="'+LINE+'"/>'+cheeks(0.75);
+           '<ellipse cx="48" cy="69" rx="8.5" ry="7.5" fill="'+LINE+'"/>'+
+           '<ellipse cx="48" cy="67" rx="5" ry="4" fill="#5A3A22" opacity="0.55"/>'+cheeks(0.8);
       arms=cheer; react=1;
       behind='<path d="M6,40 q-4,9 0,18" stroke="#f0ad3c" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
              '<path d="M90,40 q4,9 0,18" stroke="#f0ad3c" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
              star(13,22,5,"#f472b6")+star(83,24,5,"#0d9d6c");
       break;
-    default: /* idle — big warm eyes, gentle smile, soft blush */
+    default: /* idle — dimensional warm eyes, gentle smile, soft blush */
       face=bigEyes(37,59,50,10,12,5.5,0,2.5)+
-           '<path d="M42,67 Q48,70.5 54,67" stroke="'+LINE+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+cheeks(0.55);
+           '<path d="M42,67 Q48,70.5 54,67" stroke="'+LINE+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+cheeks(0.6);
   }
-  /* chubby unified body — layered depth, not flat vector:
-     base gradient, bottom shade, film grain, top-left sheen, soft belly */
+  /* layered dimensional body — base, AO pools, grain, sheen, rim light:
+     1 ground shadow  2 behind-props  3 body base  4 bottom core shade
+     5 AO under arms + lower crevice  6 grain  7 key-light sheen
+     8 belly + inset shadow  9 rim light edge  10 arms  11 sprig  12 face  13 outline */
   const assembled=
-    '<ellipse cx="48" cy="87" rx="23" ry="4.5" fill="url(#'+u+'-shadG)"/>'+
+    '<ellipse cx="48" cy="88" rx="26" ry="5" fill="url(#'+u+'-shadG)"/>'+
     behind+
     '<ellipse cx="48" cy="56" rx="30" ry="28" fill="url(#'+u+'-bodyG)"/>'+
-    '<ellipse cx="48" cy="56" rx="30" ry="28" fill="url(#'+u+'-shadeG)"/>'+
-    '<ellipse cx="48" cy="56" rx="29" ry="27" fill="#8B5A3B" filter="url(#'+u+'-grain)" opacity="0.13"/>'+
-    '<ellipse cx="36" cy="40" rx="12" ry="7.5" fill="url(#'+u+'-hiG)" transform="rotate(-20 36 40)"/>'+
+    '<ellipse cx="52" cy="72" rx="20" ry="12" fill="url(#'+u+'-aoG)" opacity="0.55"/>'+
+    '<ellipse cx="18" cy="62" rx="7" ry="10" fill="url(#'+u+'-aoG)" opacity="0.4"/>'+
+    '<ellipse cx="78" cy="62" rx="7" ry="10" fill="url(#'+u+'-aoG)" opacity="0.4"/>'+
+    '<ellipse cx="48" cy="56" rx="29" ry="27" fill="#7A4A26" filter="url(#'+u+'-grain)" opacity="0.16"/>'+
+    '<ellipse cx="35" cy="38" rx="14" ry="8.5" fill="url(#'+u+'-hiG)" transform="rotate(-20 35 38)"/>'+
     '<ellipse cx="48" cy="69" rx="18.5" ry="11.5" fill="url(#'+u+'-bellyG)"/>'+
+    '<path d="M30,63 Q48,57 66,63" stroke="#B07B3E" stroke-width="2" fill="none" opacity="0.35" stroke-linecap="round"/>'+
+    '<path d="M68,36 A26,24 0 0 1 72,68" stroke="url(#'+u+'-rimG)" stroke-width="3.5" fill="none" stroke-linecap="round"/>'+
     arms+topper+face+
     '<ellipse cx="48" cy="56" rx="30" ry="28" fill="none" stroke="'+LINE+'" stroke-width="2.5"/>';
   let inner=assembled;
   if(squash) inner='<g transform="translate(48 84) scale(1.08 0.94) translate(-48 -84)">'+assembled+'</g>';
   const tiltG=tilt?'<g transform="rotate('+tilt+' 48 58)">'+inner+'</g>':inner;
   /* life system: gentle sway + breathing always; squash-and-stretch pop on
-     reactive states. negative delays desync multiple Sprouts per screen. */
+     reactive states. negative delays desync multiple Pips per screen. */
   const rootCls=react?"bb-mroot bb-react":"bb-mroot";
   const body='<g class="'+rootCls+'" style="animation-delay:-'+rootPh+'s,-'+rootPh+'s">'+
              '<g class="bb-mbreathe" style="animation-delay:-'+breathPh+'s">'+tiltG+'</g></g>';
-  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 96 96" role="img" aria-label="Sprout, your ByteBar study buddy">'+
-    '<title>Sprout — your study buddy</title>'+defs+body+'</svg>';
+  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 96 96" role="img" aria-label="Pip, your ByteBar study buddy">'+
+    '<title>Pip — your study buddy</title>'+defs+body+'</svg>';
 }
 
+/* lightweight canvas confetti — no libraries.
+   burstConfetti(n)        → big celebration from screen center
+   burstConfetti(n, x, y)  → small burst from a screen point (streak pops) */
 /* lightweight canvas confetti — no libraries.
    burstConfetti(n)        → big celebration from screen center
    burstConfetti(n, x, y)  → small burst from a screen point (streak pops) */
