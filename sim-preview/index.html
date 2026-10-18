@@ -1699,6 +1699,7 @@ html,body{overscroll-behavior-x:none;}
     <div class="panel">
       <table class="compare">
         <tr><th></th><th>ByteBar Pro</th><th>Free quizzes</th></tr>
+        <tr class="hl"><td>Full access — all 12 exams, one price</td><td class="y">✓</td><td class="n">5-question taste each</td></tr>
         <tr class="hl"><td>Full 100-question timed simulations</td><td class="y">✓</td><td class="n">–</td></tr>
         <tr><td>Hands-on terminal simulations (CKA/CKAD)</td><td class="y">✓</td><td class="n">–</td></tr>
         <tr><td>Explanation on every answer</td><td class="y">✓</td><td class="n">–</td></tr>
@@ -1715,7 +1716,8 @@ html,body{overscroll-behavior-x:none;}
       <div class="faqitem"><button class="fq">What score should I aim for before booking the real exam?</button><div class="fa">Consistently above 85% on timed simulations with no domain below 70%. The readiness meter on your results page tracks this for you and tells you when you're there.</div></div>
       <div class="faqitem"><button class="fq">What if I fail the real exam after using ByteBar?</button><div class="fa">Bring us your score report. We'll point you at the exact domains to rebuild and extend your access — we'd rather you pass late than pay twice.</div></div>
       <div class="faqitem"><button class="fq">Can I use it on my phone?</button><div class="fa">Yes. The simulator is fully responsive — practice on your phone, run full timed simulations on desktop. Your progress syncs to your account on each device.</div></div>
-      <div class="faqitem"><button class="fq">Is this a subscription?</button><div class="fa">No. Pro is a one-time payment of $19.99. No renewals, no expiring access — yours until you pass.</div></div>
+      <div class="faqitem"><button class="fq">Is this a subscription?</button><div class="fa">No. Pro is a one-time payment of $19.99 for all 12 exams. No renewals, no expiring access — yours until you pass.</div></div>
+      <div class="faqitem"><button class="fq">Is $19.99 per exam or for all exams?</button><div class="fa">All exams. One $19.99 payment unlocks all 12 exams — full 1,000-question banks, timed simulations, terminal tasks, everything. Others charge $99 per exam. We charge $19.99 for all of them.</div></div>
       <div class="faqitem"><button class="fq">How is this different from free practice questions?</button><div class="fa">Depth and realism. The free taste gives you 5 questions per exam. ByteBar Pro gives you full timed simulations, an explanation for every answer, domain-level analytics, and a readiness prediction trained on your own attempts.</div></div>
     </div></div>
 
@@ -2128,8 +2130,8 @@ html,body{overscroll-behavior-x:none;}
         <div class="tchip">🛡 30-day pass guarantee</div>
         <div class="tchip">🔒 Secure checkout</div>
       </div>
-      <div class="priceline"><span class="was">$99</span><span class="p">$19.99</span><span class="per">one-time</span></div>
-      <button class="btn block" id="pw-buy">Get Pro — $19.99</button>
+      <div class="priceline"><span class="was">$99</span><span class="p">$19.99</span><span class="per">one-time · all 12 exams</span></div>
+      <button class="btn block" id="pw-buy">Get Pro — $19.99 · All 12 exams</button>
       <div class="fineprint">Secure checkout · Instant access · Yours forever<br>No subscription, no renewals. 30-day pass guarantee.</div>
       <div class="keyrow">
         <input id="pw-key" type="text" placeholder="BB19-XXXXXX-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" style="font-family:ui-monospace,Menlo,monospace; letter-spacing:.04em;">
@@ -4586,8 +4588,8 @@ function finishExam(expired){
         '<li><span class="pp-check">✓</span> Domain breakdowns + missed-question review</li>' +
         '<li><span class="pp-check">✓</span> Exam readiness prediction + custom quiz builder</li>' +
         '</ul>' +
-        '<button class="btn pp-cta" id="ub-go">Unlock Pro — ' + CONFIG.PRICE + ' one-time</button>' +
-        '<div class="pp-fine">One payment · Yours forever · 30-day pass guarantee</div>';
+        '<button class="btn pp-cta" id="ub-go">Unlock Pro — ' + CONFIG.PRICE + ' one-time · all 12 exams</button>' +
+        '<div class="pp-fine">One payment for all 12 exams · Yours forever · 30-day pass guarantee</div>';
       upSlot.appendChild(up);
       const go=$("ub-go");
       if(go) go.addEventListener("click",openPaywall);
