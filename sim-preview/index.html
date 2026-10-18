@@ -8,14 +8,15 @@
 <style>
 :root{
   --navy:#0b1e42; --navy2:#132c5e; --navy3:#1b3a7a;
-  --bg:#eef2f8; --card:#ffffff; --ink:#152238; --mut:#5d6f8f; --line:#dfe6f2;
+  /* Warm, welcoming neutrals — cream, not stark white. */
+  --bg:#f6f1e6; --card:#fffdf8; --ink:#2c2620; --mut:#6f695c; --line:#e6dcc4;
   --cyan:#0b8fc4; --cyan-soft:#e6f5fc;
   --green:#0d9d6c; --green-soft:#e2f6ee;
   --amber:#c77408; --amber-soft:#fdf1de;
   --red:#d63a3a; --red-soft:#fdecec;
   --gold:#b45309;
-  --shadow:0 10px 30px rgba(11,30,66,.10);
-  --shadow-lg:0 18px 50px rgba(11,30,66,.16);
+  --shadow:0 10px 30px rgba(122,90,48,.10);
+  --shadow-lg:0 18px 50px rgba(122,90,48,.15);
   --r:16px;
 }
 *{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
@@ -73,7 +74,7 @@ body{
 .examcard .qcount{background:var(--cyan-soft); color:var(--cyan); border-radius:8px; padding:4px 9px; font-weight:800;}
 .locktag{
   position:absolute; top:14px; right:14px; font-size:10.5px; font-weight:800; letter-spacing:.07em;
-  background:linear-gradient(180deg,#ffd97a,#f0ad3c); color:#3a2503; padding:4px 9px; border-radius:7px;
+  background:#f6d98c; color:#5f4208; padding:4px 9px; border-radius:7px;
 }
 .freetag{
   position:absolute; top:14px; right:14px; font-size:10.5px; font-weight:800; letter-spacing:.07em;
@@ -82,63 +83,38 @@ body{
 }
 /* ---------- locked exam cards (free tier teaser) ---------- */
 .examcard.locked{
-  background:linear-gradient(160deg,#f8fafc 0%,#f1f5f9 100%);
-  border-top-color:#cbd5e1;
+  background:linear-gradient(160deg,#faf6ec 0%,#f2ebda 100%);
+  border-top-color:#e0d3b8;
 }
 .examcard.locked .eicon{filter:grayscale(.7) opacity(.75);}
-.examcard.locked .ecode{color:#94a3b8;}
-.examcard.locked .ename{color:#64748b;}
-.examcard.locked:hover{transform:translateY(-3px); box-shadow:0 14px 34px rgba(240,173,60,.28); border-color:#f0ad3c;}
+.examcard.locked .ecode{color:#a89c80;}
+.examcard.locked .ename{color:#8a7d63;}
+.examcard.locked:hover{transform:translateY(-3px); box-shadow:var(--shadow-lg); border-color:#d9c9a8;}
 .examcard.locked:hover .eicon{filter:none;}
+/* Subtle Pro marker — informative, not shouty. */
 .locktag.big{
-  font-size:13px; padding:7px 13px; border-radius:10px;
-  background:linear-gradient(180deg,#ffd97a,#f59e0b);
-  box-shadow:0 4px 14px rgba(245,158,11,.4);
-  animation:bbLockGlow 2.4s ease-in-out infinite;
-}
-@keyframes bbLockGlow{
-  0%,100%{box-shadow:0 4px 14px rgba(245,158,11,.4);}
-  50%{box-shadow:0 4px 22px rgba(245,158,11,.65);}
+  font-size:10.5px; padding:4px 9px; border-radius:7px;
+  background:#f4eee0; color:#8a7c60; border:1px solid #e6dcc4;
+  box-shadow:none; animation:none;
 }
 .lockmsg{
   position:absolute; top:46px; right:14px; font-size:10px; font-weight:700;
   color:#b45309; letter-spacing:.03em;
 }
-/* ---------- free-teaser upgrade banner (results screen) ---------- */
-.upgrade-banner{
-  background:linear-gradient(135deg,#7c3aed 0%,#a855f7 35%,#ec4899 70%,#f59e0b 100%);
-  border-radius:22px; padding:26px 24px; margin-bottom:22px; color:#fff;
-  display:flex; gap:18px; align-items:center; position:relative; overflow:hidden;
-  box-shadow:0 16px 44px rgba(168,85,247,.38);
-  animation:bbUpgradeIn .5s cubic-bezier(.2,.9,.3,1.15);
+/* ---------- post-quiz upgrade card (calm, results-first) ---------- */
+.upgradecard{
+  background:var(--card); border:1px solid var(--line);
+  border-radius:18px; padding:22px; margin:26px 0 6px; color:var(--ink);
+  display:flex; gap:16px; align-items:center;
+  box-shadow:var(--shadow);
 }
-@keyframes bbUpgradeIn{
-  from{opacity:0; transform:translateY(18px) scale(.97);}
-  to{opacity:1; transform:none;}
-}
-.upgrade-banner::before{
-  content:""; position:absolute; inset:0;
-  background:radial-gradient(circle at 85% 15%, rgba(255,255,255,.22), transparent 45%),
-             radial-gradient(circle at 10% 90%, rgba(255,255,255,.14), transparent 40%);
-  pointer-events:none;
-}
-.upgrade-banner .ub-mascot{flex:none; position:relative; z-index:1;}
-.upgrade-banner .ub-mascot .mascot-slot{animation:bbWiggle 3.2s ease-in-out infinite;}
-.upgrade-banner .ub-body{position:relative; z-index:1; flex:1; min-width:0;}
-.upgrade-banner .ub-kick{font-size:11px; font-weight:800; letter-spacing:.2em; text-transform:uppercase; opacity:.85; margin-bottom:6px;}
-.upgrade-banner .ub-head{font-size:21px; font-weight:800; line-height:1.3; letter-spacing:-.01em; margin-bottom:8px;}
-.upgrade-banner .ub-sub{font-size:13.5px; opacity:.92; line-height:1.5; margin-bottom:14px;}
-.upgrade-banner .ub-cta{
-  background:linear-gradient(180deg,#fff,#fef3c7); color:#7c2d12; border:0;
-  font-size:16px; padding:14px 26px; box-shadow:0 6px 20px rgba(0,0,0,.25);
-  animation:bbCtaBounce 2s ease-in-out infinite;
-}
-.upgrade-banner .ub-cta:hover{transform:translateY(-2px) scale(1.03);}
-@keyframes bbCtaBounce{
-  0%,100%{transform:translateY(0);}
-  50%{transform:translateY(-3px);}
-}
-.upgrade-banner .ub-fine{font-size:11.5px; opacity:.8; margin-top:10px;}
+.upgradecard .uc-mascot{flex:none;}
+.upgradecard .uc-body{flex:1; min-width:0;}
+.upgradecard .uc-head{font-size:17px; font-weight:800; letter-spacing:-.01em; margin-bottom:6px; color:var(--navy);}
+.upgradecard .uc-sub{font-size:13.5px; color:var(--mut); line-height:1.55; margin-bottom:14px;}
+.upgradecard .ub-cta{font-size:15px; padding:13px 24px;}
+/* legacy: retired gradient banner (kept selector harmless) */
+.upgrade-banner{display:none !important;}
 /* ---------- mascot idle wiggle ---------- */
 @keyframes bbWiggle{
   0%,100%{transform:rotate(-2deg);}
@@ -146,25 +122,18 @@ body{
 }
 .mascot-slot.wiggly{animation:bbWiggle 3.2s ease-in-out infinite; display:inline-block;}
 /* ---------- guest nudge with mascot ---------- */
-.acct-nudge{border:2px solid #a78bfa; background:linear-gradient(135deg,#f5f3ff,#fdf4ff);}
+.acct-nudge{border:2px solid #e3cf9f; background:linear-gradient(135deg,#fff9ec,#fffdf8);}
 .acct-nudge .nudge-mascot{flex:none;}
-/* ---------- paywall excitement ---------- */
+/* ---------- paywall: calm, confident pricing (Linear/Stripe tone) ---------- */
 #paywall .sheet .shead{
-  background:linear-gradient(135deg,#4c1d95 0%,#7c3aed 40%,#db2777 75%,#f59e0b 100%);
+  background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
   position:relative; overflow:hidden;
 }
 #paywall .sheet .shead::before{
   content:""; position:absolute; inset:0;
-  background:radial-gradient(circle at 80% 10%, rgba(255,255,255,.25), transparent 45%);
+  background:radial-gradient(circle at 80% 10%, rgba(255,255,255,.08), transparent 45%);
   pointer-events:none;
 }
-#paywall .btn.gold{
-  background:linear-gradient(180deg,#fde68a,#f59e0b); color:#451a03;
-  font-size:18px; padding:17px 30px;
-  box-shadow:0 8px 26px rgba(245,158,11,.45);
-  animation:bbCtaBounce 2s ease-in-out infinite;
-}
-#paywall .btn.gold:hover{transform:translateY(-2px) scale(1.02); box-shadow:0 12px 32px rgba(245,158,11,.55);}
 /* ---------- playful section rhythm ---------- */
 .secttl.fun{color:transparent; background:linear-gradient(90deg,#7c3aed,#db2777,#f59e0b); -webkit-background-clip:text; background-clip:text;}
 /* ---------- reduced motion: kill the fun, keep the function ---------- */
@@ -184,7 +153,11 @@ body{
   transition:border-color .14s, transform .14s; position:relative;
 }
 .modecard:hover{border-color:var(--cyan); transform:translateY(-2px);}
-.modecard.pro{border-color:#f0c060; background:linear-gradient(180deg,#fffdf6,#fff);}
+.modecard.pro{border-color:#f0c060; background:linear-gradient(180deg,#fff9ee,#fffdf8);}
+/* Warm, friendly icon chip — color confidence, not sales. */
+.mchip{display:inline-flex; width:48px; height:48px; border-radius:16px; background:var(--mc,#e6f5fc);
+  align-items:center; justify-content:center; font-size:24px; margin-bottom:13px;
+  box-shadow:inset 0 -3px 0 rgba(0,0,0,.06);}
 .modecard h3{margin:0 0 8px; font-size:21px; letter-spacing:-.01em;}
 .modecard p{margin:0 0 14px; color:var(--mut); font-size:14.5px; line-height:1.6;}
 .modecard ul{margin:0; padding:0; list-style:none; display:grid; gap:8px;}
@@ -197,7 +170,7 @@ body{
 .backlink:hover{color:var(--cyan);}
 
 /* ---------- briefing ---------- */
-.brief{max-width:720px; margin:0 auto; background:var(--card); border:1px solid var(--line); border-radius:20px; padding:34px 32px; box-shadow:var(--shadow-lg);}
+.brief{max-width:720px; margin:0 auto; background:linear-gradient(180deg,#fff9ee 0%,var(--card) 140px); border:1px solid var(--line); border-radius:20px; padding:34px 32px; box-shadow:var(--shadow-lg);}
 .brief h2{margin:0 0 6px; font-size:26px; letter-spacing:-.01em; color:var(--navy);}
 .brief .rule{border-top:1px solid var(--line); padding:13px 0; display:flex; gap:12px; font-size:15px; line-height:1.5;}
 .brief .rule .ic{flex:none; width:30px; height:30px; border-radius:9px; background:var(--cyan-soft); color:var(--cyan); display:flex; align-items:center; justify-content:center; font-weight:800;}
@@ -237,7 +210,7 @@ body{
 .endbtn{background:rgba(214,58,58,.16); border:1px solid rgba(214,58,58,.55); color:#ffd9d9; font-weight:700; font-size:13.5px; border-radius:10px; padding:9px 16px; cursor:pointer; font-family:inherit;}
 .endbtn:hover{background:rgba(214,58,58,.3);}
 .exambody{max-width:1280px; margin:0 auto; padding:26px 22px 60px; display:grid; grid-template-columns:1fr 264px; gap:22px; align-items:start;}
-.qcard{background:var(--card); border:1px solid var(--line); border-radius:18px; padding:30px 30px 26px; box-shadow:var(--shadow);}
+.qcard{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:30px 30px 26px; box-shadow:var(--shadow);}
 .qhead{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
 .qnum{font-size:12.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--mut);}
 .flagbtn{margin-left:auto; background:var(--bg); border:1px solid var(--line); border-radius:9px; font-size:13px; font-weight:700; color:var(--mut); padding:7px 13px; cursor:pointer; font-family:inherit;}
@@ -245,13 +218,13 @@ body{
 .qtext{font-size:19px; line-height:1.55; font-weight:600; margin:0 0 20px; letter-spacing:-.005em;}
 .opt{
   display:flex; gap:13px; align-items:flex-start; width:100%; text-align:left; margin:0 0 11px; padding:15px 16px;
-  font-size:15.5px; line-height:1.45; color:var(--ink); background:#f8fafd; border:1.5px solid var(--line);
+  font-size:15.5px; line-height:1.45; color:var(--ink); background:#fbf8f1; border:1.5px solid var(--line);
   border-radius:13px; cursor:pointer; font-family:inherit; transition:border-color .12s, background .12s;
 }
-.opt:hover{border-color:#9fc3e8; background:#f2f7fe;}
-.opt.sel{border-color:var(--navy); background:#eaf0fb; box-shadow:0 0 0 3px rgba(11,30,66,.08);}
+.opt:hover{border-color:#d9c69a; background:#f6f0e1;}
+.opt.sel{border-color:var(--navy); background:#f3ecda; box-shadow:0 0 0 3px rgba(11,30,66,.08);}
 .opt .key{
-  flex:none; width:30px; height:30px; border-radius:9px; background:#e2e9f5; color:var(--navy);
+  flex:none; width:30px; height:30px; border-radius:9px; background:#ece2cb; color:var(--navy);
   font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center;
 }
 .opt.sel .key{background:var(--navy); color:#fff;}
@@ -266,7 +239,7 @@ body{
 .palette .psub{font-size:12px; color:var(--mut); margin-bottom:12px;}
 .palgrid{display:grid; grid-template-columns:repeat(5,1fr); gap:7px;}
 .pal{
-  aspect-ratio:1; border-radius:9px; border:1.5px solid var(--line); background:#f8fafd; color:var(--mut);
+  aspect-ratio:1; border-radius:9px; border:1.5px solid var(--line); background:#fbf8f1; color:var(--mut);
   font-size:12.5px; font-weight:700; cursor:pointer; font-family:inherit; position:relative; font-variant-numeric:tabular-nums;
 }
 .pal.cur{border-color:var(--navy); box-shadow:0 0 0 2px rgba(11,30,66,.25); color:var(--navy);}
@@ -274,13 +247,13 @@ body{
 .pal.fl::after{content:""; position:absolute; top:4px; right:4px; width:8px; height:8px; border-radius:50%; background:var(--gold);}
 .palkey{display:flex; gap:12px; margin-top:14px; font-size:11.5px; color:var(--mut); flex-wrap:wrap;}
 .palkey span{display:flex; align-items:center; gap:5px;}
-.dot{width:10px; height:10px; border-radius:3px; background:#f8fafd; border:1.5px solid var(--line); display:inline-block;}
+.dot{width:10px; height:10px; border-radius:3px; background:#fbf8f1; border:1.5px solid var(--line); display:inline-block;}
 .dot.a{background:var(--navy); border-color:var(--navy);}
 .dot.f{background:var(--gold); border:0; border-radius:50%;}
 
 /* ---------- results ---------- */
 .reswrap{max-width:920px; margin:0 auto;}
-.rescard{background:var(--card); border:1px solid var(--line); border-radius:22px; padding:38px 36px; box-shadow:var(--shadow-lg); text-align:center;}
+.rescard{background:linear-gradient(180deg,#fff9ee 0%,var(--card) 140px); border:1px solid var(--line); border-radius:22px; padding:38px 36px; box-shadow:var(--shadow-lg); text-align:center;}
 .scorewrap{display:flex; gap:30px; align-items:center; justify-content:center; flex-wrap:wrap; margin:8px 0 6px;}
 .ring{position:relative; width:170px; height:170px; flex:none;}
 .ring svg{transform:rotate(-90deg);}
@@ -316,7 +289,7 @@ body{
 
 /* ---------- paywall modal ---------- */
 .overlay{position:fixed; inset:0; background:rgba(8,18,40,.62); backdrop-filter:blur(4px); z-index:100; display:flex; align-items:center; justify-content:center; padding:20px;}
-.sheet{background:#fff; border-radius:24px; max-width:520px; width:100%; padding:0; overflow:hidden; box-shadow:0 30px 80px rgba(0,0,0,.4); animation:pop .25s cubic-bezier(.2,.9,.3,1.2);}
+.sheet{background:var(--card); border-radius:24px; max-width:520px; width:100%; padding:0; overflow:hidden; box-shadow:0 30px 80px rgba(60,40,10,.35); animation:pop .25s cubic-bezier(.2,.9,.3,1.2);}
 @keyframes pop{from{transform:scale(.94) translateY(10px); opacity:0;}}
 .sheet .shead{background:linear-gradient(135deg,var(--navy),var(--navy3)); color:#fff; padding:28px 30px 24px; text-align:center;}
 .sheet .shead .kick{font-size:11.5px; font-weight:800; letter-spacing:.22em; color:#7fd4f7; text-transform:uppercase;}
@@ -477,8 +450,8 @@ body{
 .badge.unlocked:hover{transform:translateY(-2px);}
 .unlockov{position:fixed; inset:0; z-index:200; background:rgba(8,18,40,.7); backdrop-filter:blur(5px);
   display:flex; align-items:center; justify-content:center; padding:20px;}
-.unlockcard{background:#fff; border-radius:24px; padding:40px 44px; text-align:center; max-width:400px;
-  box-shadow:0 30px 80px rgba(0,0,0,.45); animation:badgepop .5s cubic-bezier(.2,1.4,.4,1);}
+.unlockcard{background:var(--card); border-radius:24px; padding:40px 44px; text-align:center; max-width:400px;
+  box-shadow:0 30px 80px rgba(60,40,10,.4); animation:badgepop .5s cubic-bezier(.2,1.4,.4,1);}
 @keyframes badgepop{from{transform:scale(.6); opacity:0;}}
 .unlockcard .ubi{font-size:72px; display:block; margin-bottom:12px; animation:badgeshine 1.2s ease infinite;}
 @keyframes badgeshine{0%,100%{transform:scale(1);}50%{transform:scale(1.12);}}
@@ -506,14 +479,14 @@ body{
 .buildercard{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:30px; box-shadow:var(--shadow-lg); max-width:760px; margin:0 auto;}
 .exampills{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:6px;}
 .exampill{
-  border:1.5px solid var(--line); background:#f8fafd; border-radius:999px; padding:9px 16px;
+  border:1.5px solid var(--line); background:#fbf8f1; border-radius:999px; padding:9px 16px;
   font-size:13.5px; font-weight:700; cursor:pointer; font-family:inherit; color:var(--mut);
 }
 .exampill.on{border-color:var(--navy); background:var(--navy); color:#fff;}
 .domainpick{display:grid; gap:8px; margin:6px 0 4px;}
 .domopt{
   display:flex; align-items:center; gap:12px; border:1.5px solid var(--line); border-radius:12px;
-  padding:12px 15px; cursor:pointer; font-size:14.5px; font-weight:600; background:#f8fafd;
+  padding:12px 15px; cursor:pointer; font-size:14.5px; font-weight:600; background:#fbf8f1;
 }
 .domopt.on{border-color:var(--cyan); background:var(--cyan-soft);}
 .domopt .dcheck{width:22px; height:22px; border-radius:7px; border:2px solid #b9c6e4; flex:none; display:flex; align-items:center; justify-content:center; color:#fff; font-size:14px; font-weight:800;}
@@ -523,7 +496,7 @@ body{
 .sliderow input[type=range]{flex:1; accent-color:var(--cyan); height:32px;}
 .sliderow .sval{font-size:20px; font-weight:800; color:var(--navy); min-width:64px; text-align:right; font-variant-numeric:tabular-nums;}
 .togglerow{display:flex; align-items:center; gap:12px; padding:14px 0; border-top:1px solid var(--line); margin-top:8px;}
-.toggle{margin-left:auto; width:52px; height:30px; border-radius:99px; background:#dfe6f2; border:0; cursor:pointer; position:relative; transition:background .15s;}
+.toggle{margin-left:auto; width:52px; height:30px; border-radius:99px; background:#e6dcc4; border:0; cursor:pointer; position:relative; transition:background .15s;}
 .toggle::after{content:""; position:absolute; top:3px; left:3px; width:24px; height:24px; border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.2); transition:left .15s;}
 .toggle.on{background:var(--green);}
 .toggle.on::after{left:25px;}
@@ -563,7 +536,7 @@ select.builder{border:1.5px solid var(--line); border-radius:11px; padding:11px 
 .opt.wrong{border-color:var(--red); background:var(--red-soft); box-shadow:0 0 0 3px rgba(214,58,58,.12);}
 .opt.wrong .key{background:var(--red); color:#fff;}
 .opt:disabled{cursor:default;}
-.opt:disabled:hover{border-color:var(--line); background:#f8fafd;}
+.opt:disabled:hover{border-color:var(--line); background:#fbf8f1;}
 .opt.correct:disabled:hover{border-color:var(--green); background:var(--green-soft);}
 .opt.wrong:disabled:hover{border-color:var(--red); background:var(--red-soft);}
 
@@ -886,6 +859,41 @@ button:active{transform:scale(.97);}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
 }
+
+/* ---------- simulated terminal (CKA/CKAD hands-on tasks) ---------- */
+#termwrap{margin-top:6px;}
+#termctx .tctx{font-size:13px; color:var(--mut); background:var(--bg); border:1px solid var(--line);
+  border-radius:10px; padding:9px 13px; margin-bottom:12px; font-weight:600;}
+.term{background:#0d1526; border-radius:14px; padding:6px 0; box-shadow:inset 0 2px 12px rgba(0,0,0,.45);
+  border:1px solid #1e2b45; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+#termout{max-height:280px; overflow-y:auto; padding:12px 16px 4px; font-size:13.5px; line-height:1.65;}
+#termout .tline{white-space:pre-wrap; word-break:break-word; color:#c9d6f2; margin-bottom:5px;}
+#termout .tline.tcmd{color:#7fd4f7; font-weight:700;}
+#termout .tline.tin{color:#fff;}
+#termout .tline.tok{color:#4ade80; font-weight:700;}
+#termout .tline.terr{color:#f87171;}
+.termline{display:flex; align-items:center; gap:8px; padding:10px 16px 14px;}
+.tprompt{color:#4ade80; font-size:13.5px; white-space:nowrap; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;}
+#terminput{flex:1; min-width:0; background:transparent; border:0; outline:0; color:#fff;
+  font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13.5px; padding:6px 2px;}
+#terminput::placeholder{color:#475569;}
+#terminput:disabled{opacity:.45;}
+#termhint .thint{margin-top:10px; font-size:13.5px; background:var(--amber-soft); border:1px solid #f3d9a8;
+  color:#7a4a06; border-radius:10px; padding:10px 14px; line-height:1.5;}
+.termrow{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
+.termnote{font-size:12.5px; color:var(--mut); margin-top:10px;}
+/* ---------- multi-select (PBQ) ---------- */
+.opt.ms .mcheck{margin-left:auto; width:22px; height:22px; border-radius:7px; border:2px solid #d9cba6;
+  display:inline-flex; align-items:center; justify-content:center; font-size:13px; color:transparent; flex:none;}
+.opt.ms.sel .mcheck{background:var(--cyan); border-color:var(--cyan); color:#fff;}
+.opt.ms.correct .mcheck{background:var(--green); border-color:var(--green); color:#fff;}
+/* ---------- builder terminal note ---------- */
+.terminote{font-size:14px; color:var(--ink); background:var(--cyan-soft); border:1px solid #bde3f5;
+  border-radius:12px; padding:13px 16px; line-height:1.55;}
+@media (prefers-reduced-motion: reduce){
+  .upgradecard{animation:none !important;}
+}
+
 </style>
 </head>
 <body>
@@ -952,68 +960,68 @@ button:active{transform:scale(.97);}
       <span class="meta"><span class="qcount">1000 Qs</span> 5-question teaser · free</span>
     </button>
     <button class="examcard locked" style="--acc:#fbbf24;--i:4" onclick="examCardClick('linuxplus_xk0_006')">
-      <span class="locktag big">🔒 PRO</span>
-      <span class="lockmsg">1,000 questions · locked</span>
+      <span class="locktag">🔒 Pro</span>
+      <span class="lockmsg">1,000-question bank · Pro</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></span><span class="ecode">XK0-006</span></span>
       <span class="ename">CompTIA Linux+</span>
       <span class="etag">Linux systems &amp; administration</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> Unlock the full bank</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> Full bank · Pro</span>
     </button>
     <button class="examcard locked" style="--acc:#818cf8;--i:5" onclick="examCardClick('cka')">
-      <span class="locktag big">🔒 PRO</span>
-      <span class="lockmsg">1,000 questions · locked</span>
+      <span class="locktag">🔒 Pro</span>
+      <span class="lockmsg">1,000-question bank · Pro</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></span><span class="ecode">CKA</span></span>
       <span class="ename">Certified Kubernetes Admin</span>
       <span class="etag">K8s clusters &amp; workloads</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> Unlock the full bank</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> Full bank · Pro</span>
     </button>
     <button class="examcard locked" style="--acc:#facc15;--i:6" onclick="examCardClick('ckad')">
-      <span class="locktag big">🔒 PRO</span>
-      <span class="lockmsg">1,000 questions · locked</span>
+      <span class="locktag">🔒 Pro</span>
+      <span class="lockmsg">1,000-question bank · Pro</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span><span class="ecode">CKAD</span></span>
       <span class="ename">K8s App Developer</span>
       <span class="etag">Cloud-native app design on K8s</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> Unlock the full bank</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> Full bank · Pro</span>
     </button>
     <button class="examcard locked" style="--acc:#2dd4bf;--i:7" onclick="examCardClick('dca')">
-      <span class="locktag big">🔒 PRO</span>
-      <span class="lockmsg">1,000 questions · locked</span>
+      <span class="locktag">🔒 Pro</span>
+      <span class="lockmsg">1,000-question bank · Pro</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span class="ecode">DCA</span></span>
       <span class="ename">Docker Certified Associate</span>
       <span class="etag">Containers, images &amp; orchestration</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> Unlock the full bank</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> Full bank · Pro</span>
     </button>
     <button class="examcard locked" style="--acc:#c084fc;--i:8" onclick="examCardClick('terraform_004')">
-      <span class="locktag big">🔒 PRO</span>
-      <span class="lockmsg">1,000 questions · locked</span>
+      <span class="locktag">🔒 Pro</span>
+      <span class="lockmsg">1,000-question bank · Pro</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span><span class="ecode">Terraform</span></span>
       <span class="ename">Terraform Associate</span>
       <span class="etag">IaC workflows &amp; HCL</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> Unlock the full bank</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> Full bank · Pro</span>
     </button>
     <button class="examcard locked" style="--acc:#a78bfa;--i:9" onclick="examCardClick('cloudplus_cv0_004')">
-      <span class="locktag big">🔒 PRO</span>
-      <span class="lockmsg">1,000 questions · locked</span>
+      <span class="locktag">🔒 Pro</span>
+      <span class="lockmsg">1,000-question bank · Pro</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span><span class="ecode">CV0-004</span></span>
       <span class="ename">CompTIA Cloud+</span>
       <span class="etag">Cloud architecture &amp; operations</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> Unlock the full bank</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> Full bank · Pro</span>
     </button>
     <button class="examcard locked" style="--acc:#34d399;--i:10" onclick="examCardClick('gcp_ace')">
-      <span class="locktag big">🔒 PRO</span>
-      <span class="lockmsg">1,000 questions · locked</span>
+      <span class="locktag">🔒 Pro</span>
+      <span class="lockmsg">1,000-question bank · Pro</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span class="ecode">GCP-ACE</span></span>
       <span class="ename">GCP Associate Engineer</span>
       <span class="etag">Deploy &amp; manage on Google Cloud</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> Unlock the full bank</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> Full bank · Pro</span>
     </button>
     <button class="examcard locked" style="--acc:#60a5fa;--i:11" onclick="examCardClick('itil4')">
-      <span class="locktag big">🔒 PRO</span>
-      <span class="lockmsg">1,000 questions · locked</span>
+      <span class="locktag">🔒 Pro</span>
+      <span class="lockmsg">1,000-question bank · Pro</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span><span class="ecode">ITIL-4</span></span>
       <span class="ename">ITIL 4 Foundation</span>
       <span class="etag">IT service management practices</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> Unlock the full bank</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> Full bank · Pro</span>
     </button>
     </div>
 
@@ -1111,6 +1119,7 @@ button:active{transform:scale(.97);}
     </div>
     <div class="modegrid">
       <button class="modecard" id="mode-practice">
+        <span class="mchip" style="--mc:#e2f6ee;">⚡</span>
         <h3>Quick Practice</h3>
         <p>5 questions, instant explanations. A quick taste of the real thing — no timer, no pressure.</p>
         <ul><li>5 exam-style questions</li><li>Explanation after every answer</li><li>Free teaser · no account needed</li></ul>
@@ -1118,9 +1127,10 @@ button:active{transform:scale(.97);}
       </button>
       <button class="modecard pro" id="mode-sim">
         <span class="locktag" id="sim-locktag">PRO</span>
+        <span class="mchip" style="--mc:#fdf1de;">🎯</span>
         <h3>Exam Simulation</h3>
-        <p>The full question bank under real exam conditions. This is the closest thing to test day.</p>
-        <ul><li>100 questions · 90-minute timer · auto-submit</li><li>Domain-level score report &amp; readiness prediction</li><li>Custom quiz builder — your domains, your rules</li><li>Performance analytics &amp; study plan</li></ul>
+        <p id="modes-sim-p">The full question bank under real exam conditions. This is the closest thing to test day.</p>
+        <ul id="sim-feats"><li>Exam-realistic questions · timer · auto-submit</li><li>Domain-level score report &amp; readiness prediction</li><li>Custom quiz builder — your domains, your rules</li><li>Performance analytics &amp; study plan</li></ul>
         <div class="price">$19.99 <small>one-time · all 12 exams</small></div>
       </button>
     </div>
@@ -1145,7 +1155,8 @@ button:active{transform:scale(.97);}
       <div class="resmascot" style="margin-bottom:0;"><span class="mascot-slot" data-mascot="idle" data-size="54"></span></div>
       <h2 id="brief-title">Exam simulation</h2>
       <p style="color:var(--mut); margin:0 0 8px; font-size:15px;" id="brief-sub"></p>
-      <div class="rule"><div class="ic">◷</div><div><b>90 minutes, 100 questions.</b> The timer starts when you begin and cannot be paused.</div></div>
+      <p style="color:var(--mut); margin:0 0 14px; font-size:13.5px;" id="brief-note"></p>
+      <div class="rule"><div class="ic">◷</div><div><b>Real exam timing.</b> The timer matches the vendor's actual exam and cannot be paused.</div></div>
       <div class="rule"><div class="ic">▦</div><div><b>Navigate freely.</b> Use the question palette to jump around, flag questions for review, and change answers before you finish.</div></div>
       <div class="rule"><div class="ic">✓</div><div><b>Passing score: 70%.</b> You'll get a domain-by-domain breakdown showing exactly what to study next.</div></div>
       <div class="warn"><span class="mascot-slot" data-mascot="nervous" data-size="46" style="float:left;margin:0 12px 4px 0;"></span><b>No pausing.</b> When the timer hits zero your exam auto-submits. Treat this like the real thing — that's the point.<div style="clear:both;"></div></div>
@@ -1175,6 +1186,19 @@ button:active{transform:scale(.97);}
       <div id="coachline" class="coachline"><span class="mascot" id="coachmascot"></span><span id="coachtext">Let's go — you've got this.</span></div>
       <p class="qtext" id="qtext"></p>
       <div id="opts"></div>
+      <div id="termwrap" class="hidden">
+        <div id="termctx"></div>
+        <div class="term" id="term" aria-label="Simulated terminal">
+          <div id="termout" aria-live="polite"></div>
+          <div class="termline"><span class="tprompt">candidate@cluster:~$</span><input id="terminput" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="type your command and press Run"></div>
+        </div>
+        <div id="termhint"></div>
+        <div class="termrow">
+          <button class="btn" id="termsubmit">Run command</button>
+          <button class="btn ghost" id="termreveal">Show solution</button>
+        </div>
+        <div class="termnote">Type the command exactly as you would on the real exam. Three attempts per task.</div>
+      </div>
       <div class="explainbox" id="explain"></div>
       <div class="qnav">
         <button class="btn ghost" id="prevbtn">← Previous</button>
@@ -1203,7 +1227,6 @@ button:active{transform:scale(.97);}
     <div class="probadge" id="results-probadge" style="background:linear-gradient(180deg,#ffd97a,#f0ad3c);color:#3a2503;">Pro</div>
   </div></div>
   <div class="wrap"><div class="reswrap">
-    <div id="res-upgrade"></div>
     <div class="rescard">
       <div style="font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);" id="res-exam">Exam results</div>
       <div class="resmascot" id="res-mascot"></div>
@@ -1258,6 +1281,7 @@ button:active{transform:scale(.97);}
         <button class="btn" id="res-home">Back to exams</button>
       </div>
     </div>
+    <div id="res-upgrade"></div>
   </div></div>
   <div class="foot"><div class="wm">B Y T E B A R</div>bytebarhq.com</div>
 </div>
@@ -1355,7 +1379,7 @@ button:active{transform:scale(.97);}
     <div class="buildercard">
       <div class="fieldlabel" style="margin-top:0;">1 · Choose an exam</div>
       <div class="exampills" id="builder-exams"></div>
-      <div class="fieldlabel">2 · Choose domains</div>
+      <div class="fieldlabel" id="builder-domlabel">2 · Choose domains</div>
       <div class="domainpick" id="builder-domains"></div>
       <div class="fieldlabel">3 · How many questions?</div>
       <div class="sliderow">
@@ -1446,13 +1470,13 @@ button:active{transform:scale(.97);}
     <div class="shead">
       <div class="kick">ByteBar Pro</div>
       <div class="resmascot"><span class="mascot-slot floaty" data-mascot="happy" data-size="64"></span></div>
-      <h2>Unlock every exam simulation</h2>
+      <h2>ByteBar Pro</h2>
       <p>One payment. All 12 exams. Yours forever.</p>
     </div>
     <div class="sbody">
       <ul class="feats">
         <li><span><b>12 full exam simulations</b> — 1,000 questions per exam</span></li>
-        <li><span><b>Real timed conditions</b> with auto-submit — 90 minutes, like test day</span></li>
+        <li><span><b>Exam-realistic simulations</b> — timing and format matched to the real exam</span></li>
         <li><span><b>Domain-level score reports</b> showing exactly what to study</span></li>
         <li><span><b>Every answer explained</b> — right or wrong, you learn why</span></li>
         <li><span><b>Custom quiz builder</b> — drill your weakest domains on demand</span></li>
@@ -1464,7 +1488,7 @@ button:active{transform:scale(.97);}
         <div class="tchip">🔒 Secure checkout</div>
       </div>
       <div class="priceline"><span class="was">$99</span><span class="p">$19.99</span><span class="per">one-time</span></div>
-      <button class="btn gold block" id="pw-buy">Unlock Pro — $19.99</button>
+      <button class="btn block" id="pw-buy">Get Pro — $19.99</button>
       <div class="fineprint">Secure checkout · Instant access · Yours forever<br>No subscription, no renewals. 30-day pass guarantee.</div>
       <div class="keyrow">
         <input id="pw-key" type="text" placeholder="Already purchased? Enter license key" autocomplete="off">
@@ -1512,6 +1536,1097 @@ const ICONS = {"az900": "<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"#fff\
 const QCOUNT_DISPLAY = 1000;
 const QCOUNT_DISPLAY_TXT = "1,000";
 
+/* ================= REAL EXAM FORMATS =================
+   Each simulation mirrors the vendor's actual exam: question count, time
+   limit, and question types. The 1,000-question bank is the POOL — every
+   simulation draws the exam-realistic count from it, so each exam feels
+   like its real counterpart instead of a generic 100-question quiz.
+   types: "mcq" (multiple choice), "pbq" (multi-select performance-based),
+          "terminal" (hands-on typed-command tasks, CKA/CKAD style). */
+const EXAM_FORMATS = {
+  az900:        { count: 45, minutes: 65,  types: ["mcq"] },
+  az104:        { count: 50, minutes: 100, types: ["mcq"] },
+  saa_c03:      { count: 65, minutes: 130, types: ["mcq"] },
+  cysa_cs0_004: { count: 85, minutes: 165, types: ["mcq","pbq"] },
+  linuxplus_xk0_006: { count: 90, minutes: 90, types: ["mcq","pbq"] },
+  cka:          { count: 17, minutes: 120, types: ["terminal"] },
+  ckad:         { count: 19, minutes: 120, types: ["terminal"] },
+  dca:          { count: 55, minutes: 80,  types: ["mcq"] },
+  terraform_004:{ count: 57, minutes: 60,  types: ["mcq"] },
+  cloudplus_cv0_004: { count: 90, minutes: 90, types: ["mcq"] },
+  gcp_ace:      { count: 55, minutes: 120, types: ["mcq"] },
+  itil4:        { count: 40, minutes: 60,  types: ["mcq"] },
+};
+function examFormat(slug){
+  return EXAM_FORMATS[slug] || {count:CONFIG.SIM_COUNT, minutes:CONFIG.SIM_MINUTES, types:["mcq"]};
+}
+function formatLabel(fmt){
+  if(fmt.types.indexOf("terminal")!==-1) return "Hands-on terminal tasks";
+  if(fmt.types.indexOf("pbq")!==-1) return "Multiple-choice + performance-based";
+  return "Multiple-choice";
+}
+/* Build a simulation bank: exam-realistic count drawn from the pool.
+   Terminal exams draw hands-on tasks; pbq exams mix in multi-selects. */
+function buildSimBank(slug){
+  const fmt=examFormat(slug);
+  if(fmt.types.indexOf("terminal")!==-1){
+    return shuffle((TERMINAL_TASKS[slug]||[]).slice()).slice(0,fmt.count).map(prepTerminal);
+  }
+  const mcqs=shuffle(BANKS[slug].slice());
+  let pool=mcqs.map(prepQ);
+  if(fmt.types.indexOf("pbq")!==-1 && PBQ_QUESTIONS[slug]){
+    const pbqs=shuffle(PBQ_QUESTIONS[slug].slice()).slice(0,6).map(prepMS);
+    pool=pbqs.concat(shuffle(mcqs).slice(0,Math.max(0,fmt.count-pbqs.length)).map(prepQ));
+    return shuffle(pool);
+  }
+  return pool.slice(0,fmt.count);
+}
+function buildPracticeBank(slug){
+  const fmt=examFormat(slug);
+  if(fmt.types.indexOf("terminal")!==-1){
+    return shuffle((TERMINAL_TASKS[slug]||[]).slice()).slice(0,CONFIG.PRACTICE_COUNT).map(prepTerminal);
+  }
+  return shuffle(BANKS[slug].slice()).slice(0,CONFIG.PRACTICE_COUNT).map(prepQ);
+}
+/* Terminal task prep: keep the task data intact, init session state. */
+function prepTerminal(t){
+  return {kind:"terminal", task:t.task, ctx:t.ctx||"", accept:t.accept, hints:t.hints||[],
+          solution:t.solution, explain:t.explain, domain:t.domain||"General",
+          _attempts:0, _revealed:false, __res:null};
+}
+/* Validate a typed command: normalize, then every fragment of ANY accept
+   group must appear (order-independent, alias-tolerant). */
+function terminalMatches(input, accept){
+  const norm=(" "+input.toLowerCase().replace(/\s+/g," ").trim()+" ");
+  return (accept||[]).some(group=>group.every(f=>norm.indexOf(f.toLowerCase())!==-1));
+}
+/* ================= TERMINAL TASKS (CKA/CKAD hands-on) ================= */
+const TERMINAL_TASKS = {
+ "cka": [
+  {
+   "task": "Create a Deployment named web using image nginx:1.25 with 3 replicas.",
+   "ctx": "Cluster: cka-cluster \u00b7 you have kubectl access",
+   "accept": [
+    [
+     "kubectl",
+     "create",
+     "deploy",
+     "web",
+     "nginx:1.25",
+     "--replicas",
+     "3"
+    ]
+   ],
+   "hints": [
+    "kubectl create deployment <name> --image=<img> --replicas=<n>",
+    "kubectl create deployment web --image=nginx:1.25 --replicas=3"
+   ],
+   "solution": "kubectl create deployment web --image=nginx:1.25 --replicas=3",
+   "explain": "kubectl create deployment takes --image and --replicas flags in one shot. On the real CKA this is the fastest way to spin up a workload \u2014 no YAML needed.",
+   "domain": "Workloads & Scheduling"
+  },
+  {
+   "task": "Expose Deployment web as a ClusterIP Service named web-svc on port 80.",
+   "ctx": "Cluster: cka-cluster \u00b7 Deployment web exists",
+   "accept": [
+    [
+     "kubectl",
+     "expose",
+     "deploy",
+     "web",
+     "--port",
+     "80",
+     "web-svc"
+    ],
+    [
+     "kubectl",
+     "create",
+     "service",
+     "clusterip",
+     "web-svc",
+     "--tcp=80:80"
+    ]
+   ],
+   "hints": [
+    "kubectl expose deployment web --port=80 --name=web-svc",
+    "Don't forget the --name flag or the service gets a generated name."
+   ],
+   "solution": "kubectl expose deployment web --port=80 --target-port=80 --name=web-svc",
+   "explain": "kubectl expose turns a workload into a Service. --port is the service port; --target-port is the container port. ClusterIP is the default type.",
+   "domain": "Services & Networking"
+  },
+  {
+   "task": "Scale Deployment web to 5 replicas.",
+   "ctx": "Cluster: cka-cluster \u00b7 Deployment web exists",
+   "accept": [
+    [
+     "kubectl",
+     "scale",
+     "deploy",
+     "web",
+     "--replicas",
+     "5"
+    ]
+   ],
+   "hints": [
+    "kubectl scale deployment <name> --replicas=<n>",
+    "kubectl scale deployment web --replicas=5"
+   ],
+   "solution": "kubectl scale deployment web --replicas=5",
+   "explain": "kubectl scale adjusts the replica count declaratively. The Deployment controller then creates or deletes pods to match.",
+   "domain": "Workloads & Scheduling"
+  },
+  {
+   "task": "Create a Namespace named prod.",
+   "ctx": "Cluster: cka-cluster",
+   "accept": [
+    [
+     "kubectl",
+     "create",
+     "namespace",
+     "prod"
+    ],
+    [
+     "kubectl",
+     "create",
+     "ns",
+     "prod"
+    ]
+   ],
+   "hints": [
+    "kubectl create namespace <name>  (ns works too)",
+    "kubectl create namespace prod"
+   ],
+   "solution": "kubectl create namespace prod",
+   "explain": "Namespaces isolate workloads. kubectl accepts both 'namespace' and its alias 'ns'.",
+   "domain": "Cluster Architecture, Installation & Configuration"
+  },
+  {
+   "task": "List all Pods in the prod namespace with wide output.",
+   "ctx": "Cluster: cka-cluster \u00b7 Namespace prod exists",
+   "accept": [
+    [
+     "kubectl",
+     "get",
+     "pods",
+     "-n",
+     "prod",
+     "-o",
+     "wide"
+    ],
+    [
+     "kubectl",
+     "get",
+     "pods",
+     "--namespace",
+     "prod",
+     "-o",
+     "wide"
+    ],
+    [
+     "kubectl",
+     "get",
+     "po",
+     "-n",
+     "prod",
+     "-o",
+     "wide"
+    ]
+   ],
+   "hints": [
+    "kubectl get pods -n <ns> -o wide",
+    "kubectl get pods -n prod -o wide"
+   ],
+   "solution": "kubectl get pods -n prod -o wide",
+   "explain": "-o wide adds node, pod IP, and nominated-node columns \u2014 the fastest way to see where pods actually landed.",
+   "domain": "Troubleshooting"
+  },
+  {
+   "task": "Drain node worker1 ahead of an upgrade. DaemonSet pods must not block the drain.",
+   "ctx": "Cluster: cka-cluster \u00b7 Node worker1 is schedulable",
+   "accept": [
+    [
+     "kubectl",
+     "drain",
+     "worker1",
+     "--ignore-daemonsets"
+    ]
+   ],
+   "hints": [
+    "kubectl drain <node> --ignore-daemonsets",
+    "DaemonSet pods can't be evicted, so the flag tells drain to skip them."
+   ],
+   "solution": "kubectl drain worker1 --ignore-daemonsets",
+   "explain": "drain cordons the node AND evicts pods (respecting PodDisruptionBudgets). Without --ignore-daemonsets, DaemonSet pods block the drain forever.",
+   "domain": "Cluster Architecture, Installation & Configuration"
+  },
+  {
+   "task": "Taint node worker1 so that only pods tolerating spot=true can schedule there. Use taint key spot, value true, effect NoSchedule.",
+   "ctx": "Cluster: cka-cluster \u00b7 Node worker1 exists",
+   "accept": [
+    [
+     "kubectl",
+     "taint",
+     "worker1",
+     "spot=true:noschedule"
+    ]
+   ],
+   "hints": [
+    "kubectl taint nodes <node> <key>=<value>:<effect>",
+    "kubectl taint nodes worker1 spot=true:NoSchedule"
+   ],
+   "solution": "kubectl taint nodes worker1 spot=true:NoSchedule",
+   "explain": "Taints repel pods unless they carry a matching toleration \u2014 the core mechanism behind dedicated/spot node pools.",
+   "domain": "Workloads & Scheduling"
+  },
+  {
+   "task": "Create a ConfigMap named app-cfg with a literal key mode and value prod.",
+   "ctx": "Cluster: cka-cluster",
+   "accept": [
+    [
+     "kubectl",
+     "create",
+     "configmap",
+     "app-cfg",
+     "--from-literal=mode=prod"
+    ]
+   ],
+   "hints": [
+    "kubectl create configmap <name> --from-literal=<k>=<v>",
+    "kubectl create configmap app-cfg --from-literal=mode=prod"
+   ],
+   "solution": "kubectl create configmap app-cfg --from-literal=mode=prod",
+   "explain": "--from-literal builds a ConfigMap from key=value pairs on the command line \u2014 no YAML file needed for simple config.",
+   "domain": "Workloads & Scheduling"
+  },
+  {
+   "task": "Create a Secret named db-pass with a literal key password and value s3cret.",
+   "ctx": "Cluster: cka-cluster",
+   "accept": [
+    [
+     "kubectl",
+     "create",
+     "secret",
+     "generic",
+     "db-pass",
+     "--from-literal=password=s3cret"
+    ]
+   ],
+   "hints": [
+    "kubectl create secret generic <name> --from-literal=<k>=<v>",
+    "kubectl create secret generic db-pass --from-literal=password=s3cret"
+   ],
+   "solution": "kubectl create secret generic db-pass --from-literal=password=s3cret",
+   "explain": "Secrets hold sensitive data base64-encoded in etcd. 'generic' is the type for arbitrary key-value secrets.",
+   "domain": "Workloads & Scheduling"
+  },
+  {
+   "task": "Update Deployment web to use image nginx:1.26. The container is named nginx.",
+   "ctx": "Cluster: cka-cluster \u00b7 Deployment web exists",
+   "accept": [
+    [
+     "kubectl",
+     "set",
+     "image",
+     "deploy",
+     "web",
+     "nginx=nginx:1.26"
+    ]
+   ],
+   "hints": [
+    "kubectl set image deployment/<name> <container>=<new-image>",
+    "kubectl set image deployment/web nginx=nginx:1.26"
+   ],
+   "solution": "kubectl set image deployment/web nginx=nginx:1.26",
+   "explain": "kubectl set image triggers a rolling update. The format is <container-name>=<image> \u2014 the container name, not the deployment name, goes on the left.",
+   "domain": "Workloads & Scheduling"
+  },
+  {
+   "task": "Roll back Deployment web to its previous revision.",
+   "ctx": "Cluster: cka-cluster \u00b7 Deployment web has rollout history",
+   "accept": [
+    [
+     "kubectl",
+     "rollout",
+     "undo",
+     "deploy",
+     "web"
+    ]
+   ],
+   "hints": [
+    "kubectl rollout undo deployment/<name>",
+    "kubectl rollout undo deployment/web"
+   ],
+   "solution": "kubectl rollout undo deployment/web",
+   "explain": "rollout undo reverts to the previous ReplicaSet. Pair with 'rollout history' to pick a specific revision with --to-revision.",
+   "domain": "Troubleshooting"
+  },
+  {
+   "task": "Show the last 20 log lines from Deployment web.",
+   "ctx": "Cluster: cka-cluster \u00b7 Deployment web is running",
+   "accept": [
+    [
+     "kubectl",
+     "logs",
+     "deploy",
+     "web",
+     "--tail",
+     "20"
+    ]
+   ],
+   "hints": [
+    "kubectl logs deployment/<name> --tail=<n>",
+    "kubectl logs deployment/web --tail=20"
+   ],
+   "solution": "kubectl logs deployment/web --tail=20",
+   "explain": "kubectl logs works directly against Deployments (it picks a pod). --tail limits output \u2014 essential when logs are huge.",
+   "domain": "Troubleshooting"
+  },
+  {
+   "task": "Open an interactive shell inside Pod web-7d9f8-x2kq4.",
+   "ctx": "Cluster: cka-cluster \u00b7 Pod web-7d9f8-x2kq4 is running",
+   "accept": [
+    [
+     "kubectl",
+     "exec",
+     "-it",
+     "web-7d9f8-x2kq4",
+     "--",
+     "/bin/sh"
+    ],
+    [
+     "kubectl",
+     "exec",
+     "web-7d9f8-x2kq4",
+     "-it",
+     "--",
+     "/bin/sh"
+    ],
+    [
+     "kubectl",
+     "exec",
+     "-it",
+     "web-7d9f8-x2kq4",
+     "--",
+     "/bin/bash"
+    ],
+    [
+     "kubectl",
+     "exec",
+     "web-7d9f8-x2kq4",
+     "-it",
+     "--",
+     "/bin/bash"
+    ]
+   ],
+   "hints": [
+    "kubectl exec -it <pod> -- /bin/sh",
+    "kubectl exec -it web-7d9f8-x2kq4 -- /bin/sh"
+   ],
+   "solution": "kubectl exec -it web-7d9f8-x2kq4 -- /bin/sh",
+   "explain": "-it gives you an interactive TTY. The -- separates kubectl flags from the command to run inside the container.",
+   "domain": "Troubleshooting"
+  },
+  {
+   "task": "Apply the manifest at /tasks/pv.yaml to the cluster.",
+   "ctx": "Cluster: cka-cluster \u00b7 File /tasks/pv.yaml exists on this host",
+   "accept": [
+    [
+     "kubectl",
+     "apply",
+     "-f",
+     "/tasks/pv.yaml"
+    ]
+   ],
+   "hints": [
+    "kubectl apply -f <file>",
+    "kubectl apply -f /tasks/pv.yaml"
+   ],
+   "solution": "kubectl apply -f /tasks/pv.yaml",
+   "explain": "apply is declarative \u2014 it creates or patches objects to match the file. On the CKA you'll apply provided manifests often.",
+   "domain": "Storage"
+  },
+  {
+   "task": "Back up etcd to /opt/etcd-backup.db. (Remember the API version env var.)",
+   "ctx": "Cluster: cka-cluster \u00b7 etcd runs on the control plane",
+   "accept": [
+    [
+     "etcdctl",
+     "snapshot",
+     "save",
+     "/opt/etcd-backup.db"
+    ]
+   ],
+   "hints": [
+    "ETCDCTL_API=3 etcdctl snapshot save <path>",
+    "ETCDCTL_API=3 etcdctl snapshot save /opt/etcd-backup.db"
+   ],
+   "solution": "ETCDCTL_API=3 etcdctl snapshot save /opt/etcd-backup.db",
+   "explain": "etcd is the cluster's source of truth, so snapshot backups are a core CKA skill. ETCDCTL_API=3 is required \u2014 v2 API can't snapshot. (Real restores also need the cert flags.)",
+   "domain": "Cluster Architecture, Installation & Configuration"
+  },
+  {
+   "task": "Mark node worker2 unschedulable WITHOUT evicting its running pods.",
+   "ctx": "Cluster: cka-cluster \u00b7 Node worker2 is schedulable",
+   "accept": [
+    [
+     "kubectl",
+     "cordon",
+     "worker2"
+    ]
+   ],
+   "hints": [
+    "This is the 'cordon vs drain' distinction: one of them doesn't move pods.",
+    "kubectl cordon worker2"
+   ],
+   "solution": "kubectl cordon worker2",
+   "explain": "cordon only marks the node unschedulable \u2014 pods stay put. drain = cordon + eviction. Classic CKA trap.",
+   "domain": "Cluster Architecture, Installation & Configuration"
+  },
+  {
+   "task": "Create a ClusterIP Service named cache listening on port 6379.",
+   "ctx": "Cluster: cka-cluster",
+   "accept": [
+    [
+     "kubectl",
+     "create",
+     "service",
+     "clusterip",
+     "cache",
+     "--tcp=6379:6379"
+    ]
+   ],
+   "hints": [
+    "kubectl create service clusterip <name> --tcp=<port>:<target>",
+    "kubectl create service clusterip cache --tcp=6379:6379"
+   ],
+   "solution": "kubectl create service clusterip cache --tcp=6379:6379",
+   "explain": "create service clusterip is the imperative shortcut. --tcp takes <service-port>:<target-port>.",
+   "domain": "Services & Networking"
+  }
+ ],
+ "ckad": [
+  {
+   "task": "Create a Deployment named api running image myapp:2.0.",
+   "ctx": "Cluster: ckad-cluster \u00b7 you have kubectl access",
+   "accept": [
+    [
+     "kubectl",
+     "create",
+     "deploy",
+     "api",
+     "--image",
+     "myapp:2.0"
+    ]
+   ],
+   "hints": [
+    "kubectl create deployment <name> --image=<img>",
+    "kubectl create deployment api --image=myapp:2.0"
+   ],
+   "solution": "kubectl create deployment api --image=myapp:2.0",
+   "explain": "The fastest path to a running workload on the CKAD: one imperative command, no YAML.",
+   "domain": "Application Deployment"
+  },
+  {
+   "task": "Expose Deployment api as a ClusterIP Service named api on port 80.",
+   "ctx": "Cluster: ckad-cluster \u00b7 Deployment api exists",
+   "accept": [
+    [
+     "kubectl",
+     "expose",
+     "deploy",
+     "api",
+     "--port",
+     "80"
+    ],
+    [
+     "kubectl",
+     "create",
+     "service",
+     "clusterip",
+     "api",
+     "--tcp=80:80"
+    ]
+   ],
+   "hints": [
+    "kubectl expose deployment api --port=80",
+    "kubectl expose deployment api --port=80 --name=api"
+   ],
+   "solution": "kubectl expose deployment api --port=80 --name=api",
+   "explain": "expose creates the Service in one step. The service name defaults to the deployment name, but --name makes it explicit.",
+   "domain": "Services & Networking"
+  },
+  {
+   "task": "Configure Deployment api to load environment variables from the ConfigMap named app-cfg.",
+   "ctx": "Cluster: ckad-cluster \u00b7 ConfigMap app-cfg exists",
+   "accept": [
+    [
+     "kubectl",
+     "set",
+     "env",
+     "deploy",
+     "api",
+     "--from=configmap/app-cfg"
+    ],
+    [
+     "kubectl",
+     "set",
+     "env",
+     "deployment/api",
+     "--from=configmap/app-cfg"
+    ]
+   ],
+   "hints": [
+    "kubectl set env deployment/<name> --from=configmap/<cm>",
+    "kubectl set env deployment/api --from=configmap/app-cfg"
+   ],
+   "solution": "kubectl set env deployment/api --from=configmap/app-cfg",
+   "explain": "set env --from wires a whole ConfigMap into the container's environment and triggers a rollout. Twelve-factor config, CKAD-style.",
+   "domain": "Application Environment, Configuration and Security"
+  },
+  {
+   "task": "Configure Deployment api to load environment variables from the Secret named db-pass.",
+   "ctx": "Cluster: ckad-cluster \u00b7 Secret db-pass exists",
+   "accept": [
+    [
+     "kubectl",
+     "set",
+     "env",
+     "deploy",
+     "api",
+     "--from=secret/db-pass"
+    ],
+    [
+     "kubectl",
+     "set",
+     "env",
+     "deployment/api",
+     "--from=secret/db-pass"
+    ]
+   ],
+   "hints": [
+    "Same pattern as ConfigMaps, but --from=secret/<name>",
+    "kubectl set env deployment/api --from=secret/db-pass"
+   ],
+   "solution": "kubectl set env deployment/api --from=secret/db-pass",
+   "explain": "Secrets mount as env vars the same way ConfigMaps do \u2014 the only difference is how the data is stored in etcd.",
+   "domain": "Application Environment, Configuration and Security"
+  },
+  {
+   "task": "Apply the manifest at /tasks/probes.yaml. It adds liveness and readiness probes to the api Deployment.",
+   "ctx": "Cluster: ckad-cluster \u00b7 File /tasks/probes.yaml exists on this host",
+   "accept": [
+    [
+     "kubectl",
+     "apply",
+     "-f",
+     "/tasks/probes.yaml"
+    ]
+   ],
+   "hints": [
+    "kubectl apply -f <file>",
+    "kubectl apply -f /tasks/probes.yaml"
+   ],
+   "solution": "kubectl apply -f /tasks/probes.yaml",
+   "explain": "Probes are easiest to add declaratively. Liveness restarts stuck containers; readiness gates traffic during startup.",
+   "domain": "Application Observability and Maintenance"
+  },
+  {
+   "task": "Set a CPU limit of 500m and a memory limit of 512Mi on Deployment api.",
+   "ctx": "Cluster: ckad-cluster \u00b7 Deployment api exists",
+   "accept": [
+    [
+     "kubectl",
+     "set",
+     "resources",
+     "deploy",
+     "api",
+     "--limits",
+     "cpu=500m",
+     "memory=512mi"
+    ]
+   ],
+   "hints": [
+    "kubectl set resources deployment/<name> --limits=cpu=<v>,memory=<v>",
+    "kubectl set resources deployment api --limits=cpu=500m,memory=512Mi"
+   ],
+   "solution": "kubectl set resources deployment api --limits=cpu=500m,memory=512Mi",
+   "explain": "Limits cap what a container may burst to. (Requests, set with --requests, are what the scheduler uses for placement.)",
+   "domain": "Application Deployment"
+  },
+  {
+   "task": "Scale Deployment api to 4 replicas.",
+   "ctx": "Cluster: ckad-cluster \u00b7 Deployment api exists",
+   "accept": [
+    [
+     "kubectl",
+     "scale",
+     "deploy",
+     "api",
+     "--replicas",
+     "4"
+    ]
+   ],
+   "hints": [
+    "kubectl scale deployment <name> --replicas=<n>",
+    "kubectl scale deployment api --replicas=4"
+   ],
+   "solution": "kubectl scale deployment api --replicas=4",
+   "explain": "Imperative scaling for when you need replicas now. For GitOps-managed apps you'd edit the manifest instead.",
+   "domain": "Application Deployment"
+  },
+  {
+   "task": "Create a Job named backup from image busybox that runs the command: echo backup done",
+   "ctx": "Cluster: ckad-cluster",
+   "accept": [
+    [
+     "kubectl",
+     "create",
+     "job",
+     "backup",
+     "--image",
+     "busybox"
+    ]
+   ],
+   "hints": [
+    "kubectl create job <name> --image=<img> -- <command>",
+    "kubectl create job backup --image=busybox -- /bin/sh -c \"echo backup done\""
+   ],
+   "solution": "kubectl create job backup --image=busybox -- /bin/sh -c \"echo backup done\"",
+   "explain": "Jobs run to completion instead of forever. Everything after -- becomes the container's command.",
+   "domain": "Application Deployment"
+  },
+  {
+   "task": "Create a CronJob named nightly from image busybox that runs daily at 02:00.",
+   "ctx": "Cluster: ckad-cluster",
+   "accept": [
+    [
+     "kubectl",
+     "create",
+     "cronjob",
+     "nightly"
+    ]
+   ],
+   "hints": [
+    "kubectl create cronjob <name> --image=<img> --schedule=\"<cron>\" -- <command>",
+    "kubectl create cronjob nightly --image=busybox --schedule=\"0 2 * * *\" -- /bin/sh -c \"echo nightly\""
+   ],
+   "solution": "kubectl create cronjob nightly --image=busybox --schedule=\"0 2 * * *\" -- /bin/sh -c \"echo nightly\"",
+   "explain": "CronJob schedules are standard cron format: minute hour day-of-month month day-of-week. 0 2 * * * = 02:00 daily.",
+   "domain": "Application Deployment"
+  },
+  {
+   "task": "Create a ServiceAccount named deployer.",
+   "ctx": "Cluster: ckad-cluster",
+   "accept": [
+    [
+     "kubectl",
+     "create",
+     "serviceaccount",
+     "deployer"
+    ]
+   ],
+   "hints": [
+    "kubectl create serviceaccount <name>",
+    "kubectl create serviceaccount deployer"
+   ],
+   "solution": "kubectl create serviceaccount deployer",
+   "explain": "ServiceAccounts give pods an identity for the API server \u2014 the basis of RBAC for workloads.",
+   "domain": "Application Environment, Configuration and Security"
+  },
+  {
+   "task": "Configure Deployment api to run under the deployer ServiceAccount.",
+   "ctx": "Cluster: ckad-cluster \u00b7 ServiceAccount deployer exists",
+   "accept": [
+    [
+     "kubectl",
+     "set",
+     "serviceaccount",
+     "deploy",
+     "api",
+     "deployer"
+    ],
+    [
+     "kubectl",
+     "set",
+     "serviceaccount",
+     "deployment/api",
+     "deployer"
+    ]
+   ],
+   "hints": [
+    "kubectl set serviceaccount deployment/<name> <sa>",
+    "kubectl set serviceaccount deployment/api deployer"
+   ],
+   "solution": "kubectl set serviceaccount deployment/api deployer",
+   "explain": "This sets spec.template.spec.serviceAccountName and rolls the pods. Least-privilege identity for your app.",
+   "domain": "Application Environment, Configuration and Security"
+  },
+  {
+   "task": "Apply the manifest at /tasks/ingress.yaml. It routes external traffic to the api Service.",
+   "ctx": "Cluster: ckad-cluster \u00b7 File /tasks/ingress.yaml exists on this host",
+   "accept": [
+    [
+     "kubectl",
+     "apply",
+     "-f",
+     "/tasks/ingress.yaml"
+    ]
+   ],
+   "hints": [
+    "kubectl apply -f <file>",
+    "kubectl apply -f /tasks/ingress.yaml"
+   ],
+   "solution": "kubectl apply -f /tasks/ingress.yaml",
+   "explain": "Ingress is the L7 front door. Rules map hosts/paths to Services; the ingress controller does the routing.",
+   "domain": "Services & Networking"
+  },
+  {
+   "task": "Apply the manifest at /tasks/sidecar.yaml. It adds a logging sidecar container to the api pods.",
+   "ctx": "Cluster: ckad-cluster \u00b7 File /tasks/sidecar.yaml exists on this host",
+   "accept": [
+    [
+     "kubectl",
+     "apply",
+     "-f",
+     "/tasks/sidecar.yaml"
+    ]
+   ],
+   "hints": [
+    "kubectl apply -f <file>",
+    "kubectl apply -f /tasks/sidecar.yaml"
+   ],
+   "solution": "kubectl apply -f /tasks/sidecar.yaml",
+   "explain": "Sidecars extend a pod without touching the app container \u2014 the classic multi-container pattern (adapter/ambassador/sidecar).",
+   "domain": "Application Design and Build"
+  },
+  {
+   "task": "Apply the manifest at /tasks/init.yaml. It adds an init container that waits for the database.",
+   "ctx": "Cluster: ckad-cluster \u00b7 File /tasks/init.yaml exists on this host",
+   "accept": [
+    [
+     "kubectl",
+     "apply",
+     "-f",
+     "/tasks/init.yaml"
+    ]
+   ],
+   "hints": [
+    "kubectl apply -f <file>",
+    "kubectl apply -f /tasks/init.yaml"
+   ],
+   "solution": "kubectl apply -f /tasks/init.yaml",
+   "explain": "Init containers run to completion before app containers start \u2014 perfect for 'wait for dependency' logic.",
+   "domain": "Application Design and Build"
+  },
+  {
+   "task": "Apply the manifest at /tasks/pvc.yaml. It creates the PersistentVolumeClaim the api needs for storage.",
+   "ctx": "Cluster: ckad-cluster \u00b7 File /tasks/pvc.yaml exists on this host",
+   "accept": [
+    [
+     "kubectl",
+     "apply",
+     "-f",
+     "/tasks/pvc.yaml"
+    ]
+   ],
+   "hints": [
+    "kubectl apply -f <file>",
+    "kubectl apply -f /tasks/pvc.yaml"
+   ],
+   "solution": "kubectl apply -f /tasks/pvc.yaml",
+   "explain": "PVCs are how pods claim storage. The claim binds to a matching PersistentVolume (or provisions one dynamically).",
+   "domain": "Application Deployment"
+  },
+  {
+   "task": "Watch the rollout status of Deployment api until it completes.",
+   "ctx": "Cluster: ckad-cluster \u00b7 Deployment api is mid-rollout",
+   "accept": [
+    [
+     "kubectl",
+     "rollout",
+     "status",
+     "deploy",
+     "api"
+    ]
+   ],
+   "hints": [
+    "kubectl rollout status deployment/<name>",
+    "kubectl rollout status deployment/api"
+   ],
+   "solution": "kubectl rollout status deployment/api",
+   "explain": "rollout status blocks and streams progress \u2014 the safe way to confirm a deployment finished before moving on.",
+   "domain": "Application Observability and Maintenance"
+  },
+  {
+   "task": "Roll back Deployment api to its previous revision.",
+   "ctx": "Cluster: ckad-cluster \u00b7 The latest rollout broke the app",
+   "accept": [
+    [
+     "kubectl",
+     "rollout",
+     "undo",
+     "deploy",
+     "api"
+    ]
+   ],
+   "hints": [
+    "kubectl rollout undo deployment/<name>",
+    "kubectl rollout undo deployment/api"
+   ],
+   "solution": "kubectl rollout undo deployment/api",
+   "explain": "The fastest incident response on the CKAD: revert to the last known-good ReplicaSet.",
+   "domain": "Application Observability and Maintenance"
+  },
+  {
+   "task": "The api pods keep crash-looping. Show the PREVIOUS container's logs for Deployment api.",
+   "ctx": "Cluster: ckad-cluster \u00b7 Deployment api pods are crash-looping",
+   "accept": [
+    [
+     "kubectl",
+     "logs",
+     "deploy",
+     "api",
+     "--previous"
+    ]
+   ],
+   "hints": [
+    "kubectl logs deployment/<name> --previous",
+    "--previous shows the last terminated container's logs \u2014 where the crash reason lives."
+   ],
+   "solution": "kubectl logs deployment/api --previous",
+   "explain": "CrashLoopBackOff hides the evidence: the current container has no logs yet. --previous reads the dead container's output.",
+   "domain": "Application Observability and Maintenance"
+  },
+  {
+   "task": "Forward local port 8080 to port 80 of Service api for debugging.",
+   "ctx": "Cluster: ckad-cluster \u00b7 Service api exists",
+   "accept": [
+    [
+     "kubectl",
+     "port-forward",
+     "svc",
+     "api",
+     "8080:80"
+    ],
+    [
+     "kubectl",
+     "port-forward",
+     "service/api",
+     "8080:80"
+    ],
+    [
+     "kubectl",
+     "port-forward",
+     "service",
+     "api",
+     "8080:80"
+    ]
+   ],
+   "hints": [
+    "kubectl port-forward svc/<name> <local>:<remote>",
+    "kubectl port-forward svc/api 8080:80"
+   ],
+   "solution": "kubectl port-forward svc/api 8080:80",
+   "explain": "port-forward tunnels to a Service without exposing it \u2014 the standard way to debug against cluster services locally.",
+   "domain": "Services & Networking"
+  }
+ ]
+};
+/* ================= PBQ MULTI-SELECT (CySA+/Linux+) ================= */
+const PBQ_QUESTIONS = {
+ "cysa_cs0_004": [
+  {
+   "q": "A SOC analyst sees: (1) host 10.4.2.15 opening outbound HTTPS to an unknown external IP every 60 seconds, (2) a burst of DNS queries for random-looking subdomains, (3) one user complaining the laptop is slow. Which TWO indicators together most strongly suggest C2 beaconing? (Select all that apply.)",
+   "options": [
+    "Regular 60-second outbound connections to an unknown external IP",
+    "High-entropy subdomains in DNS queries (possible domain generation algorithm)",
+    "A single user reporting slow laptop performance",
+    "One failed RDP login from a known admin workstation"
+   ],
+   "answers": [
+    0,
+    1
+   ],
+   "explain": "Beaconing = periodic check-ins (the 60-second rhythm) plus DGA-style DNS for resilient C2. Slow performance alone is weak signal; a single failed admin login is noise.",
+   "domain": "Threat Detection & Analysis"
+  },
+  {
+   "q": "During CONTAINMENT of an active intrusion, which TWO actions are appropriate? (Select all that apply.)",
+   "options": [
+    "Isolate the affected host from the network but leave it powered on",
+    "Block the attacker's C2 IP at the perimeter firewall",
+    "Immediately reimage all affected hosts",
+    "Delete system logs to prevent the attacker reading them"
+   ],
+   "answers": [
+    0,
+    1
+   ],
+   "explain": "Containment = stop the bleeding while preserving evidence: isolate (powered on = memory forensics intact) and block C2. Reimaging is eradication, and deleting logs destroys evidence.",
+   "domain": "Incident Response"
+  },
+  {
+   "q": "Which THREE are detective controls? (Select all that apply.)",
+   "options": [
+    "Network intrusion detection system (IDS)",
+    "SIEM alerting on anomalous logins",
+    "Quarterly manual log reviews",
+    "Perimeter firewall rules",
+    "Annual security awareness training"
+   ],
+   "answers": [
+    0,
+    1,
+    2
+   ],
+   "explain": "Detective controls find incidents in progress or after the fact: IDS, SIEM alerting, log reviews. Firewalls are preventive; training is deterrent/corrective.",
+   "domain": "Security Operations"
+  },
+  {
+   "q": "A vulnerability scan returns: (A) critical RCE on an internet-facing web server, (B) medium missing patch on an isolated test VM, (C) critical privilege escalation on a domain controller reachable only from the LAN, (D) low informational banner disclosure. Which TWO get remediated first?",
+   "options": [
+    "A \u2014 critical RCE, internet-facing",
+    "C \u2014 critical privesc on a domain controller",
+    "B \u2014 medium patch on an isolated test VM",
+    "D \u2014 low banner disclosure"
+   ],
+   "answers": [
+    0,
+    1
+   ],
+   "explain": "Prioritize by exploitability \u00d7 impact: internet-facing RCE is the fastest path in; domain-controller privesc is the keys to the kingdom. Test VMs and banners wait.",
+   "domain": "Vulnerability Management"
+  },
+  {
+   "q": "When hunting for lateral movement, which THREE data sources are most valuable? (Select all that apply.)",
+   "options": [
+    "NetFlow / network connection logs",
+    "Windows Security event logs (4624/4625 logons)",
+    "EDR process-ancestry telemetry",
+    "Helpdesk ticket subjects"
+   ],
+   "answers": [
+    0,
+    1,
+    2
+   ],
+   "explain": "Lateral movement lives in authentication and connection data: who logged on where (4624/4625), what connected to what (NetFlow), and what spawned what (EDR). Helpdesk tickets are noise here.",
+   "domain": "Threat Detection & Analysis"
+  },
+  {
+   "q": "A SIEM correlation rule for brute-force detection fires 200 times a day, 99% on approved admin tooling. Which TWO are valid reasons to TUNE the rule rather than disable it? (Select all that apply.)",
+   "options": [
+    "Reduce false positives while keeping detection for real attacks",
+    "Exclude the approved admin tooling's known-good behavior",
+    "Tuning is never allowed \u2014 noisy rules must stay as-is",
+    "Make the SOC dashboard look cleaner for management"
+   ],
+   "answers": [
+    0,
+    1
+   ],
+   "explain": "Tuning preserves the detection while removing known-good noise \u2014 that's the job. Disabling blinds you; tuning for aesthetics is malpractice.",
+   "domain": "Security Operations"
+  }
+ ],
+ "linuxplus_xk0_006": [
+  {
+   "q": "Which TWO commands show disk space usage? (Select all that apply.)",
+   "options": [
+    "df -h",
+    "du -sh /var/*",
+    "ls -lh /",
+    "free -h"
+   ],
+   "answers": [
+    0,
+    1
+   ],
+   "explain": "df reports filesystem free space; du reports directory usage. ls shows file listings (sizes, not usage); free shows RAM/swap.",
+   "domain": "System Configuration"
+  },
+  {
+   "q": "Which THREE are valid systemd unit types? (Select all that apply.)",
+   "options": [
+    ".service",
+    ".timer",
+    ".target",
+    ".daemon"
+   ],
+   "answers": [
+    0,
+    1,
+    2
+   ],
+   "explain": "systemd units include .service, .timer, .target, .socket, .mount and more \u2014 but there is no .daemon type.",
+   "domain": "System Configuration"
+  },
+  {
+   "q": "An admin needs an environment variable set for ALL users' future login shells. Which TWO files could correctly provide this? (Select all that apply.)",
+   "options": [
+    "/etc/profile",
+    "/etc/bash.bashrc",
+    "~/.bash_history",
+    "/etc/hosts"
+   ],
+   "answers": [
+    0,
+    1
+   ],
+   "explain": "/etc/profile runs for login shells; /etc/bash.bashrc for interactive shells \u2014 together they cover all users. .bash_history stores command history; /etc/hosts maps names to IPs.",
+   "domain": "System Configuration"
+  },
+  {
+   "q": "Which TWO commands list listening network ports? (Select all that apply.)",
+   "options": [
+    "ss -tuln",
+    "netstat -tuln",
+    "ps aux",
+    "ls /proc/net/tcp"
+   ],
+   "answers": [
+    0,
+    1
+   ],
+   "explain": "ss (modern) and netstat (legacy) both list sockets with -tuln. ps shows processes; reading /proc/net/tcp raw is possible but not a 'command that lists ports'.",
+   "domain": "Networking"
+  },
+  {
+   "q": "A file has permissions 754 (rwxr-xr--). Which THREE statements are true? (Select all that apply.)",
+   "options": [
+    "The owner can read, write, and execute",
+    "The group can read and execute",
+    "Others can only read",
+    "The group can write to the file"
+   ],
+   "answers": [
+    0,
+    1,
+    2
+   ],
+   "explain": "754 = rwx|r-x|r--. Owner: full control. Group: read+execute (5 = 4+1). Other: read-only (4). Nobody said the group could write.",
+   "domain": "Files and Storage"
+  },
+  {
+   "q": "Which TWO statements about LVM are true? (Select all that apply.)",
+   "options": [
+    "A volume group pools one or more physical volumes",
+    "Logical volumes are carved out of volume groups",
+    "Extending a filesystem always requires unmounting it first",
+    "Physical volumes sit on top of logical volumes"
+   ],
+   "answers": [
+    0,
+    1
+   ],
+   "explain": "The stack is PV \u2192 VG \u2192 LV, bottom-up. Many filesystems (ext4, XFS) extend online; and PVs are the bottom layer, not the top.",
+   "domain": "Files and Storage"
+  }
+ ]
+};
+
+
 /* ================= license-key verification (production) =================
    Mirrors keygen.py. Keys are Payhip "From a list" pre-generated keys of
    the form BB19-<BODY>-<CHECK>; CHECK is an FNV-1a checksum over
@@ -1544,7 +2659,7 @@ function show(id){
   });
   window.scrollTo(0,0);
 }
-function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); a[i]=a[j]; a[j]=a[i]; } return a; }
+function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function isPro(){ return localStorage.getItem("bb_pro")==="1"; }
 function refreshBadges(){
   ["home-probadge","modes-probadge"].forEach(id=>{
@@ -1764,7 +2879,7 @@ function renderHome(){
     const d=document.createElement("button");
     d.className="examcard"+(locked?" locked":""); d.style.setProperty("--acc", e.accent); d.style.setProperty("--i", idx);
     const tag = locked
-      ? '<span class="locktag big">🔒 PRO</span><span class="lockmsg">'+QCOUNT_DISPLAY_TXT+' questions · locked</span>'
+      ? '<span class="locktag">🔒 Pro</span><span class="lockmsg">'+QCOUNT_DISPLAY_TXT+'-question bank · Pro</span>'
       : (free && !pro
         ? '<span class="freetag">✦ TRY FREE</span>'
         : '<span class="locktag">PRO</span>');
@@ -1773,7 +2888,7 @@ function renderHome(){
       '<span class="erow"><span class="eicon">'+(ICONS[e.slug]||"")+'</span><span class="ecode">'+e.code+'</span></span>'+
       '<span class="ename">'+e.name+'</span>'+
       '<span class="etag">'+e.tagline+'</span>'+
-      '<span class="meta"><span class="qcount">'+QCOUNT_DISPLAY+' Qs</span> '+(locked?"Unlock the full bank":(free&&!pro?"5-question teaser · free":"Timed simulation · Score report"))+'</span>';
+      '<span class="meta"><span class="qcount">'+QCOUNT_DISPLAY+' Qs</span> '+(locked?"Full bank · Pro":(free&&!pro?"5-question teaser · free":"Timed simulation · Score report"))+'</span>';
     d.addEventListener("click",()=>examCardClick(e.slug));
     g.appendChild(d);
   });
@@ -1813,6 +2928,21 @@ function renderModes(slug){
   const slot=$("modes-qbar-slot");
   if(slot) slot.innerHTML=
     '<div style="font-size:12.5px;color:var(--mut);font-weight:600;">Question bank: '+QCOUNT_DISPLAY_TXT+' exam-style questions</div>';
+  /* Simulation card mirrors the real exam's format — no two exams look alike. */
+  const fmt=examFormat(slug), fl=$("sim-feats");
+  if(fl){
+    const unit=fmt.types[0]==="terminal"?"tasks":"questions";
+    const items=[
+      fmt.count+" "+unit+" · "+fmt.minutes+"-minute timer · auto-submit",
+      "Domain-level score report & readiness prediction",
+      "Custom quiz builder — your domains, your rules",
+      "Performance analytics & study plan"
+    ];
+    if(fmt.types[0]==="terminal") items[1]="Hands-on tasks — type real commands, like the real exam";
+    fl.innerHTML=items.map(t=>"<li>"+t+"</li>").join("");
+  }
+  const sp=$("modes-sim-p");
+  if(sp) sp.textContent="The "+QCOUNT_DISPLAY_TXT+"-question bank under real "+curExam.code+" conditions. This is the closest thing to test day.";
   refreshBadges();
   show("screen-modes");
 }
@@ -1826,8 +2956,6 @@ $("mode-sim").addEventListener("click",()=>{
 /* ================= paywall ================= */
 function openPaywall(){
   $("paywall").classList.remove("hidden"); $("pw-msg").textContent="";
-  /* Unlock moment should feel exciting, not transactional. */
-  setTimeout(()=>burstConfetti(60), 250);
 }
 function closePaywall(){ $("paywall").classList.add("hidden"); }
 $("pw-close").addEventListener("click",closePaywall);
@@ -1852,7 +2980,7 @@ $("pw-demo").addEventListener("click",e=>{
 function startPractice(slug){
   if(!isPro() && !isFreeExam(slug)){ openPaywall(); return; }
   const exam=EXAMS.find(e=>e.slug===slug);
-  const bank=shuffle(BANKS[slug].slice()).slice(0,CONFIG.PRACTICE_COUNT).map(prepQ);
+  const bank=buildPracticeBank(slug);
   S={mode:"practice",exam,bank,idx:0,score:0,misses:[],answered:false,t0:Date.now()};
   document.documentElement.style.setProperty("--qacc",exam.accent);
   $("exam-label").textContent=exam.code; $("exam-sublabel").textContent="Quick practice · free";
@@ -1861,23 +2989,39 @@ function startPractice(slug){
 }
 function prepQ(q){
   const order=shuffle(q.options.map((_,i)=>i));
-  return {q:q.q, options:order.map(i=>q.options[i]), answer:order.indexOf(q.answer),
-          explain:q.explain, domain:q.domain||"General"};
+  /* banks store answers as letters ("A"–"D"); convert to the shuffled index */
+  const ansIdx = (typeof q.answer==="string") ? (q.answer.charCodeAt(0)-65) : q.answer;
+  return {q:q.q, options:order.map(i=>q.options[i]), answer:order.indexOf(ansIdx),
+          explain:q.explain, domain:q.domain||"General", kind:q.kind||"mcq",
+          answers:q.answers||null /* multi-select correct set (original indices) */};
+}
+/* Multi-select prep: remap the correct-index set through the shuffle. */
+function prepMS(q){
+  const order=shuffle(q.options.map((_,i)=>i));
+  const newOpts=order.map(i=>q.options[i]);
+  const newAns=q.answers.map(a=>order.indexOf(a));
+  return {q:q.q, options:newOpts, answers:newAns, explain:q.explain,
+          domain:q.domain||"General", kind:"ms"};
 }
 
-/* ================= simulation (pro) ================= */
+/* ================= simulation (pro): exam-realistic format ================= */
 let timerId=null, deadline=0;
 function renderBrief(slug){
   curExam=EXAMS.find(e=>e.slug===slug);
+  const fmt=examFormat(slug);
   $("brief-title").textContent=curExam.code+" — exam simulation";
-  $("brief-sub").textContent=curExam.name+" · "+CONFIG.SIM_COUNT+" questions · "+CONFIG.SIM_MINUTES+" minutes";
+  $("brief-sub").textContent=curExam.name+" · "+fmt.count+" "+(fmt.types[0]==="terminal"?"tasks":"questions")+" · "+fmt.minutes+" minutes · "+formatLabel(fmt);
+  const bn=$("brief-note");
+  if(bn) bn.textContent="Drawn from the "+QCOUNT_DISPLAY_TXT+"-question "+curExam.code+" bank — just like the real "+curExam.code+", no two runs are the same.";
   show("screen-brief");
 }
 $("brief-back").addEventListener("click",()=>renderModes(curExam.slug));
 $("brief-start").addEventListener("click",()=>{
-  const bank=shuffle(BANKS[curExam.slug].slice()).map(prepQ);
+  const fmt=examFormat(curExam.slug);
+  const bank=buildSimBank(curExam.slug);
   S={mode:"sim",exam:curExam,bank,idx:0,score:0,misses:[],answers:new Array(bank.length).fill(null),
-     flags:new Array(bank.length).fill(false),t0:Date.now(),submitted:false};
+     flags:new Array(bank.length).fill(false),t0:Date.now(),submitted:false,
+     minutes:fmt.minutes, fmtCount:fmt.count};
   document.documentElement.style.setProperty("--qacc",curExam.accent);
   $("exam-label").textContent=curExam.code; $("exam-sublabel").textContent=curExam.name;
   $("timer").style.display="flex"; $("endbtn").textContent="End exam";
@@ -1887,7 +3031,7 @@ function startTimer(resumed){
   clearInterval(timerId);
   const tm=$("timermascot"); if(tm) tm.classList.add("hidden");
   if(!resumed){
-    const mins=(S.mode==="custom"&&S.timed)?(S.minutes||30):CONFIG.SIM_MINUTES;
+    const mins=(S.mode==="custom"&&S.timed)?(S.minutes||30):(S.minutes||CONFIG.SIM_MINUTES);
     deadline=Date.now()+mins*60*1000;
   }
   const t=$("timer"), tx=$("timetext");
@@ -1939,9 +3083,11 @@ function paintPalette(){
 }
 function renderQ(){
   const q=S.bank[S.idx], n=S.bank.length;
-  $("qnum").textContent="Question "+(S.idx+1)+" of "+n+(q.domain?" · "+q.domain:"");
-  $("qtext").textContent=q.q;
-  const box=$("opts"); box.innerHTML="";
+  const isTerm=q.kind==="terminal", isMS=q.kind==="ms";
+  $("qnum").textContent=(isTerm?"Task ":"Question ")+(S.idx+1)+" of "+n+(q.domain?" · "+q.domain:"");
+  $("qtext").textContent=isTerm?q.task:q.q;
+  const box=$("opts"); box.innerHTML=""; box.style.display=isTerm?"none":"";
+  const tw=$("termwrap"); if(tw) tw.classList.toggle("hidden",!isTerm);
   const ex=$("explain"); ex.classList.remove("show"); ex.innerHTML="";
   const fb=$("flagbtn");
   if(!isLiveMode()){
@@ -1949,6 +3095,9 @@ function renderQ(){
     fb.classList.toggle("on",S.flags[S.idx]);
     fb.textContent=S.flags[S.idx]?"⚑ Flagged":"⚑ Flag for review";
   } else fb.classList.add("hidden");
+  if(isTerm){ renderTerminal(q); }
+  else if(isMS){ renderMulti(q,box); }
+  else {
   q.options.forEach((t,i)=>{
     const b=document.createElement("button");
     b.className="opt"; b.type="button";
@@ -1971,8 +3120,153 @@ function renderQ(){
     showExplanation(q, q.__res==="right");
     [...opts].forEach(o=>{o.disabled=true;});
   }
+  }
   $("prevbtn").disabled=S.idx===0;
   $("nextbtn").textContent = S.idx===n-1 ? (S.mode==="sim"?"Review →":"See results →") : "Next →";
+  paintPalette();
+}
+/* ---------- multi-select (PBQ) ---------- */
+function renderMulti(q,box){
+  const live=isLiveMode();
+  q.options.forEach((t,i)=>{
+    const b=document.createElement("button");
+    b.className="opt ms"; b.type="button";
+    b.innerHTML='<span class="key">'+String.fromCharCode(65+i)+'</span><span></span><span class="mcheck">✓</span>';
+    b.lastChild.previousSibling.textContent=t;
+    const cur=live?null:S.answers[S.idx];
+    if(!live && cur && cur.indexOf(i)!==-1) b.classList.add("sel");
+    b.addEventListener("click",()=>{
+      if(live){ if(S.answered) return; b.classList.toggle("sel"); return; }
+      let cur2=S.answers[S.idx]||[];
+      cur2=cur2.indexOf(i)===-1?cur2.concat([i]):cur2.filter(x=>x!==i);
+      S.answers[S.idx]=cur2.length?cur2:null;
+      b.classList.toggle("sel");
+      paintPalette(); buddyOnMilestone(); saveResume();
+    });
+    box.appendChild(b);
+  });
+  if(live){
+    const chk=document.createElement("button");
+    chk.className="btn"; chk.id="ms-check"; chk.textContent="Check answer";
+    chk.style.marginTop="12px";
+    chk.addEventListener("click",()=>answerMS(q));
+    box.appendChild(chk);
+    if(q.__res){ /* restore on back-nav */
+      S.answered=true;
+      const opts=box.querySelectorAll(".opt");
+      q.answers.forEach(a=>opts[a].classList.add("correct"));
+      if(q.__res==="wrong"){
+        const miss=S.misses.find(m=>m.q===q);
+        (miss&&miss.picked||[]).forEach(p=>{ if(opts[p]&&q.answers.indexOf(p)===-1) opts[p].classList.add("wrong"); });
+      }
+      showExplanationMS(q, q.__res==="right");
+      box.querySelectorAll(".opt").forEach(o=>o.disabled=true);
+      chk.disabled=true;
+    }
+  }
+}
+function msCorrect(q, picked){
+  const a=(q.answers||[]).slice().sort().join(","), b=(picked||[]).slice().sort().join(",");
+  return a===b && picked.length>0;
+}
+function answerMS(q){
+  if(S.answered) return;
+  S.answered=true;
+  const opts=[...$("opts").querySelectorAll(".opt")];
+  const picked=opts.map((o,i)=>o.classList.contains("sel")?i:-1).filter(i=>i!==-1);
+  const wasRight=msCorrect(q,picked);
+  q.answers.forEach(a=>opts[a].classList.add("correct","ding"));
+  if(!wasRight){ picked.forEach(p=>{ if(q.answers.indexOf(p)===-1) opts[p].classList.add("wrong"); });
+    S.misses.push({q, picked}); q.__res="wrong"; }
+  else { S.score++; q.__res="right"; }
+  showExplanationMS(q, wasRight);
+  opts.forEach(o=>o.disabled=true);
+  const chk=$("ms-check"); if(chk) chk.disabled=true;
+  buddyOnAnswer(wasRight); paintPalette(); saveResume();
+}
+function showExplanationMS(q, wasRight){
+  const ex=$("explain");
+  ex.className="explainbox show "+(wasRight?"right":"wrong");
+  const head=wasRight
+    ? '<div class="exhead"><span class="mascot">'+mascotSVG("happy",42)+'</span><span class="exic">✓</span> Correct — nice work</div>'
+    : '<div class="exhead"><span class="mascot">'+mascotSVG("encourage",42)+'</span><span class="exic">✗</span> Not quite — here\'s why</div>';
+  const correctLine='<div style="margin-bottom:8px;"><b>Correct answer'+(q.answers.length>1?"s":"")+':</b> '+
+    escapeHtml(q.answers.map(a=>String.fromCharCode(65+a)+". "+q.options[a]).join(" · "))+'</div>';
+  ex.innerHTML=head+'<div class="exbody">'+correctLine+escapeHtml(q.explain)+'</div>';
+}
+/* ---------- terminal tasks (CKA/CKAD hands-on) ---------- */
+function renderTerminal(q){
+  const tw=$("termwrap");
+  const out=$("termout"); out.innerHTML="";
+  const ctx=$("termctx");
+  if(ctx){ ctx.innerHTML=""; const d=document.createElement("div"); d.className="tctx"; d.textContent=q.ctx||""; ctx.appendChild(d); }
+  termPrint("$ # task "+(S.idx+1)+": "+q.task, "tcmd");
+  if(q.__res){ /* restore solved/revealed state on back-nav */
+    termPrint("$ "+q._lastInput, "tin");
+    if(q.__res==="right") termPrint("✓ Task complete — well done.", "tok");
+    else { termPrint("✗ Task forfeited.", "terr"); termPrint("$ # solution: "+q.solution, "tcmd"); }
+    const inp=$("terminput"); if(inp) inp.disabled=true;
+    const sb=$("termsubmit"); if(sb) sb.disabled=true;
+    const rv=$("termreveal"); if(rv) rv.disabled=true;
+    if(isLiveMode()) showExplanation(q, q.__res==="right");
+  } else {
+    q._attempts=q._attempts||0;
+    const inp=$("terminput"); if(inp){ inp.disabled=false; inp.value=""; setTimeout(()=>inp.focus(),60); }
+    const sb=$("termsubmit"); if(sb) sb.disabled=false;
+    const rv=$("termreveal"); if(rv) rv.disabled=false;
+  }
+  const hint=$("termhint"); if(hint) hint.innerHTML="";
+}
+function termPrint(text, cls){
+  const out=$("termout"); if(!out) return;
+  const d=document.createElement("div"); d.className="tline "+(cls||"");
+  d.textContent=text; out.appendChild(d); out.scrollTop=out.scrollHeight;
+}
+function termSubmit(){
+  const q=S.bank[S.idx]; if(!q||q.kind!=="terminal"||q.__res) return;
+  const inp=$("terminput"), val=(inp.value||"").trim();
+  if(!val) return;
+  q._attempts=(q._attempts||0)+1;
+  q._lastInput=val;
+  termPrint("$ "+val, "tin");
+  if(terminalMatches(val, q.accept)){
+    q.__res="right";
+    termPrint("✓ Task complete — well done.", "tok");
+    termDone(q,true);
+  } else if(q._attempts>=3){
+    q.__res="wrong"; q._revealed=true;
+    termPrint("✗ That's strike three. Here's the solution:", "terr");
+    termPrint("$ # solution: "+q.solution, "tcmd");
+    termDone(q,false);
+  } else {
+    termPrint("✗ Command not recognized. Try again ("+(3-q._attempts)+" left).", "terr");
+    const hint=$("termhint");
+    if(hint && q.hints[q._attempts-1]){
+      hint.innerHTML="";
+      const d=document.createElement("div"); d.className="thint";
+      d.textContent="💡 Hint: "+q.hints[q._attempts-1]; hint.appendChild(d);
+    }
+    inp.value=""; inp.focus();
+  }
+  saveResume();
+}
+function termReveal(){
+  const q=S.bank[S.idx]; if(!q||q.kind!=="terminal"||q.__res) return;
+  q.__res="wrong"; q._revealed=true;
+  termPrint("$ # solution: "+q.solution, "tcmd");
+  termDone(q,false); saveResume();
+}
+function termDone(q, wasRight){
+  const inp=$("terminput"); if(inp) inp.disabled=true;
+  const sb=$("termsubmit"); if(sb) sb.disabled=true;
+  const rv=$("termreveal"); if(rv) rv.disabled=true;
+  if(isLiveMode()){
+    if(wasRight){ S.score++; } else { S.misses.push({q, picked:null, terminal:true}); }
+    showExplanation(q, wasRight);
+    buddyOnAnswer(wasRight);
+  } else {
+    S.answers[S.idx]=wasRight;
+  }
   paintPalette();
 }
 function answer(i,btn){
@@ -2004,6 +3298,12 @@ function answer(i,btn){
     saveResume();
   }
 }
+$("termsubmit").addEventListener("click",termSubmit);
+$("termreveal").addEventListener("click",()=>{
+  const q=S&&S.bank[S.idx];
+  if(q&&q.kind==="terminal"&&!q.__res&&confirm("Forfeit this task and see the solution?")) termReveal();
+});
+$("terminput").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); termSubmit(); } });
 function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
 /* Prominent explanation panel: mascot + clear right/wrong verdict + full explanation */
 function showExplanation(q, wasRight){
@@ -2012,7 +3312,9 @@ function showExplanation(q, wasRight){
   const head=wasRight
     ? '<div class="exhead"><span class="mascot">'+mascotSVG("happy",42)+'</span><span class="exic">✓</span> Correct — nice work</div>'
     : '<div class="exhead"><span class="mascot">'+mascotSVG("encourage",42)+'</span><span class="exic">✗</span> Not quite — here\'s why</div>';
-  const correctLine='<div style="margin-bottom:8px;"><b>Correct answer:</b> '+escapeHtml(q.options[q.answer])+'</div>';
+  const correctLine = q.kind==="terminal"
+    ? '<div style="margin-bottom:8px;"><b>Solution:</b> '+escapeHtml(q.solution)+'</div>'
+    : '<div style="margin-bottom:8px;"><b>Correct answer:</b> '+escapeHtml(q.options[q.answer])+'</div>';
   ex.innerHTML=head+'<div class="exbody">'+correctLine+escapeHtml(q.explain)+'</div>';
 }
 $("flagbtn").addEventListener("click",()=>{
@@ -2046,7 +3348,14 @@ function finishExam(expired){
     doms[d]=doms[d]||{t:0,c:0};
     doms[d].t++;
     if(live){
-      /* score/misses already tracked live */
+      /* score/misses already tracked live (mcq, multi-select, terminal) */
+    } else if(q.kind==="terminal"){
+      if(S.answers[i]===true){ score++; doms[d].c++; }
+      else misses.push({q,picked:null,terminal:true});
+    } else if(q.kind==="ms"){
+      const pk=S.answers[i];
+      if(pk && msCorrect(q,pk)){ score++; doms[d].c++; }
+      else misses.push({q,picked:pk||[]});
     } else {
       if(picked===q.answer){ score++; doms[d].c++; }
       else misses.push({q,picked});
@@ -2113,13 +3422,25 @@ function finishExam(expired){
   if(!misses.length){ mw.innerHTML='<div style="color:var(--green);font-weight:700;padding:8px 2px;">Perfect run — nothing to review. 🎯</div>'; }
   misses.forEach((m,ix)=>{
     const d=document.createElement("div"); d.className="miss";
-    const yourTxt = m.picked==null ? "No answer given" : m.q.options[m.picked];
+    let yourTxt, qTxt, corrTxt, maLabel;
+    if(m.terminal || m.q.kind==="terminal"){
+      yourTxt = m.q._lastInput ? "$ "+m.q._lastInput : "Task forfeited";
+      qTxt = m.q.task; corrTxt = m.q.solution; maLabel="⌨ Solution: ";
+    } else if(m.q.kind==="ms"){
+      yourTxt = ((m.picked||[]).map(p=>String.fromCharCode(65+p)).join(", "))||"No answer given";
+      qTxt = m.q.q;
+      corrTxt = m.q.answers.map(a=>String.fromCharCode(65+a)+". "+m.q.options[a]).join(" · ");
+      maLabel="✓ Correct: ";
+    } else {
+      yourTxt = (m.picked==null ? "No answer given" : m.q.options[m.picked]);
+      qTxt = m.q.q; corrTxt = m.q.options[m.q.answer]; maLabel="✓ Correct: ";
+    }
     d.innerHTML='<div class="mq">'+(ix+1)+'. </div>'+
-      '<div class="ma">✓ Correct: </div>'+
+      '<div class="ma">'+maLabel+'</div>'+
       '<div class="yours">✗ Yours: </div>'+
       '<div class="me"></div>';
-    d.querySelector(".mq").append(document.createTextNode(m.q.q));
-    d.querySelector(".ma").append(document.createTextNode(m.q.options[m.q.answer]));
+    d.querySelector(".mq").append(document.createTextNode(qTxt));
+    d.querySelector(".ma").append(document.createTextNode(corrTxt));
     d.querySelector(".yours").append(document.createTextNode(yourTxt));
     d.querySelector(".me").textContent=m.q.explain;
     mw.appendChild(d);
@@ -2139,25 +3460,22 @@ function finishExam(expired){
   };
   $("res-home").onclick=renderHome;
 
-  /* Free teaser complete → upgrade prompt. This is the conversion moment:
-     "You scored X% on 5 questions. Imagine 1,000." */
+  /* Free teaser complete → a calm upgrade card BELOW the results.
+     Results first (that's what they came for); the card is quiet and factual. */
   const upSlot=$("res-upgrade");
   if(upSlot){
     upSlot.innerHTML="";
     if(S.mode==="practice" && !isPro()){
       const up=document.createElement("div");
-      up.className="upgrade-banner";
+      up.className="upgradecard";
       up.innerHTML=
-        '<div class="ub-mascot"><span class="mascot-slot floaty">'+mascotSVG(pct>=CONFIG.PASS_PCT?"celebrate":"encourage",72)+'</span></div>'+
-        '<div class="ub-body"><div class="ub-kick">That was just the warm-up</div>'+
-        '<div class="ub-head">You scored '+pct+'% on 5 questions.<br>Imagine '+QCOUNT_DISPLAY_TXT+'.</div>'+
-        '<div class="ub-sub">Full timed simulations · every answer explained · all 12 exams · yours forever.</div>'+
-        '<button class="btn gold ub-cta" id="ub-go">Unlock Pro — $19.99</button>'+
-        '<div class="ub-fine">One-time payment · no subscription · 30-day pass guarantee</div></div>';
+        '<div class="uc-mascot"><span class="mascot-slot">'+mascotSVG("idle",52)+'</span></div>'+
+        '<div class="uc-body"><div class="uc-head">Want the full '+curExam.code+' bank?</div>'+
+        '<div class="uc-sub">That was '+CONFIG.PRACTICE_COUNT+' teaser questions. Pro includes the full '+QCOUNT_DISPLAY_TXT+'-question bank, '+curExam.code+'-realistic timed simulations, and an explanation for every answer.</div>'+
+        '<button class="btn ub-cta" id="ub-go">See Pro — '+CONFIG.PRICE+' one-time</button></div>';
       upSlot.appendChild(up);
       const go=$("ub-go");
       if(go) go.addEventListener("click",openPaywall);
-      setTimeout(()=>burstConfetti(70), 650);
     }
   }
 
@@ -2437,8 +3755,10 @@ function saveResume(){
     const data={mode:S.mode, slug:S.exam.slug, idx:S.idx, t0:S.t0, score:S.score,
       misses:S.misses, answers:S.answers||null, flags:S.flags||null, timed:!!S.timed,
       minutes:S.minutes||0,
-      bank:S.bank.map(q=>({q:q.q,options:q.options,answer:q.answer,explain:q.explain,
-        domain:q.domain,__res:q.__res||null})),
+      bank:S.bank.map(q=>({q:q.q||q.task||"",options:q.options||null,answer:(q.answer!=null?q.answer:null),
+        answers:q.answers||null,explain:q.explain,domain:q.domain,__res:q.__res||null,
+        kind:q.kind||"mcq",task:q.task||null,ctx:q.ctx||null,accept:q.accept||null,
+        hints:q.hints||null,solution:q.solution||null,_revealed:!!q._revealed,_lastInput:q._lastInput||null})),
       deadline:(S.mode==="sim"||(S.mode==="custom"&&S.timed))?deadline:0};
     localStorage.setItem(resumeKey(), JSON.stringify(data));
   }catch(e){/* quota — resume silently disabled */}
@@ -2679,7 +3999,24 @@ function renderBuilder(){
 }
 function renderBuilderDomains(){
   const e=EXAMS.find(x=>x.slug===builderSel.exam);
+  const fmt=examFormat(e.slug);
   const box=$("builder-domains"); box.innerHTML="";
+  const dl=$("builder-domlabel");
+  if(fmt.types.indexOf("terminal")!==-1){
+    /* Terminal exams drill hands-on tasks, not domains. */
+    if(dl) dl.textContent="2 · Hands-on tasks";
+    const note=document.createElement("div");
+    note.className="terminote";
+    note.textContent="Real "+e.code+"-style tasks — type actual commands in a simulated terminal, just like the exam.";
+    box.appendChild(note);
+    builderSel.domains=new Set(["terminal"]);
+    const slider=$("builder-count");
+    if(slider){ slider.min="5"; slider.max=String(fmt.count); slider.value="10"; $("builder-countval").textContent="10"; }
+    return;
+  }
+  if(dl) dl.textContent="2 · Choose domains";
+  const slider=$("builder-count");
+  if(slider){ slider.min="10"; slider.max="100"; }
   const counts={};
   BANKS[e.slug].forEach(q=>{ const d=q.domain||"General"; counts[d]=(counts[d]||0)+1; });
   e.domains.forEach(d=>{
@@ -2696,22 +4033,32 @@ function renderBuilderDomains(){
 }
 function startCustom(){
   const e=EXAMS.find(x=>x.slug===builderSel.exam);
+  const fmt=examFormat(e.slug);
   const doms=[...builderSel.domains];
   const msg=$("builder-msg");
-  if(!doms.length){ msg.textContent="Pick at least one domain."; msg.style.color="var(--red)"; return; }
-  let pool=BANKS[e.slug].filter(q=>doms.includes(q.domain||"General"));
-  if(!pool.length){ msg.textContent="No questions in those domains yet."; msg.style.color="var(--red)"; return; }
-  const count=Math.min(parseInt($("builder-count").value,10)||25, pool.length);
   const timed=$("builder-timed").classList.contains("on");
   const minutes=parseInt($("builder-minutes").value,10)||30;
-  const bank=shuffle(pool.slice()).slice(0,count).map(prepQ);
+  let bank, sublabel;
+  if(fmt.types.indexOf("terminal")!==-1){
+    const count=Math.min(Math.max(parseInt($("builder-count").value,10)||10,5),fmt.count);
+    bank=shuffle((TERMINAL_TASKS[e.slug]||[]).slice()).slice(0,count).map(prepTerminal);
+    if(!bank.length){ msg.textContent="No tasks available for this exam yet."; msg.style.color="var(--red)"; return; }
+    sublabel="Custom drill · "+count+" terminal tasks";
+  } else {
+    if(!doms.length){ msg.textContent="Pick at least one domain."; msg.style.color="var(--red)"; return; }
+    let pool=BANKS[e.slug].filter(q=>doms.includes(q.domain||"General"));
+    if(!pool.length){ msg.textContent="No questions in those domains yet."; msg.style.color="var(--red)"; return; }
+    const count=Math.min(parseInt($("builder-count").value,10)||25, pool.length);
+    bank=shuffle(pool.slice()).slice(0,count).map(prepQ);
+    sublabel="Custom quiz · "+count+" Qs · "+doms.length+" domain"+(doms.length>1?"s":"");
+  }
   curExam=e;
   S={mode:"custom", exam:e, bank, idx:0, score:0, misses:[], answered:false,
      answers:new Array(bank.length).fill(null), flags:new Array(bank.length).fill(false),
      t0:Date.now(), submitted:false, timed, minutes, customDomains:doms};
   document.documentElement.style.setProperty("--qacc",e.accent);
   $("exam-label").textContent=e.code;
-  $("exam-sublabel").textContent="Custom quiz · "+count+" Qs · "+doms.length+" domain"+(doms.length>1?"s":"");
+  $("exam-sublabel").textContent=sublabel;
   $("timer").style.display=timed?"flex":"none";
   $("endbtn").textContent=timed?"End quiz":"Finish";
   const fb=$("flagbtn"); timed?fb.classList.remove("hidden"):fb.classList.add("hidden");
@@ -2828,6 +4175,22 @@ function wireStatic(){
          answers:bank.map((q,i)=> i%4===0 ? (q.answer+1)%4 : q.answer),
          flags:new Array(bank.length).fill(false),t0:Date.now()-63*60000,submitted:true};
       finishExam(false);
+    },400);
+  }
+  if(shot==="terminal"){
+    setTimeout(()=>{
+      localStorage.setItem("bb_pro","1");
+      const e=EXAMS.find(x=>x.slug==="cka"), bank=shuffle((TERMINAL_TASKS.cka||[]).slice()).map(prepTerminal);
+      curExam=e;
+      S={mode:"sim",exam:e,bank,idx:0,score:0,misses:[],answers:new Array(bank.length).fill(null),
+         flags:new Array(bank.length).fill(false),t0:Date.now(),submitted:false,timed:true,minutes:120,terminal:true};
+      document.documentElement.style.setProperty("--qacc",e.accent);
+      $("exam-label").textContent=e.code;
+      $("exam-sublabel").textContent="Hands-on terminal tasks · "+bank.length+" tasks drawn from the 1,000-task bank";
+      $("timer").style.display="flex"; $("endbtn").textContent="End exam";
+      deadline=Date.now()+120*60*1000;
+      show("screen-exam"); renderExamChrome(); renderQ();
+      $("timetext").textContent="119:58";
     },400);
   }
 })();
