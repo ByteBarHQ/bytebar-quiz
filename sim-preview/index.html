@@ -43,6 +43,20 @@ body{
   background:linear-gradient(180deg,#ffd97a,#f0ad3c); color:#3a2503;
   padding:6px 12px; border-radius:999px;
 }
+/* ---------- persistent home button (every topbar + exam bar) ---------- */
+.homebtn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:38px; height:38px; flex:0 0 auto; padding:0;
+  border-radius:12px; cursor:pointer; font-family:inherit;
+  background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.20);
+  color:#dce7fb;
+  transition:background .15s ease, transform .12s ease, box-shadow .15s ease;
+}
+.homebtn:hover{background:rgba(255,255,255,.17); color:#fff; box-shadow:0 2px 12px rgba(0,0,0,.28);}
+.homebtn:active{transform:scale(.93);}
+.homebtn:focus-visible{outline:2px solid #7fd4f7; outline-offset:2px;}
+.homebtn svg{width:20px; height:20px;}
+@media (prefers-reduced-motion: reduce){ .homebtn{transition:none;} }
 .probadge.free{background:rgba(255,255,255,.14); color:#dbe5f7; border:1px solid rgba(255,255,255,.25);}
 
 /* ---------- layout ---------- */
@@ -329,6 +343,7 @@ body{
   .examcard{min-height:0; padding:20px 18px;}
   /* top bar: declutter on narrow screens */
   .topbar .inner{padding:11px 14px; gap:8px;}
+  .homebtn{width:36px; height:36px; border-radius:11px;}
   .brandmark{font-size:11px; letter-spacing:.3em;}
   .brandsub{display:none;}
   .lvlpill{display:none;}
@@ -908,6 +923,250 @@ button:active{transform:scale(.97);}
   border-radius:12px; padding:13px 16px; line-height:1.55;}
 @media (prefers-reduced-motion: reduce){
   .upgradecard{animation:none !important;}
+}
+
+/* ============ DUOLINGO-GRADE TACTILE SYSTEM (2026-10-18) ============
+   Research: Duolingo's addictive feel comes from ONE core interaction —
+   the 3D press. A button is two layers: a face and a base 4px below in a
+   darker shade of the face color. On press, the face travels down until it
+   lands flush on the base. The brain reads the visible edge as depth and
+   the travel as a physical click. Tactility comes from BORDERS, not float
+   shadows. Applied here to every pressable element in the app. */
+
+/* --- primary buttons: the signature 3D press --- */
+.btn{
+  box-shadow:0 5px 0 #060f22;               /* the lip: darker navy base */
+  transition:transform .08s ease, box-shadow .08s ease, filter .15s ease;
+}
+.btn:hover{transform:none; filter:brightness(1.05);}
+.btn:active{transform:translateY(5px); box-shadow:0 0 0 #060f22;}
+.btn.gold{box-shadow:0 5px 0 #a86a14;}
+.btn.gold:active{transform:translateY(5px); box-shadow:0 0 0 #a86a14;}
+.btn.ghost{box-shadow:0 4px 0 #d9cba6;}
+.btn.ghost:hover{background:var(--cyan-soft);}
+.btn.ghost:active{transform:translateY(4px); box-shadow:0 0 0 #d9cba6;}
+/* stamped, chunky labels on buttons (Duolingo: 700 + wide tracking) */
+.btn{letter-spacing:.015em;}
+
+/* --- answer options: the most-tapped element in the app --- */
+.opt{
+  box-shadow:0 3px 0 #ddd0b4;               /* pressable lip */
+  transition:transform .08s ease, box-shadow .08s ease, border-color .12s, background .12s;
+}
+.opt:hover{transform:none;}
+.opt:active{transform:translateY(3px); box-shadow:0 0 0 #ddd0b4;}
+/* selected = physically pressed IN and locked (Duolingo behavior) */
+.opt.sel{
+  transform:translateY(3px); box-shadow:0 0 0 #0b1e42;
+  border-color:var(--navy); background:#f3ecda;
+}
+.opt.correct{
+  transform:translateY(3px); box-shadow:0 0 0 #0a7a54;
+  border-color:var(--green); background:var(--green-soft);
+}
+.opt.wrong{
+  transform:translateY(3px); box-shadow:0 0 0 #a82e2e;
+  border-color:var(--red); background:var(--red-soft);
+}
+.opt:disabled:active{transform:translateY(3px);} /* locked-in, no bounce */
+
+/* --- question palette: chunky tactile squares --- */
+.pal{
+  box-shadow:0 3px 0 #ddd0b4;
+  transition:transform .08s ease, box-shadow .08s ease, background .12s;
+}
+.pal:active{transform:translateY(3px); box-shadow:0 0 0 #ddd0b4;}
+.pal.ans{box-shadow:0 3px 0 #060f22;}
+.pal.ans:active{transform:translateY(3px); box-shadow:0 0 0 #060f22;}
+.pal.cur{box-shadow:0 3px 0 #0b8fc4;}
+
+/* --- pills, domain pickers, menu buttons: same tactile language --- */
+.exampill{
+  box-shadow:0 3px 0 #ddd0b4;
+  transition:transform .08s ease, box-shadow .08s ease, background .12s, border-color .12s;
+}
+.exampill:active{transform:translateY(3px); box-shadow:0 0 0 #ddd0b4;}
+.exampill.on{box-shadow:0 3px 0 #060f22;}
+.exampill.on:active{transform:translateY(3px); box-shadow:0 0 0 #060f22;}
+.domopt{
+  box-shadow:0 3px 0 #ddd0b4;
+  transition:transform .08s ease, box-shadow .08s ease, background .12s, border-color .12s;
+}
+.domopt:active{transform:translateY(3px); box-shadow:0 0 0 #ddd0b4;}
+.domopt.on{box-shadow:0 3px 0 #0a7cb0;}
+.domopt.on:active{transform:translateY(3px); box-shadow:0 0 0 #0a7cb0;}
+.menubtn{
+  box-shadow:0 3px 0 #ddd0b4;
+  transition:transform .08s ease, box-shadow .08s ease, border-color .12s;
+}
+.menubtn:active{transform:translateY(3px); box-shadow:0 0 0 #ddd0b4;}
+.flagbtn{
+  box-shadow:0 3px 0 #ddd0b4;
+  transition:transform .08s ease, box-shadow .08s ease, background .12s;
+}
+.flagbtn:active{transform:translateY(3px); box-shadow:0 0 0 #ddd0b4;}
+.endbtn{
+  box-shadow:0 3px 0 rgba(120,20,20,.55);
+  transition:transform .08s ease, box-shadow .08s ease, background .12s;
+}
+.endbtn:active{transform:translateY(3px); box-shadow:0 0 0 rgba(120,20,20,.55);}
+.toggle{box-shadow:0 3px 0 #c9b98f;}
+.toggle:active{transform:translateY(2px); box-shadow:0 1px 0 #c9b98f;}
+
+/* --- exam cards: Duolingo card treatment — thick bottom lip, not float --- */
+.examcard{
+  border-bottom:4px solid #e0d3b8;
+  transition:transform .14s cubic-bezier(.2,.9,.25,1.15), box-shadow .14s, border-color .14s;
+}
+.examcard:hover{transform:translateY(-4px) scale(1.015);}
+.examcard:active{transform:translateY(1px) scale(.995);}
+/* bouncy cascade entrance with overshoot (game-juice easing, never linear) */
+@keyframes bbCardIn{0%{opacity:0; transform:translateY(22px) scale(.94);}60%{opacity:1; transform:translateY(-3px) scale(1.01);}100%{opacity:1; transform:none;}}
+.examcard{animation:bbCardIn .55s cubic-bezier(.2,.9,.25,1.15) backwards; animation-delay:calc(var(--i,0)*45ms);}
+
+/* ============ BOLDER HERO + COLOR CONFIDENCE (2026-10-18) ============ */
+/* Duolingo isn't afraid of bold. Bigger type, confident gradient headline,
+   richer color blocking — still professional, never gaudy. */
+.hero h1{font-size:48px; letter-spacing:-.025em; line-height:1.08;}
+.hero h1 .cy{
+  background:linear-gradient(92deg,#0b8fc4 10%,#0d9d6c 90%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+.hero p{font-size:18px;}
+/* trust chips get the tactile lip too */
+.trust{box-shadow:0 3px 0 #ddd0b4;}
+/* proofbar stats: bigger numbers, more presence */
+.proofbar .pstat b{font-size:36px;}
+/* section titles: confident, with gradient accent bar */
+.secttl{font-size:16px; color:var(--navy);}
+#screen-home .secttl::before{
+  background:linear-gradient(90deg,#0b8fc4,#0d9d6c,#f0ad3c);
+  width:26px; height:5px;
+}
+/* mode cards: tactile + bolder */
+.modecard{box-shadow:0 4px 0 #ddd0b4; transition:transform .08s ease, box-shadow .08s ease, border-color .14s;}
+.modecard:hover{transform:translateY(-2px);}
+.modecard:active{transform:translateY(4px); box-shadow:0 0 0 #ddd0b4;}
+.modecard h3{font-size:23px; letter-spacing:-.015em;}
+/* icon chips: richer, more saturated presence */
+.mchip{box-shadow:inset 0 -4px 0 rgba(0,0,0,.08), 0 4px 12px rgba(11,30,66,.12);}
+.eicon{box-shadow:inset 0 -4px 0 rgba(0,0,0,.14), 0 6px 14px rgba(11,30,66,.18);}
+
+/* ============ RESULTS: the lesson-complete moment, bigger (2026-10-18) ============ */
+/* Passing should feel like an event. Bigger headline, celebratory gradient on pass. */
+.res-headline{font-size:34px; letter-spacing:-.02em;}
+.rescard{border-top:6px solid var(--line);}
+.rescard.passed{border-top-color:#0d9d6c;}
+.rescard.failed{border-top-color:#d63a3a;}
+/* score ring: thicker, more confident */
+.ring .pct b{font-size:48px;}
+/* domain bars: chunkier, more satisfying to look at */
+.dbar{height:13px; box-shadow:inset 0 2px 4px rgba(11,30,66,.08);}
+.dbar > div{box-shadow:inset 0 -3px 0 rgba(0,0,0,.12);}
+
+/* ============ MICRO-INTERACTION POLISH (2026-10-18) ============ */
+/* every state change answers back — immediately, with easing, never linear */
+/* keyrow activate button + paywall buy: tactile */
+#pw-activate{box-shadow:0 4px 0 #d9cba6;}
+#pw-activate:active{transform:translateY(4px); box-shadow:0 0 0 #d9cba6;}
+#pw-buy{box-shadow:0 5px 0 #060f22;}
+#pw-buy:active{transform:translateY(5px); box-shadow:0 0 0 #060f22;}
+/* auth submit */
+#auth-submit{box-shadow:0 5px 0 #060f22;}
+#auth-submit:active{transform:translateY(5px); box-shadow:0 0 0 #060f22;}
+/* unlock/lvlup/prowelcome CTAs */
+#unlock-ok, #lvlup-ok, #prow-ok{box-shadow:0 5px 0 #060f22;}
+#unlock-ok:active, #lvlup-ok:active, #prow-ok:active{transform:translateY(5px); box-shadow:0 0 0 #060f22;}
+/* builder start */
+#builder-start{box-shadow:0 5px 0 #a86a14;}
+#builder-start:active{transform:translateY(5px); box-shadow:0 0 0 #a86a14;}
+/* brief start */
+#brief-start{box-shadow:0 5px 0 #060f22;}
+#brief-start:active{transform:translateY(5px); box-shadow:0 0 0 #060f22;}
+/* hero CTA */
+.hero-cta{box-shadow:0 5px 0 #060f22;}
+.hero-cta:active{transform:translateY(5px); box-shadow:0 0 0 #060f22;}
+/* results nav buttons */
+#res-home{box-shadow:0 5px 0 #060f22;}
+#res-home:active{transform:translateY(5px); box-shadow:0 0 0 #060f22;}
+#res-retake, #res-share{box-shadow:0 4px 0 #d9cba6;}
+#res-retake:active, #res-share:active{transform:translateY(4px); box-shadow:0 0 0 #d9cba6;}
+/* terminal run/solution */
+#termsubmit{box-shadow:0 5px 0 #060f22;}
+#termsubmit:active{transform:translateY(5px); box-shadow:0 0 0 #060f22;}
+#termreveal{box-shadow:0 4px 0 #d9cba6;}
+#termreveal:active{transform:translateY(4px); box-shadow:0 0 0 #d9cba6;}
+/* qnav prev/next */
+#prevbtn{box-shadow:0 4px 0 #d9cba6;}
+#prevbtn:active{transform:translateY(4px); box-shadow:0 0 0 #d9cba6;}
+#nextbtn{box-shadow:0 5px 0 #060f22;}
+#nextbtn:active{transform:translateY(5px); box-shadow:0 0 0 #060f22;}
+/* resume button */
+.resumebar .btn{box-shadow:0 4px 0 #a86a14;}
+.resumebar .btn:active{transform:translateY(4px); box-shadow:0 0 0 #a86a14;}
+
+/* squash-and-stretch on correct answer: the card does a happy bounce */
+@keyframes bbCorrectBounce{0%{transform:scale(1);}35%{transform:scale(1.02,.97);}65%{transform:scale(.99,1.01);}100%{transform:scale(1);}}
+.opt.correct{animation:bbCorrectBounce .4s ease;}
+/* wrong answer: sharper, shorter shake (contrast: correct is bouncy, wrong is blunt) */
+@keyframes bbWrongThud{0%{transform:translateX(0);}25%{transform:translateX(-7px);}50%{transform:translateX(5px);}75%{transform:translateX(-2px);}100%{transform:translateX(0);}}
+.qflash-bad{animation:bbWrongThud .35s ease;}
+
+/* stat cards: tactile lip + richer icon chips */
+.stat{box-shadow:0 3px 0 #ddd0b4;}
+.stat .sic{box-shadow:inset 0 -3px 0 rgba(0,0,0,.1);}
+/* badge cards: tactile */
+.badge{box-shadow:0 3px 0 #ddd0b4;}
+.badge.unlocked{box-shadow:0 3px 0 #d9a83f;}
+/* dashboard panels keep soft shadow (content, not controls) */
+
+/* paywall price: bigger, more confident */
+.priceline .p{font-size:52px;}
+/* paywall feature list: bolder checkmarks */
+.sheet ul.feats li::before{font-size:19px;}
+
+/* empty states: bigger mascot moment, warmer copy container */
+.emptystate{
+  background:linear-gradient(180deg,#fffdf6,#fff);
+  border:1.5px dashed #e6dcc4; border-radius:18px;
+  padding:34px 20px; gap:12px;
+}
+.emptystate .mascot-slot{filter:drop-shadow(0 6px 14px rgba(11,143,196,.22));}
+
+/* coach line: subtle tactile lip so it feels like a physical buddy card */
+.coachline{box-shadow:0 3px 0 #e8d5a8;}
+.coachline.cool{box-shadow:0 3px 0 #c9dcf5;}
+
+/* streak pill: pops with overshoot when it updates (already has bbStreakPop) */
+/* XP float-up: slightly bigger, more celebratory */
+.xpfloater{font-size:19px;}
+
+/* mobile: keep the tactile system, slightly smaller lips for small screens */
+@media (max-width:560px){
+  .hero h1{font-size:32px;}
+  .hero p{font-size:16px;}
+  .res-headline{font-size:27px;}
+  .priceline .p{font-size:44px;}
+  .btn{box-shadow:0 4px 0 #060f22;}
+  .btn:active{transform:translateY(4px); box-shadow:0 0 0 #060f22;}
+  .proofbar .pstat b{font-size:28px;}
+}
+
+/* reduced motion: the tactile system degrades gracefully —
+   lips stay (they're static depth), travel/press animation is removed */
+@media (prefers-reduced-motion: reduce){
+  .btn, .btn.gold, .btn.ghost, .opt, .pal, .exampill, .domopt, .menubtn,
+  .flagbtn, .endbtn, .modecard, .examcard, .stat, .badge, .trust,
+  .coachline, #pw-activate, #pw-buy, #auth-submit, #unlock-ok, #lvlup-ok,
+  #prow-ok, #builder-start, #brief-start, .hero-cta, #res-home,
+  #res-retake, #res-share, #termsubmit, #termreveal, #prevbtn, #nextbtn,
+  .resumebar .btn{transition:none;}
+  .btn:active, .btn.gold:active, .btn.ghost:active, .opt:active, .pal:active,
+  .exampill:active, .domopt:active, .menubtn:active, .flagbtn:active,
+  .endbtn:active, .modecard:active, .examcard:active{transform:none;}
+  .opt.sel, .opt.correct, .opt.wrong{transform:none;}
+  .examcard{animation:none;}
+  .opt.correct{animation:none;}
 }
 
 </style>
@@ -2694,6 +2953,42 @@ function show(id){
   });
   window.scrollTo(0,0);
 }
+
+/* ================= persistent home navigation =================
+   A home button is injected into every topbar (all screens + the
+   exam screen's dark bar). From an active exam it guards against
+   accidental progress loss; everywhere else it's a straight shot. */
+const HOME_SVG='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.7V20.5h14V9.7"/><path d="M9.7 20.5v-5.6h4.6v5.6"/></svg>';
+function goHome(){
+  const onExam = !$("screen-exam").classList.contains("hidden");
+  if(onExam && S && !S.submitted){
+    const timed = S.mode==="sim" || (S.mode==="custom" && S.timed);
+    if(timed){
+      /* Timed exam: leaving discards it — confirm first. */
+      if(!confirm("Leave the exam?\n\nYour progress won't be saved.")) return;
+      clearInterval(timerId); clearResume();
+    } else {
+      /* Untimed practice/custom: progress auto-saves; home offers "Resume". */
+      saveResume();
+      clearInterval(timerId);
+    }
+    S=null;
+    const tm=$("timermascot"); if(tm) tm.classList.add("hidden");
+  }
+  renderHome();
+}
+function installHomeButtons(){
+  document.querySelectorAll(".topbar .inner, .examtop .inner").forEach(inner=>{
+    if(inner.querySelector(".homebtn")) return;
+    const b=document.createElement("button");
+    b.type="button"; b.className="homebtn";
+    b.setAttribute("aria-label","Back to home");
+    b.title="Back to home";
+    b.innerHTML=HOME_SVG;
+    b.addEventListener("click",goHome);
+    inner.insertBefore(b, inner.firstChild);
+  });
+}
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function isPro(){ return localStorage.getItem("bb_pro")==="1"; }
 function refreshBadges(){
@@ -3419,6 +3714,7 @@ $("endbtn").addEventListener("click",()=>{
 function finishExam(expired){
   clearInterval(timerId);
   clearResume();
+  if(S) S.submitted=true; /* finished exams are never "live" — guards goHome + saveResume */
   const tm=$("timermascot"); if(tm) tm.classList.add("hidden");
   const n=S.bank.length;
   const live=isLiveMode();
@@ -3592,6 +3888,8 @@ function finishExam(expired){
     if(jb) jb.addEventListener("click",openAuth);
   }
   refreshAccount();
+  const rc=document.querySelector("#screen-results .rescard");
+  if(rc){ rc.classList.toggle("passed",pass); rc.classList.toggle("failed",!pass); }
   show("screen-results");
 }
 
@@ -4222,6 +4520,7 @@ function wireStatic(){
   $("builder-start").addEventListener("click",startCustom);
   window.addEventListener("pagehide",saveResume);
   document.addEventListener("visibilitychange",()=>{ if(document.hidden) saveResume(); });
+  installHomeButtons();
 }
 
 /* ================= shot hooks (preview only) ================= */
