@@ -5430,16 +5430,17 @@ wireReveals();
 wireCounters();
 wireHero();
 refreshAccount();
-renderHome();
-/* Deep-link support: ?exam=<slug> jumps to exam mode selection */
+/* Deep-link support: ?exam=<slug> jumps straight to exam — skip home render to avoid flash */
 (function(){
   try {
     var params = new URLSearchParams(window.location.search);
     var examSlug = params.get('exam');
     if(examSlug && EXAMS.some(function(e){ return e.slug === examSlug; })) {
       examCardClick(examSlug);
+      return;
     }
   } catch(e) {}
+  renderHome();
 })();
 </script>
 </body>
