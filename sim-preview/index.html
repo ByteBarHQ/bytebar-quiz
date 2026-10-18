@@ -1281,6 +1281,9 @@ button:active{transform:scale(.97);}
   .endbtn:active, .modecard:active, .examcard:active{transform:none;}
   .opt.sel, .opt.correct, .opt.wrong{transform:none;}
   .examcard{animation:none;}
+  /* Sprout life system: freeze all motion; lids stay open */
+  .bb-mroot,.bb-mbreathe,.bb-pupil,.bb-sproutwig{animation:none !important;}
+  .bb-lid{animation:none !important; transform:scaleY(0) !important;}
   .opt.correct{animation:none;}
 }
 
@@ -1347,6 +1350,30 @@ button:active{transform:scale(.97);}
 /* a hovered mascot perks up — a tiny moment of personality */
 .mascot-slot{transition:transform .25s var(--ease-spring);}
 .mascot-slot:hover{transform:scale(1.08) rotate(-3deg);}
+
+/* ============ Sprout life system (2026-10-18) ============
+   Texture lives in the SVG (grain filter + layered gradients).
+   These keyframes give Sprout weight, breath, and presence:
+   - bbMSway: the whole body sways gently, like it's standing
+   - bbMBreathe: slow squash-and-stretch breath (never a flat float)
+   - bbMBlink: lids snap shut every ~5s — the single biggest "alive" cue
+   - bbMDrift: pupils wander almost imperceptibly — subliminal life
+   - bbMWig: the head-sprout leaves tremble in a breeze
+   - bbMPop: one-shot anticipation squash → stretch on reactions
+   Per-instance negative delays (set inline) keep multiple Sprouts
+   on one screen from moving in lockstep. */
+.bb-mroot{transform-box:fill-box; transform-origin:50% 90%; animation:bbMSway 5.2s ease-in-out infinite;}
+.bb-mroot.bb-react{animation:bbMSway 5.2s ease-in-out infinite, bbMPop .55s cubic-bezier(.2,.9,.25,1.25);}
+@keyframes bbMSway{0%,100%{transform:rotate(-1.6deg);}50%{transform:rotate(1.6deg);}}
+@keyframes bbMPop{0%{transform:scale(1.16,.84);}55%{transform:scale(.94,1.07);}78%{transform:scale(1.02,.98);}100%{transform:scale(1,1);}}
+.bb-mbreathe{transform-box:fill-box; transform-origin:50% 88%; animation:bbMBreathe 3.8s ease-in-out infinite;}
+@keyframes bbMBreathe{0%,100%{transform:scale(1,1) translateY(0);}50%{transform:scale(1.018,.984) translateY(-1px);}}
+.bb-lid{transform-box:fill-box; transform-origin:50% 50%; transform:scaleY(0); animation:bbMBlink 4.8s ease-in-out infinite;}
+@keyframes bbMBlink{0%,92.5%,100%{transform:scaleY(0);}95%{transform:scaleY(1);}97.5%{transform:scaleY(0);}}
+.bb-pupil{animation:bbMDrift 7.5s ease-in-out infinite;}
+@keyframes bbMDrift{0%,100%{transform:translate(0,0);}35%{transform:translate(.9px,.5px);}70%{transform:translate(-.8px,.6px);}}
+.bb-sproutwig{transform-box:fill-box; transform-origin:50% 100%; animation:bbMWig 3.4s ease-in-out infinite;}
+@keyframes bbMWig{0%,100%{transform:rotate(-6deg);}50%{transform:rotate(7deg);}}
 
 /* ---------- micro-interactions: every state change answers back ---------- */
 /* text inputs + selects: focus glows in, never snaps */
@@ -1424,9 +1451,10 @@ input[type="text"]:focus,input[type="password"]:focus,select:focus{
   background:linear-gradient(92deg,#0d9d6c 20%,#0b8fc4 80%);
   -webkit-background-clip:text; background-clip:text; color:transparent;
 }
-/* proofbar: numbers get quiet gradient confidence */
+/* proofbar: numbers stay bright on the navy card (2026-10-18 fix — dark
+   gradient was invisible on navy) */
 .proofbar .pstat b{
-  background:linear-gradient(180deg,#0b1e42,#1b3a7a);
+  background:linear-gradient(180deg,#ffffff,#cfe6ff);
   -webkit-background-clip:text; background-clip:text; color:transparent;
 }
 /* section accent bars: already tri-color — deepen saturation */
@@ -3301,15 +3329,18 @@ function installHomeButtons(){
 function shuffle(a){ for(let i=a.length-1;i>0;i--){ const j=Math.floor(Math.random()*(i+1)); const t=a[i]; a[i]=a[j]; a[j]=t; } return a; }
 function isPro(){
   /* Pro lives on the account when logged in; device flag is the fallback
-     for guests who activated before creating an account. */
+     for guests who activated before creating an account.
+     The license key is REQUIRED on both paths — a bare flag without a key
+     is never valid (2026-10-18: preview ?shot= hooks used to set the flag
+     without a key, silently granting Pro). */
   const r=userRec();
-  if(r && r.pro) return true;
-  return localStorage.getItem("bb_pro")==="1";
+  if(r && r.pro && r.proKey) return true;
+  return localStorage.getItem("bb_pro")==="1" && !!localStorage.getItem("bb_pro_key");
 }
 /* Sync device-level Pro flag from the signed-in account (call after sign-in). */
 function syncProFromAccount(){
   const r=userRec();
-  if(r && r.pro){
+  if(r && r.pro && r.proKey){
     localStorage.setItem("bb_pro","1");
     if(r.proKey) localStorage.setItem("bb_pro_key",r.proKey);
   } else {
@@ -3348,76 +3379,121 @@ function refreshBadges(){
    thoughtful, sleep, determined, surprised, celebrate, nervous,
    cheering. Unknown states fall back to idle.
    ============================================================ */
+let bbUID=0;
 function mascotSVG(state, size){
   const s=size||56;
   const st=state||"idle";
+  const u="bbm"+(++bbUID);
+  /* phase offsets so multiple Sprouts on one screen don't move in lockstep */
+  const rootPh=((bbUID*1.37)%5.2).toFixed(2), breathPh=((bbUID*2.11)%3.8).toFixed(2),
+        lidPh=((bbUID*0.93)%4.8).toFixed(2), lidPh2=(((bbUID*0.93)%4.8)+0.05).toFixed(2);
   /* warm, soft palette — nothing harsh or cold */
   const BODY="#FFDDB8", BELLY="#FFE9D1", LINE="#8B5A3B",
         CHEEK="#FF9EAA", PUPIL="#3A3340",
         LEAF="#58B368", LEAFD="#3E8E4F";
+  /* ---- texture + depth defs: layered gradients + film grain (per-instance ids) ---- */
+  const defs='<defs>'+
+    '<radialGradient id="'+u+'-bodyG" cx="0.42" cy="0.3" r="0.9">'+
+      '<stop offset="0" stop-color="#FFF1DE"/><stop offset="0.55" stop-color="#FFDDB8"/><stop offset="1" stop-color="#F0B985"/></radialGradient>'+
+    '<radialGradient id="'+u+'-bellyG" cx="0.5" cy="0.35" r="0.8">'+
+      '<stop offset="0" stop-color="#FFF6E8"/><stop offset="1" stop-color="#FFE3C2"/></radialGradient>'+
+    '<radialGradient id="'+u+'-eyeG" cx="0.5" cy="0.38" r="0.75">'+
+      '<stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#DCE3F1"/></radialGradient>'+
+    '<radialGradient id="'+u+'-pupG" cx="0.38" cy="0.32" r="0.85">'+
+      '<stop offset="0" stop-color="#6E657F"/><stop offset="1" stop-color="#2B2733"/></radialGradient>'+
+    '<radialGradient id="'+u+'-cheekG" cx="0.5" cy="0.5" r="0.5">'+
+      '<stop offset="0" stop-color="#FF9EAA" stop-opacity="0.9"/><stop offset="1" stop-color="#FF9EAA" stop-opacity="0"/></radialGradient>'+
+    '<linearGradient id="'+u+'-leafG" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#86D694"/><stop offset="1" stop-color="#3E8E4F"/></linearGradient>'+
+    '<linearGradient id="'+u+'-shadeG" x1="0" y1="0" x2="0" y2="1">'+
+      '<stop offset="0" stop-color="#A06838" stop-opacity="0"/><stop offset="1" stop-color="#A06838" stop-opacity="0.35"/></linearGradient>'+
+    '<radialGradient id="'+u+'-hiG" cx="0.5" cy="0.5" r="0.5">'+
+      '<stop offset="0" stop-color="#FFFFFF" stop-opacity="0.55"/><stop offset="1" stop-color="#FFFFFF" stop-opacity="0"/></radialGradient>'+
+    '<radialGradient id="'+u+'-shadG" cx="0.5" cy="0.5" r="0.5">'+
+      '<stop offset="0" stop-color="#0B1E42" stop-opacity="0.22"/><stop offset="1" stop-color="#0B1E42" stop-opacity="0"/></radialGradient>'+
+    '<filter id="'+u+'-grain" x="-20%" y="-20%" width="140%" height="140%">'+
+      '<feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="7" stitchTiles="stitch" result="n"/>'+
+      '<feColorMatrix in="n" type="matrix" values="0 0 0 0 0.42 0 0 0 0 0.27 0 0 0 0 0.15 0 0 0 0.55 0" result="g"/>'+
+      '<feComposite in="g" in2="SourceGraphic" operator="in"/></filter>'+
+    '</defs>';
+  /* blink lids — body-toned covers that snap shut every few seconds */
+  const lids=(ex1,ex2,ey,rx,ry)=>{
+    return '<ellipse class="bb-lid" style="animation-delay:-'+lidPh+'s" cx="'+ex1+'" cy="'+ey+'" rx="'+(rx+0.6)+'" ry="'+(ry+0.6)+'" fill="url(#'+u+'-bodyG)"/>'+
+           '<ellipse class="bb-lid" style="animation-delay:-'+lidPh2+'s" cx="'+ex2+'" cy="'+ey+'" rx="'+(rx+0.6)+'" ry="'+(ry+0.6)+'" fill="url(#'+u+'-bodyG)"/>';
+  };
   /* 4-point sparkle star helper */
   const star=(cx,cy,r,fill)=>{
     const k=(r/7).toFixed(2);
     return '<path d="M0,-7 C1,-2.1 2.1,-1 7,0 C2.1,1 1,2.1 0,7 C-1,2.1 -2.1,1 -7,0 C-2.1,-1 -1,-2.1 0,-7 Z"'+
       ' transform="translate('+cx+' '+cy+') scale('+k+')" fill="'+fill+'"/>';
   };
-  /* big kawaii eyes: white + pupil + catchlights. ex,ey = center, rx,ry = size */
+  /* big kawaii eyes with depth: gradient sclera, dimensional pupil,
+     double catchlight, drifting pupils, blinking lids */
   const bigEyes=(ex1,ex2,ey,rx,ry,pr,px,py)=>{
-    return '<ellipse cx="'+ex1+'" cy="'+ey+'" rx="'+rx+'" ry="'+ry+'" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-      '<ellipse cx="'+ex2+'" cy="'+ey+'" rx="'+rx+'" ry="'+ry+'" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-      '<circle cx="'+(ex1+px)+'" cy="'+(ey+py)+'" r="'+pr+'" fill="'+PUPIL+'"/>'+
-      '<circle cx="'+(ex2+px)+'" cy="'+(ey+py)+'" r="'+pr+'" fill="'+PUPIL+'"/>'+
+    return '<ellipse cx="'+ex1+'" cy="'+ey+'" rx="'+rx+'" ry="'+ry+'" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+      '<ellipse cx="'+ex2+'" cy="'+ey+'" rx="'+rx+'" ry="'+ry+'" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+      '<circle class="bb-pupil" cx="'+(ex1+px)+'" cy="'+(ey+py)+'" r="'+pr+'" fill="url(#'+u+'-pupG)"/>'+
+      '<circle class="bb-pupil" cx="'+(ex2+px)+'" cy="'+(ey+py)+'" r="'+pr+'" fill="url(#'+u+'-pupG)"/>'+
       '<circle cx="'+(ex1+px+pr*0.45)+'" cy="'+(ey+py-pr*0.55)+'" r="'+(pr*0.42).toFixed(1)+'" fill="#fff"/>'+
-      '<circle cx="'+(ex2+px+pr*0.45)+'" cy="'+(ey+py-pr*0.55)+'" r="'+(pr*0.42).toFixed(1)+'" fill="#fff"/>';
+      '<circle cx="'+(ex2+px+pr*0.45)+'" cy="'+(ey+py-pr*0.55)+'" r="'+(pr*0.42).toFixed(1)+'" fill="#fff"/>'+
+      '<circle cx="'+(ex1+px-pr*0.35)+'" cy="'+(ey+py+pr*0.42)+'" r="'+(pr*0.2).toFixed(1)+'" fill="#fff" opacity="0.75"/>'+
+      '<circle cx="'+(ex2+px-pr*0.35)+'" cy="'+(ey+py+pr*0.42)+'" r="'+(pr*0.2).toFixed(1)+'" fill="#fff" opacity="0.75"/>'+
+      lids(ex1,ex2,ey,rx,ry);
   };
-  /* blush cheeks — research top-ranked cute cue */
+  /* blush cheeks — soft radial, no hard edge */
   const cheeks=(op)=>{
     const o=op||0.55;
-    return '<ellipse cx="28" cy="61" rx="6.5" ry="4.2" fill="'+CHEEK+'" opacity="'+o+'"/>'+
-           '<ellipse cx="68" cy="61" rx="6.5" ry="4.2" fill="'+CHEEK+'" opacity="'+o+'"/>';
+    return '<ellipse cx="28" cy="61" rx="7.5" ry="5" fill="url(#'+u+'-cheekG)" opacity="'+o+'"/>'+
+           '<ellipse cx="68" cy="61" rx="7.5" ry="5" fill="url(#'+u+'-cheekG)" opacity="'+o+'"/>';
   };
-  /* tiny sprout on head — Sprout's signature silhouette */
+  /* tiny sprout on head — leaves wiggle with life */
   const sprout=(droop)=>{
     const tip=droop?22:14, bend=droop?6:0;
     return '<path d="M48,29 Q'+(48+bend)+','+(29-(29-tip)/2)+' 48,'+tip+'" stroke="'+LEAFD+'" stroke-width="3" fill="none" stroke-linecap="round"/>'+
-      '<ellipse cx="'+(41-bend*0.4)+'" cy="'+(tip+7)+'" rx="6" ry="3.4" fill="'+LEAF+'" stroke="'+LEAFD+'" stroke-width="1.4" transform="rotate(-28 '+(41-bend*0.4)+' '+(tip+7)+')"/>'+
-      '<ellipse cx="'+(55+bend*0.4)+'" cy="'+(tip+7)+'" rx="6" ry="3.4" fill="'+LEAF+'" stroke="'+LEAFD+'" stroke-width="1.4" transform="rotate(28 '+(55+bend*0.4)+' '+(tip+7)+')"/>';
+      '<g class="bb-sproutwig">'+
+      '<ellipse cx="'+(41-bend*0.4)+'" cy="'+(tip+7)+'" rx="6" ry="3.4" fill="url(#'+u+'-leafG)" stroke="'+LEAFD+'" stroke-width="1.4" transform="rotate(-28 '+(41-bend*0.4)+' '+(tip+7)+')"/>'+
+      '<ellipse cx="'+(55+bend*0.4)+'" cy="'+(tip+7)+'" rx="6" ry="3.4" fill="url(#'+u+'-leafG)" stroke="'+LEAFD+'" stroke-width="1.4" transform="rotate(28 '+(55+bend*0.4)+' '+(tip+7)+')"/>'+
+      '</g>';
   };
-  /* stubby little arms */
-  const armL='<ellipse cx="18" cy="60" rx="5" ry="9" fill="'+BODY+'" stroke="'+LINE+'" stroke-width="2"/>';
-  const armR='<ellipse cx="78" cy="60" rx="5" ry="9" fill="'+BODY+'" stroke="'+LINE+'" stroke-width="2"/>';
+  /* stubby little arms with soft shading */
+  const armL='<ellipse cx="18" cy="60" rx="5" ry="9" fill="url(#'+u+'-bodyG)" stroke="'+LINE+'" stroke-width="2"/>';
+  const armR='<ellipse cx="78" cy="60" rx="5" ry="9" fill="url(#'+u+'-bodyG)" stroke="'+LINE+'" stroke-width="2"/>';
   const raise='<g transform="rotate(140 18 60)">'+armL+'</g><g transform="rotate(-140 78 60)">'+armR+'</g>';
   const cheer='<g transform="rotate(155 18 60)">'+armL+'</g><g transform="rotate(-155 78 60)">'+armR+'</g>';
   const spread='<g transform="rotate(80 18 60)">'+armL+'</g><g transform="rotate(-80 78 60)">'+armR+'</g>';
 
-  let arms=armL+armR, tilt=0, squash=0, face="", behind="", topper=sprout(false);
+  let arms=armL+armR, tilt=0, squash=0, react=0, face="", behind="", topper=sprout(false);
   switch(st){
     case "happy": /* closed happy arcs + open smile — the plushie look */
       face='<path d="M28,50 Q37,41 46,50" stroke="'+PUPIL+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
            '<path d="M50,50 Q59,41 68,50" stroke="'+PUPIL+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
            '<path d="M38,63 Q48,76 58,63 Q48,68.5 38,63Z" fill="'+LINE+'"/>'+cheeks(0.7);
+      react=1;
       break;
     case "proud": /* confident half-lids, gaze up, smirk */
-      face='<ellipse cx="37" cy="52" rx="9" ry="9" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-           '<ellipse cx="59" cy="52" rx="9" ry="9" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-           '<circle cx="37" cy="49" r="5" fill="'+PUPIL+'"/><circle cx="59" cy="49" r="5" fill="'+PUPIL+'"/>'+
+      face='<ellipse cx="37" cy="52" rx="9" ry="9" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="59" cy="52" rx="9" ry="9" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<circle class="bb-pupil" cx="37" cy="49" r="5" fill="url(#'+u+'-pupG)"/><circle class="bb-pupil" cx="59" cy="49" r="5" fill="url(#'+u+'-pupG)"/>'+
            '<circle cx="38.8" cy="47.2" r="1.9" fill="#fff"/><circle cx="60.8" cy="47.2" r="1.9" fill="#fff"/>'+
+           '<circle cx="35.5" cy="50.5" r="1" fill="#fff" opacity="0.7"/><circle cx="57.5" cy="50.5" r="1" fill="#fff" opacity="0.7"/>'+
            '<path d="M29,45 Q37,42.5 45,45" stroke="'+LINE+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+
            '<path d="M51,45 Q59,42.5 67,45" stroke="'+LINE+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+
-           '<path d="M42,67 Q51,69.5 56,65" stroke="'+LINE+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+cheeks(0.5);
+           '<path d="M42,67 Q51,69.5 56,65" stroke="'+LINE+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+cheeks(0.5)+
+           lids(37,59,52,9,9);
       tilt=-4;
       behind=star(74,26,6,"#f0ad3c");
       break;
     case "sympathetic": /* droopy gentle eyes, soft tilt — feels WITH you */
-      face='<ellipse cx="37" cy="52" rx="9" ry="9.5" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-           '<ellipse cx="59" cy="52" rx="9" ry="9.5" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-           '<circle cx="37" cy="54.5" r="5" fill="'+PUPIL+'"/><circle cx="59" cy="54.5" r="5" fill="'+PUPIL+'"/>'+
+      face='<ellipse cx="37" cy="52" rx="9" ry="9.5" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="59" cy="52" rx="9" ry="9.5" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<circle class="bb-pupil" cx="37" cy="54.5" r="5" fill="url(#'+u+'-pupG)"/><circle class="bb-pupil" cx="59" cy="54.5" r="5" fill="url(#'+u+'-pupG)"/>'+
            '<circle cx="38.8" cy="52.7" r="1.9" fill="#fff"/><circle cx="60.8" cy="52.7" r="1.9" fill="#fff"/>'+
            '<path d="M30,47 Q37,45 44,47" stroke="'+LINE+'" stroke-width="2.2" fill="none" stroke-linecap="round"/>'+
            '<path d="M52,47 Q59,45 66,47" stroke="'+LINE+'" stroke-width="2.2" fill="none" stroke-linecap="round"/>'+
            '<path d="M43,68 Q48,70 53,68" stroke="'+LINE+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
-           '<ellipse cx="28" cy="61" rx="7.5" ry="5" fill="'+CHEEK+'" opacity="0.7"/>'+
-           '<ellipse cx="68" cy="61" rx="7.5" ry="5" fill="'+CHEEK+'" opacity="0.7"/>';
+           '<ellipse cx="28" cy="61" rx="8" ry="5.4" fill="url(#'+u+'-cheekG)" opacity="0.7"/>'+
+           '<ellipse cx="68" cy="61" rx="8" ry="5.4" fill="url(#'+u+'-cheekG)" opacity="0.7"/>'+
+           lids(37,59,52,9,9.5);
       tilt=4;
       break;
     case "encourage": /* warm open eyes + open smile — "you've got this" */
@@ -3428,16 +3504,17 @@ function mascotSVG(state, size){
     case "excited": /* sparkle eyes, big open mouth, arms up */
       face=star(37,50,8,PUPIL)+star(59,50,8,PUPIL)+
            '<ellipse cx="48" cy="68" rx="7" ry="6" fill="'+LINE+'"/>'+cheeks(0.7);
-      arms=raise; squash=1;
+      arms=raise; squash=1; react=1;
       behind='<path d="M8,44 q-3,7 0,14" stroke="#7fd4f7" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
              '<path d="M88,44 q3,7 0,14" stroke="#7fd4f7" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
       break;
     case "thoughtful": /* gaze drifts up, flat thinking mouth */
-      face='<ellipse cx="37" cy="50" rx="10" ry="12" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-           '<ellipse cx="59" cy="50" rx="10" ry="12" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-           '<circle cx="34.5" cy="46.5" r="5.5" fill="'+PUPIL+'"/><circle cx="56.5" cy="46.5" r="5.5" fill="'+PUPIL+'"/>'+
+      face='<ellipse cx="37" cy="50" rx="10" ry="12" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="59" cy="50" rx="10" ry="12" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<circle class="bb-pupil" cx="34.5" cy="46.5" r="5.5" fill="url(#'+u+'-pupG)"/><circle class="bb-pupil" cx="56.5" cy="46.5" r="5.5" fill="url(#'+u+'-pupG)"/>'+
            '<circle cx="36.3" cy="44.7" r="2" fill="#fff"/><circle cx="58.3" cy="44.7" r="2" fill="#fff"/>'+
-           '<path d="M43,68 L53,67" stroke="'+LINE+'" stroke-width="2.5" stroke-linecap="round"/>'+cheeks(0.4);
+           '<path d="M43,68 L53,67" stroke="'+LINE+'" stroke-width="2.5" stroke-linecap="round"/>'+cheeks(0.4)+
+           lids(37,59,50,10,12);
       behind='<circle cx="70" cy="32" r="2.2" fill="#b9c6e4"/><circle cx="76" cy="25" r="3" fill="#b9c6e4"/>'+
              '<ellipse cx="84" cy="15" rx="8" ry="6" fill="#fff" stroke="#b9c6e4" stroke-width="1.5"/>';
       tilt=-3;
@@ -3453,25 +3530,28 @@ function mascotSVG(state, size){
     case "determined": /* angled brows, locked-in gaze, firm mouth */
       face='<path d="M27,40 L45,44.5" stroke="'+PUPIL+'" stroke-width="3" stroke-linecap="round"/>'+
            '<path d="M69,40 L51,44.5" stroke="'+PUPIL+'" stroke-width="3" stroke-linecap="round"/>'+
-           '<ellipse cx="37" cy="53" rx="9.5" ry="10.5" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-           '<ellipse cx="59" cy="53" rx="9.5" ry="10.5" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-           '<circle cx="37" cy="54" r="5.5" fill="'+PUPIL+'"/><circle cx="59" cy="54" r="5.5" fill="'+PUPIL+'"/>'+
+           '<ellipse cx="37" cy="53" rx="9.5" ry="10.5" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="59" cy="53" rx="9.5" ry="10.5" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<circle class="bb-pupil" cx="37" cy="54" r="5.5" fill="url(#'+u+'-pupG)"/><circle class="bb-pupil" cx="59" cy="54" r="5.5" fill="url(#'+u+'-pupG)"/>'+
            '<circle cx="38.9" cy="52.1" r="2" fill="#fff"/><circle cx="60.9" cy="52.1" r="2" fill="#fff"/>'+
-           '<path d="M41,68 L55,68" stroke="'+LINE+'" stroke-width="2.8" stroke-linecap="round"/>'+cheeks(0.35);
+           '<circle cx="35.5" cy="55.5" r="1.1" fill="#fff" opacity="0.7"/><circle cx="57.5" cy="55.5" r="1.1" fill="#fff" opacity="0.7"/>'+
+           '<path d="M41,68 L55,68" stroke="'+LINE+'" stroke-width="2.8" stroke-linecap="round"/>'+cheeks(0.35)+
+           lids(37,59,53,9.5,10.5);
       break;
     case "surprised": /* huge eyes, tiny pupils, little "o" mouth */
-      face='<ellipse cx="37" cy="50" rx="11.5" ry="13.5" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-           '<ellipse cx="59" cy="50" rx="11.5" ry="13.5" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-           '<circle cx="37" cy="51" r="4" fill="'+PUPIL+'"/><circle cx="59" cy="51" r="4" fill="'+PUPIL+'"/>'+
+      face='<ellipse cx="37" cy="50" rx="11.5" ry="13.5" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="59" cy="50" rx="11.5" ry="13.5" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<circle class="bb-pupil" cx="37" cy="51" r="4" fill="url(#'+u+'-pupG)"/><circle class="bb-pupil" cx="59" cy="51" r="4" fill="url(#'+u+'-pupG)"/>'+
            '<circle cx="38.4" cy="49.4" r="1.6" fill="#fff"/><circle cx="60.4" cy="49.4" r="1.6" fill="#fff"/>'+
-           '<ellipse cx="48" cy="69" rx="4.2" ry="5" fill="none" stroke="'+LINE+'" stroke-width="2.6"/>'+cheeks(0.5);
-      arms=spread;
+           '<ellipse cx="48" cy="69" rx="4.2" ry="5" fill="none" stroke="'+LINE+'" stroke-width="2.6"/>'+cheeks(0.5)+
+           lids(37,59,50,11.5,13.5);
+      arms=spread; react=1;
       break;
     case "celebrate": /* party hat, happy arcs, confetti */
       face='<path d="M28,50 Q37,41 46,50" stroke="'+PUPIL+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
            '<path d="M50,50 Q59,41 68,50" stroke="'+PUPIL+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
            '<path d="M37,62 Q48,77 59,62 Q48,68 37,62Z" fill="'+LINE+'"/>'+cheeks(0.75);
-      arms=raise;
+      arms=raise; react=1;
       topper='<g transform="rotate(12 48 28)">'+
         '<polygon points="36,30 60,30 48,4" fill="#f472b6" stroke="'+LINE+'" stroke-width="1.6"/>'+
         '<polygon points="41,21 55,21 48,4" fill="#f0ad3c" opacity="0.9"/>'+
@@ -3481,16 +3561,18 @@ function mascotSVG(state, size){
              star(20,40,4,"#f0ad3c")+star(76,44,4,"#f472b6");
       break;
     case "nervous": /* darting eyes, wavy mouth, sweat drop */
-      face='<ellipse cx="37" cy="51" rx="8.5" ry="10" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-           '<ellipse cx="59" cy="51" rx="8.5" ry="10" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
-           '<circle cx="40" cy="52" r="4.5" fill="'+PUPIL+'"/><circle cx="62" cy="52" r="4.5" fill="'+PUPIL+'"/>'+
-           '<path d="M40,68 q3,-3 6,0 t6,0" stroke="'+LINE+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+cheeks(0.45);
+      face='<ellipse cx="37" cy="51" rx="8.5" ry="10" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="59" cy="51" rx="8.5" ry="10" fill="url(#'+u+'-eyeG)" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<circle class="bb-pupil" cx="40" cy="52" r="4.5" fill="url(#'+u+'-pupG)"/><circle class="bb-pupil" cx="62" cy="52" r="4.5" fill="url(#'+u+'-pupG)"/>'+
+           '<circle cx="41.6" cy="50.4" r="1.7" fill="#fff"/><circle cx="63.6" cy="50.4" r="1.7" fill="#fff"/>'+
+           '<path d="M40,68 q3,-3 6,0 t6,0" stroke="'+LINE+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+cheeks(0.45)+
+           lids(37,59,51,8.5,10);
       behind='<path d="M73,32 q6.5,8.5 0,14 q-6.5,-5.5 0,-14" fill="#7fd4f7" stroke="'+LINE+'" stroke-width="1.2"/>';
       break;
     case "cheering": /* star eyes, huge grin, arms sky-high */
       face=star(37,50,8.5,PUPIL)+star(59,50,8.5,PUPIL)+
            '<ellipse cx="48" cy="69" rx="8.5" ry="7.5" fill="'+LINE+'"/>'+cheeks(0.75);
-      arms=cheer;
+      arms=cheer; react=1;
       behind='<path d="M6,40 q-4,9 0,18" stroke="#f0ad3c" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
              '<path d="M90,40 q4,9 0,18" stroke="#f0ad3c" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
              star(13,22,5,"#f472b6")+star(83,24,5,"#0d9d6c");
@@ -3499,20 +3581,29 @@ function mascotSVG(state, size){
       face=bigEyes(37,59,50,10,12,5.5,0,2.5)+
            '<path d="M42,67 Q48,70.5 54,67" stroke="'+LINE+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+cheeks(0.55);
   }
-  /* chubby unified body — one soft blob, no separate head.
-     face sits on top of body; outline redrawn last for a crisp edge */
-  const assembled=behind+
-    '<ellipse cx="48" cy="56" rx="30" ry="28" fill="'+BODY+'"/>'+
-    '<ellipse cx="48" cy="68" rx="19" ry="12" fill="'+BELLY+'" opacity="0.65"/>'+
+  /* chubby unified body — layered depth, not flat vector:
+     base gradient, bottom shade, film grain, top-left sheen, soft belly */
+  const assembled=
+    '<ellipse cx="48" cy="87" rx="23" ry="4.5" fill="url(#'+u+'-shadG)"/>'+
+    behind+
+    '<ellipse cx="48" cy="56" rx="30" ry="28" fill="url(#'+u+'-bodyG)"/>'+
+    '<ellipse cx="48" cy="56" rx="30" ry="28" fill="url(#'+u+'-shadeG)"/>'+
+    '<ellipse cx="48" cy="56" rx="29" ry="27" fill="#8B5A3B" filter="url(#'+u+'-grain)" opacity="0.13"/>'+
+    '<ellipse cx="36" cy="40" rx="12" ry="7.5" fill="url(#'+u+'-hiG)" transform="rotate(-20 36 40)"/>'+
+    '<ellipse cx="48" cy="69" rx="18.5" ry="11.5" fill="url(#'+u+'-bellyG)"/>'+
     arms+topper+face+
     '<ellipse cx="48" cy="56" rx="30" ry="28" fill="none" stroke="'+LINE+'" stroke-width="2.5"/>';
   let inner=assembled;
   if(squash) inner='<g transform="translate(48 84) scale(1.08 0.94) translate(-48 -84)">'+assembled+'</g>';
-  const body=tilt?'<g transform="rotate('+tilt+' 48 58)">'+inner+'</g>':inner;
+  const tiltG=tilt?'<g transform="rotate('+tilt+' 48 58)">'+inner+'</g>':inner;
+  /* life system: gentle sway + breathing always; squash-and-stretch pop on
+     reactive states. negative delays desync multiple Sprouts per screen. */
+  const rootCls=react?"bb-mroot bb-react":"bb-mroot";
+  const body='<g class="'+rootCls+'" style="animation-delay:-'+rootPh+'s,-'+rootPh+'s">'+
+             '<g class="bb-mbreathe" style="animation-delay:-'+breathPh+'s">'+tiltG+'</g></g>';
   return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 96 96" role="img" aria-label="Sprout, your ByteBar study buddy">'+
-    '<title>Sprout — your study buddy</title>'+body+'</svg>';
+    '<title>Sprout — your study buddy</title>'+defs+body+'</svg>';
 }
-
 
 /* lightweight canvas confetti — no libraries.
    burstConfetti(n)        → big celebration from screen center
@@ -3623,6 +3714,7 @@ function paintTrack(){
   });
   return pct;
 }
+
 function buddyOnMilestone(){
   if(!S) return;
   if(!S.milestonesHit) S.milestonesHit=new Set();
@@ -4505,8 +4597,9 @@ function doAuth(){
   if(authMode==="signup"){
     if(accts[u]){ err.textContent="That username is taken — try another."; return; }
     const r=newUserRec(u, hashPw(u,p));
-    /* Migrate device-level Pro to the new account (they bought before accounts were required). */
-    if(localStorage.getItem("bb_pro")==="1" && !r.pro){
+    /* Migrate device-level Pro to the new account (they bought before accounts were required).
+       Key required — a keyless flag is never migrated (see isPro). */
+    if(localStorage.getItem("bb_pro")==="1" && localStorage.getItem("bb_pro_key") && !r.pro){
       r.pro=true; r.proSince=Date.now();
       r.proKey=localStorage.getItem("bb_pro_key")||null;
     }
@@ -4518,8 +4611,9 @@ function doAuth(){
   } else {
     const r=accts[u];
     if(!r || r.passHash!==hashPw(u,p)){ err.textContent="Username or password doesn't match."; return; }
-    /* Migrate device-level Pro to this account if the account doesn't have it yet. */
-    if(localStorage.getItem("bb_pro")==="1" && !r.pro){
+    /* Migrate device-level Pro to this account if the account doesn't have it yet.
+       Key required — a keyless flag is never migrated (see isPro). */
+    if(localStorage.getItem("bb_pro")==="1" && localStorage.getItem("bb_pro_key") && !r.pro){
       r.pro=true; r.proSince=r.proSince||Date.now();
       r.proKey=r.proKey||localStorage.getItem("bb_pro_key")||null;
     }
@@ -5120,57 +5214,6 @@ function wireStatic(){
   installHomeButtons();
 }
 
-/* ================= shot hooks (preview only) ================= */
-(function(){
-  const q=new URLSearchParams(location.search);
-  const shot=q.get("shot");
-  if(!shot) return;
-  renderHome();
-  if(shot==="paywall"){ setTimeout(openPaywall,400); }
-  if(shot==="modes"&&EXAMS[1]){ setTimeout(()=>renderModes(EXAMS[1].slug),400); }
-  if(shot==="brief"&&EXAMS[1]){ setTimeout(()=>renderBrief(EXAMS[1].slug),400); }
-  if(shot==="exam"&&EXAMS[1]){
-    setTimeout(()=>{
-      localStorage.setItem("bb_pro","1");
-      const e=EXAMS[1], bank=shuffle(BANKS[e.slug].slice()).map(prepQ);
-      curExam=e;
-      S={mode:"sim",exam:e,bank,idx:7,score:0,misses:[],answers:bank.map((_,i)=>i<7?(i%4):null),
-         flags:bank.map((_,i)=>i===3),t0:Date.now()-42*60000,submitted:false};
-      $("exam-label").textContent=e.code; $("exam-sublabel").textContent=e.name;
-      $("timer").style.display="flex"; $("endbtn").textContent="End exam";
-      show("screen-exam"); renderExamChrome(); renderQ();
-      deadline=Date.now()+(90-42)*60*1000;
-      const tx=$("timetext");
-      tx.textContent="48:00";
-    },400);
-  }
-  if(shot==="results"&&EXAMS[1]){
-    setTimeout(()=>{
-      const e=EXAMS[1], bank=BANKS[e.slug].slice(0,20).map(prepQ);
-      curExam=e;
-      S={mode:"sim",exam:e,bank,idx:0,score:0,misses:[],
-         answers:bank.map((q,i)=> i%4===0 ? (q.answer+1)%4 : q.answer),
-         flags:new Array(bank.length).fill(false),t0:Date.now()-63*60000,submitted:true};
-      finishExam(false);
-    },400);
-  }
-  if(shot==="terminal"){
-    setTimeout(()=>{
-      localStorage.setItem("bb_pro","1");
-      const e=EXAMS.find(x=>x.slug==="cka"), bank=shuffle((TERMINAL_TASKS.cka||[]).slice()).map(prepTerminal);
-      curExam=e;
-      S={mode:"sim",exam:e,bank,idx:0,score:0,misses:[],answers:new Array(bank.length).fill(null),
-         flags:new Array(bank.length).fill(false),t0:Date.now(),submitted:false,timed:true,minutes:120,terminal:true};
-      document.documentElement.style.setProperty("--qacc",e.accent);
-      $("exam-label").textContent=e.code;
-      $("exam-sublabel").textContent="Hands-on terminal tasks · "+bank.length+" tasks drawn from the 1,000-task bank";
-      $("timer").style.display="flex"; $("endbtn").textContent="End exam";
-      deadline=Date.now()+120*60*1000;
-      show("screen-exam"); renderExamChrome(); renderQ();
-      $("timetext").textContent="119:58";
-    },400);
-  }
-})();
 
 wireStatic();
 wireReveals();
