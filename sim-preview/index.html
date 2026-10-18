@@ -608,6 +608,68 @@ button:active{transform:scale(.97);}
 /* empty-state mascot */
 .emptystate{display:flex; flex-direction:column; align-items:center; gap:8px; padding:26px 10px; color:var(--mut); font-size:14px; text-align:center;}
 
+/* ============ HOME REFRESH (2026-10-18) ============ */
+/* hero stage: mascot + speech bubble + ambient orbs */
+.hero-new{max-width:820px;}
+.hero-stage{position:relative; margin-bottom:4px;}
+.hero-orbs{position:absolute; inset:-24px -40px; pointer-events:none; overflow:visible;}
+.orb{position:absolute; border-radius:50%; filter:blur(42px); opacity:.45; animation:bbOrbFloat 7s ease-in-out infinite;}
+.orb.o1{width:150px; height:150px; left:4%; top:6%; background:#7fd4f7;}
+.orb.o2{width:110px; height:110px; right:6%; top:34%; background:#c4b5fd; animation-delay:-2.5s;}
+.orb.o3{width:96px; height:96px; left:15%; bottom:-10%; background:#6ee7b7; animation-delay:-4.5s;}
+@keyframes bbOrbFloat{0%,100%{transform:translateY(0) scale(1);}50%{transform:translateY(-16px) scale(1.06);}}
+.hero-mascot{position:relative; z-index:1; display:flex; justify-content:center; align-items:flex-start;}
+.mascot-pop{animation:bbPop .7s cubic-bezier(.2,.9,.25,1.15) .1s both;}
+@keyframes bbPop{0%{opacity:0; transform:scale(.35) translateY(48px);}60%{opacity:1; transform:scale(1.06) translateY(-6px);}100%{opacity:1; transform:none;}}
+.speech{position:absolute; left:calc(50% + 56px); top:4px; background:#fff; border:1.5px solid var(--line);
+  border-radius:14px; padding:10px 14px; text-align:left; max-width:215px; box-shadow:var(--shadow);
+  animation:bbFloat 3.4s ease-in-out 1s infinite;}
+.speech::before{content:""; position:absolute; left:-8px; top:30px; width:14px; height:14px; background:#fff;
+  border-left:1.5px solid var(--line); border-bottom:1.5px solid var(--line); transform:rotate(45deg);}
+.speech b{display:block; font-size:14.5px; color:var(--navy); margin-bottom:2px;}
+.speech span{font-size:12.5px; color:var(--mut); line-height:1.45;}
+/* trust chips with icons */
+.trust{display:inline-flex; align-items:center; gap:8px;}
+.tico{width:30px; height:30px; border-radius:9px; background:var(--cyan-soft); color:var(--cyan);
+  display:inline-flex; align-items:center; justify-content:center; flex:none;}
+.tico svg{width:16px; height:16px;}
+/* hero CTA */
+.hero-cta{margin:20px 0 4px;}
+.hero-new .authbadge{margin-top:14px;}
+/* section titles get an accent bar on home */
+#screen-home .secttl{display:flex; align-items:center; gap:10px;}
+#screen-home .secttl::before{content:""; width:22px; height:4px; border-radius:99px;
+  background:linear-gradient(90deg,var(--cyan),#7fd4f7); flex:none;}
+/* scroll reveals (class added by JS; no-JS keeps content visible) */
+.reveal{opacity:0; transform:translateY(22px); transition:opacity .65s ease, transform .65s cubic-bezier(.2,.7,.2,1);}
+.reveal.in{opacity:1; transform:none;}
+/* exam cards: cascade entrance, accent wash, bigger icons, stronger hover */
+.examcard{
+  background:var(--card);
+  background:radial-gradient(130px 130px at 88% 6%, color-mix(in srgb, var(--acc) 15%, transparent), transparent 70%), var(--card);
+  animation:bbCardIn .5s cubic-bezier(.2,.7,.2,1) backwards;
+  animation-delay:calc(var(--i,0)*45ms);
+}
+@keyframes bbCardIn{from{opacity:0; transform:translateY(18px) scale(.96);}to{opacity:1; transform:none;}}
+.eicon{width:52px; height:52px; border-radius:15px;}
+.eicon svg{width:27px; height:27px;}
+.examcard:hover{transform:translateY(-5px) scale(1.015);
+  box-shadow:var(--shadow-lg), 0 0 0 3px var(--acc), 0 18px 44px -14px var(--acc);}
+.examcard:hover .eicon{transform:scale(1.14) rotate(-6deg);}
+/* proof bar icons */
+.pico{width:36px; height:36px; border-radius:12px; background:rgba(127,212,247,.16); color:#7fd4f7;
+  display:flex; align-items:center; justify-content:center; margin:0 auto 10px;}
+.pico svg{width:19px; height:19px;}
+
+@media (max-width:560px){
+  .hero-orbs{inset:-16px -10px;}
+  .orb{filter:blur(30px); opacity:.35;}
+  .hero-mascot{flex-direction:column; align-items:center;}
+  .speech{position:static; margin-top:12px; max-width:250px; text-align:center;}
+  .speech::before{display:none;}
+  .eicon{width:48px; height:48px;}
+}
+
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms !important; animation-iteration-count:1 !important; transition-duration:.01ms !important;}
 }
@@ -628,96 +690,104 @@ button:active{transform:scale(.97);}
   </div></div>
   <div class="wrap">
     <div id="resume-slot"></div>
-    <div class="hero">
+    <div class="hero hero-new">
+      <div class="hero-stage">
+        <div class="hero-orbs" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span></div>
+        <div class="hero-mascot mascot-pop">
+          <span class="mascot-slot" data-mascot="idle" data-size="132"></span>
+          <div class="speech"><b>Ready to pass your exam?</b><span>Pick an exam below — I'll track your progress and cheer you on.</span></div>
+        </div>
+      </div>
       <h1>Practice like it's <span class="cy">test day.</span></h1>
       <p>Full-length, timed exam simulations built from real exam objectives — with instant explanations and domain-level score reports that show exactly where you stand.</p>
       <div class="trustrow">
-        <div class="trust"><b>12,000</b> exam-style questions</div>
-        <div class="trust"><b>12</b> certifications</div>
-        <div class="trust"><b>90-min</b> timed simulations</div>
+        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span><b>12,000</b> exam-style questions</span></div>
+        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></span><span><b>12</b> certifications</span></div>
+        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span><b>90-min</b> timed simulations</span></div>
       </div>
+      <button class="btn hero-cta" id="hero-cta">Choose your exam ↓</button>
       <div class="authbadge">✓ Questions mapped to official exam objectives</div>
     </div>
     <div class="secttl">Choose your exam</div>
     <div class="examgrid" id="examgrid">
-    <button class="examcard" style="--acc:#38bdf8" onclick="renderModes('az900')">
+    <button class="examcard" style="--acc:#38bdf8;--i:0" onclick="renderModes('az900')">
       <span class="locktag">PRO</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></span><span class="ecode">AZ-900</span></span>
       <span class="ename">Azure Fundamentals</span>
       <span class="etag">Cloud concepts &amp; Azure services</span>
       <span class="meta"><span class="qcount">1000 Qs</span> Timed simulation · Score report</span>
     </button>
-    <button class="examcard" style="--acc:#0ea5e9" onclick="renderModes('az104')">
+    <button class="examcard" style="--acc:#0ea5e9;--i:1" onclick="renderModes('az104')">
       <span class="locktag">PRO</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span><span class="ecode">AZ-104</span></span>
       <span class="ename">Azure Administrator</span>
       <span class="etag">Azure identity, governance &amp; compute</span>
       <span class="meta"><span class="qcount">1000 Qs</span> Timed simulation · Score report</span>
     </button>
-    <button class="examcard" style="--acc:#fb923c" onclick="renderModes('saa_c03')">
+    <button class="examcard" style="--acc:#fb923c;--i:2" onclick="renderModes('saa_c03')">
       <span class="locktag">PRO</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span><span class="ecode">SAA-C03</span></span>
       <span class="ename">AWS Solutions Architect</span>
       <span class="etag">Resilient, secure cloud architectures</span>
       <span class="meta"><span class="qcount">1000 Qs</span> Timed simulation · Score report</span>
     </button>
-    <button class="examcard" style="--acc:#f472b6" onclick="renderModes('cysa_cs0_004')">
+    <button class="examcard" style="--acc:#f472b6;--i:3" onclick="renderModes('cysa_cs0_004')">
       <span class="locktag">PRO</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 11.5 11 13.5 15 9.5"/></svg></span><span class="ecode">CS0-004</span></span>
       <span class="ename">CompTIA CySA+</span>
       <span class="etag">Threat detection &amp; incident response</span>
       <span class="meta"><span class="qcount">1000 Qs</span> Timed simulation · Score report</span>
     </button>
-    <button class="examcard" style="--acc:#fbbf24" onclick="renderModes('linuxplus_xk0_006')">
+    <button class="examcard" style="--acc:#fbbf24;--i:4" onclick="renderModes('linuxplus_xk0_006')">
       <span class="locktag">PRO</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></span><span class="ecode">XK0-006</span></span>
       <span class="ename">CompTIA Linux+</span>
       <span class="etag">Linux systems &amp; administration</span>
       <span class="meta"><span class="qcount">1000 Qs</span> Timed simulation · Score report</span>
     </button>
-    <button class="examcard" style="--acc:#818cf8" onclick="renderModes('cka')">
+    <button class="examcard" style="--acc:#818cf8;--i:5" onclick="renderModes('cka')">
       <span class="locktag">PRO</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></span><span class="ecode">CKA</span></span>
       <span class="ename">Certified Kubernetes Admin</span>
       <span class="etag">K8s clusters &amp; workloads</span>
       <span class="meta"><span class="qcount">1000 Qs</span> Timed simulation · Score report</span>
     </button>
-    <button class="examcard" style="--acc:#facc15" onclick="renderModes('ckad')">
+    <button class="examcard" style="--acc:#facc15;--i:6" onclick="renderModes('ckad')">
       <span class="locktag">PRO</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span><span class="ecode">CKAD</span></span>
       <span class="ename">K8s App Developer</span>
       <span class="etag">Cloud-native app design on K8s</span>
       <span class="meta"><span class="qcount">1000 Qs</span> Timed simulation · Score report</span>
     </button>
-    <button class="examcard" style="--acc:#2dd4bf" onclick="renderModes('dca')">
+    <button class="examcard" style="--acc:#2dd4bf;--i:7" onclick="renderModes('dca')">
       <span class="locktag">PRO</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span class="ecode">DCA</span></span>
       <span class="ename">Docker Certified Associate</span>
       <span class="etag">Containers, images &amp; orchestration</span>
       <span class="meta"><span class="qcount">1000 Qs</span> Timed simulation · Score report</span>
     </button>
-    <button class="examcard" style="--acc:#c084fc" onclick="renderModes('terraform_004')">
+    <button class="examcard" style="--acc:#c084fc;--i:8" onclick="renderModes('terraform_004')">
       <span class="locktag">PRO</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span><span class="ecode">Terraform</span></span>
       <span class="ename">Terraform Associate</span>
       <span class="etag">IaC workflows &amp; HCL</span>
       <span class="meta"><span class="qcount">1000 Qs</span> Timed simulation · Score report</span>
     </button>
-    <button class="examcard" style="--acc:#a78bfa" onclick="renderModes('cloudplus_cv0_004')">
+    <button class="examcard" style="--acc:#a78bfa;--i:9" onclick="renderModes('cloudplus_cv0_004')">
       <span class="locktag">PRO</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span><span class="ecode">CV0-004</span></span>
       <span class="ename">CompTIA Cloud+</span>
       <span class="etag">Cloud architecture &amp; operations</span>
       <span class="meta"><span class="qcount">1000 Qs</span> Timed simulation · Score report</span>
     </button>
-    <button class="examcard" style="--acc:#34d399" onclick="renderModes('gcp_ace')">
+    <button class="examcard" style="--acc:#34d399;--i:10" onclick="renderModes('gcp_ace')">
       <span class="locktag">PRO</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span class="ecode">GCP-ACE</span></span>
       <span class="ename">GCP Associate Engineer</span>
       <span class="etag">Deploy &amp; manage on Google Cloud</span>
       <span class="meta"><span class="qcount">1000 Qs</span> Timed simulation · Score report</span>
     </button>
-    <button class="examcard" style="--acc:#60a5fa" onclick="renderModes('itil4')">
+    <button class="examcard" style="--acc:#60a5fa;--i:11" onclick="renderModes('itil4')">
       <span class="locktag">PRO</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span><span class="ecode">ITIL-4</span></span>
       <span class="ename">ITIL 4 Foundation</span>
@@ -727,10 +797,10 @@ button:active{transform:scale(.97);}
     </div>
 
     <div class="proofbar">
-      <div class="pstat"><b>12</b><span>certification exams</span></div>
-      <div class="pstat"><b>12,000</b><span>exam-style questions</span></div>
-      <div class="pstat"><b>1,000</b><span>questions per exam</span></div>
-      <div class="pstat"><b>100%</b><span>answers explained</span></div>
+      <div class="pstat"><span class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></span><b data-count="12">12</b><span>certification exams</span></div>
+      <div class="pstat"><span class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span><b data-count="12000">12,000</b><span>exam-style questions</span></div>
+      <div class="pstat"><span class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg></span><b data-count="1000">1,000</b><span>questions per exam</span></div>
+      <div class="pstat"><span class="pico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg></span><b data-count="100" data-suffix="%">100%</b><span>answers explained</span></div>
     </div>
 
     <div class="secttl">Why candidates choose ByteBar</div>
@@ -1337,9 +1407,9 @@ function renderHome(){
   refreshBadges();
   refreshAccount();
   const g=$("examgrid"); g.innerHTML="";
-  EXAMS.forEach(e=>{
+  EXAMS.forEach((e,idx)=>{
     const d=document.createElement("button");
-    d.className="examcard"; d.style.setProperty("--acc", e.accent);
+    d.className="examcard"; d.style.setProperty("--acc", e.accent); d.style.setProperty("--i", idx);
     d.innerHTML =
       '<span class="locktag">PRO</span>'+
       '<span class="erow"><span class="eicon">'+(ICONS[e.slug]||"")+'</span><span class="ecode">'+e.code+'</span></span>'+
@@ -2238,6 +2308,44 @@ function startCustom(){
 function isLiveMode(){ return S && (S.mode==="practice" || (S.mode==="custom"&&!S.timed)); }
 
 /* ============================================================
+   HOME REFRESH — scroll reveals, proof-bar counters, hero CTA
+   ============================================================ */
+function wireReveals(){
+  const targets=document.querySelectorAll("#screen-home .secttl, #screen-home .proofbar, #screen-home .testiwrap, #screen-home .method, #screen-home .panel, #screen-home .guarantee");
+  if(!("IntersectionObserver" in window)){ targets.forEach(el=>el.classList.add("in")); return; }
+  targets.forEach(el=>el.classList.add("reveal"));
+  const o=new IntersectionObserver(es=>{ es.forEach(e=>{
+    if(e.isIntersecting){ e.target.classList.add("in"); o.unobserve(e.target); }
+  });},{threshold:.1, rootMargin:"0px 0px -30px 0px"});
+  targets.forEach(el=>o.observe(el));
+}
+function wireCounters(){
+  const bar=document.querySelector("#screen-home .proofbar");
+  if(!bar || bar.dataset.wired) return; bar.dataset.wired="1";
+  const els=[...bar.querySelectorAll("[data-count]")];
+  const fmt=(v,el)=>{ let s=Math.round(v).toLocaleString("en-US"); if(el.dataset.suffix) s+=el.dataset.suffix; return s; };
+  const run=()=>{
+    if(REDUCED()){ els.forEach(el=>el.textContent=fmt(+el.dataset.count,el)); return; }
+    const t0=performance.now(), dur=1300;
+    const step=t=>{ const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,3);
+      els.forEach(el=>el.textContent=fmt(+el.dataset.count*e,el));
+      if(p<1) requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  };
+  if("IntersectionObserver" in window){
+    const o=new IntersectionObserver(es=>{ es.forEach(e=>{ if(e.isIntersecting){ run(); o.disconnect(); } }); },{threshold:.4});
+    o.observe(bar);
+  } else run();
+}
+function wireHero(){
+  const cta=$("hero-cta");
+  if(cta) cta.addEventListener("click",()=>{
+    const g=$("examgrid"); if(!g) return;
+    if(REDUCED()) g.scrollIntoView(); else g.scrollIntoView({behavior:"smooth", block:"start"});
+  });
+}
+
+/* ============================================================
    FAQ accordion + misc wiring
    ============================================================ */
 function wireStatic(){
@@ -2308,6 +2416,9 @@ function wireStatic(){
 })();
 
 wireStatic();
+wireReveals();
+wireCounters();
+wireHero();
 refreshAccount();
 renderHome();
 </script>
