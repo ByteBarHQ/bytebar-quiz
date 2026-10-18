@@ -1219,6 +1219,208 @@ button:active{transform:scale(.97);}
   .opt.correct{animation:none;}
 }
 
+/* ============================================================
+   MOTION DESIGN SYSTEM — Apple/Meta-grade movement (2026-10-18)
+   Cori: "like if you go to meta website or apple the movement
+   throughout is top notch. recreate that for us tastefully"
+
+   Principles:
+   1. Easing is everything — custom cubic-bezier curves, never
+      linear, never basic ease-in-out. Fast start, buttery settle.
+   2. Choreography over simultaneity — content cascades like an
+      orchestra, each element with a slight delay.
+   3. Transform + opacity only — 60fps on phones, no layout thrash.
+   4. Restraint — every animation has a purpose. Tasteful, not bouncy.
+      (The Duolingo 3D press handles tactility; this is about flow.)
+   ============================================================ */
+:root{
+  --ease-out-expo:cubic-bezier(.16,1,.3,1);  /* Apple-style: swift start, feather settle */
+  --ease-apple:cubic-bezier(.32,.72,0,1);    /* Apple's standard UI curve */
+  --ease-spring:cubic-bezier(.34,1.35,.44,1);/* whisper of overshoot on entrances */
+  --ease-snappy:cubic-bezier(.3,.9,.25,1);   /* immediate-feeling UI feedback */
+  --dur-fast:.2s; --dur-med:.35s; --dur-slow:.6s;
+}
+
+/* ---------- screen transitions: glide, don't snap ----------
+   The screen itself fades with a whisper of movement; its content
+   cascades upward in a choreographed rise. Topbars stay stable —
+   content flows around them (iOS navigation principle). */
+.screen-enter{animation:bbScreenFade .32s var(--ease-out-expo) both;}
+@keyframes bbScreenFade{from{opacity:0; transform:translateY(10px);}to{opacity:1; transform:none;}}
+.screen-enter .wrap > *,
+.screen-enter .exambody > *{animation:bbRise var(--dur-slow) var(--ease-out-expo) both;}
+.screen-enter .wrap > *:nth-child(1),.screen-enter .exambody > *:nth-child(1){animation-delay:.03s;}
+.screen-enter .wrap > *:nth-child(2),.screen-enter .exambody > *:nth-child(2){animation-delay:.055s;}
+.screen-enter .wrap > *:nth-child(3),.screen-enter .exambody > *:nth-child(3){animation-delay:.08s;}
+.screen-enter .wrap > *:nth-child(4),.screen-enter .exambody > *:nth-child(4){animation-delay:.105s;}
+.screen-enter .wrap > *:nth-child(5),.screen-enter .exambody > *:nth-child(5){animation-delay:.13s;}
+.screen-enter .wrap > *:nth-child(6),.screen-enter .exambody > *:nth-child(6){animation-delay:.155s;}
+.screen-enter .wrap > *:nth-child(7),.screen-enter .exambody > *:nth-child(7){animation-delay:.18s;}
+.screen-enter .wrap > *:nth-child(8),.screen-enter .exambody > *:nth-child(8){animation-delay:.205s;}
+.screen-enter .wrap > *:nth-child(9),.screen-enter .exambody > *:nth-child(9){animation-delay:.23s;}
+.screen-enter .wrap > *:nth-child(10),.screen-enter .exambody > *:nth-child(10){animation-delay:.255s;}
+.screen-enter .wrap > *:nth-child(11),.screen-enter .exambody > *:nth-child(11){animation-delay:.28s;}
+.screen-enter .wrap > *:nth-child(12),.screen-enter .exambody > *:nth-child(12){animation-delay:.305s;}
+@keyframes bbRise{from{opacity:0; transform:translateY(22px);}to{opacity:1; transform:none;}}
+
+/* ---------- scroll reveals: butter-smooth, Apple-style ----------
+   Upgrades the existing .reveal system: longer travel, expo easing,
+   no linear segments. */
+.reveal{
+  opacity:0; transform:translateY(30px);
+  transition:opacity .75s var(--ease-out-expo), transform .75s var(--ease-out-expo);
+}
+.reveal.in{opacity:1; transform:none;}
+
+/* ---------- mascot life: breathing, not static ----------
+   The mascot should feel alive even when idle — a slow, calm breath
+   on the hero, a gentle float in empty states. */
+@keyframes bbBreathe{0%,100%{transform:scale(1);}50%{transform:scale(1.03);}}
+.hero-mascot .mascot-slot{display:inline-block; animation:bbBreathe 4.2s ease-in-out infinite;}
+@keyframes bbGentleFloat{0%,100%{transform:translateY(0);}50%{transform:translateY(-9px);}}
+.emptystate .mascot-slot{display:inline-block; animation:bbGentleFloat 5.5s ease-in-out infinite;}
+/* a hovered mascot perks up — a tiny moment of personality */
+.mascot-slot{transition:transform .25s var(--ease-spring);}
+.mascot-slot:hover{transform:scale(1.08) rotate(-3deg);}
+
+/* ---------- micro-interactions: every state change answers back ---------- */
+/* text inputs + selects: focus glows in, never snaps */
+input[type="text"],input[type="password"],select{
+  transition:border-color var(--dur-fast) var(--ease-snappy),
+             box-shadow var(--dur-fast) var(--ease-snappy),
+             background-color var(--dur-fast) var(--ease-snappy);
+}
+input[type="text"]:focus,input[type="password"]:focus,select:focus{
+  border-color:var(--cyan);
+  box-shadow:0 0 0 3px rgba(11,143,196,.16);
+  outline:none;
+}
+/* toggle: the knob springs home, the track cross-fades */
+.toggle{transition:background-color .25s var(--ease-apple);}
+.toggle::after{transition:left .3s var(--ease-spring);}
+/* backlinks: nudge toward their destination */
+.backlink{transition:color var(--dur-fast) var(--ease-snappy), transform var(--dur-fast) var(--ease-snappy);}
+.backlink:hover{transform:translateX(-4px);}
+.backlink:active{transform:translateX(-2px) scale(.98);}
+/* FAQ accordion: answers unfold smoothly */
+.fa{transition:max-height .4s var(--ease-out-expo), opacity .3s var(--ease-snappy);}
+/* mode cards + trust chips: hover has intent */
+.modecard{transition:transform var(--dur-fast) var(--ease-out-expo), box-shadow var(--dur-fast), border-color var(--dur-fast);}
+.trust{transition:transform var(--dur-fast) var(--ease-out-expo), box-shadow var(--dur-fast);}
+.trust:hover{transform:translateY(-2px);}
+
+/* ---------- overlays: backdrop fades, sheets spring up ----------
+   Overlays the existing pop with a springier, more confident entrance. */
+.overlay{animation:bbBackdropIn .28s var(--ease-out-expo) both;}
+@keyframes bbBackdropIn{from{opacity:0;}to{opacity:1;}}
+.sheet{animation:bbSheetIn .5s var(--ease-spring) both;}
+.unlockcard{animation:bbSheetIn .5s var(--ease-spring) both;}
+@keyframes bbSheetIn{from{opacity:0; transform:translateY(36px) scale(.96);}to{opacity:1; transform:none;}}
+/* overlay close: instant is fine — exits should feel snappy, not linger */
+
+/* ============================================================
+   VIBRANCY — color confidence (2026-10-18)
+   Cori: "continue to improve site vibrancy"
+   The warm palette, pushed bolder. Confident, never gaudy.
+   ============================================================ */
+/* exam cards: deeper accent wash + a second glow from below */
+.examcard{
+  background:
+    radial-gradient(150px 150px at 88% 4%, color-mix(in srgb, var(--acc) 24%, transparent), transparent 70%),
+    radial-gradient(220px 130px at 6% 108%, color-mix(in srgb, var(--acc) 10%, transparent), transparent 70%),
+    var(--card);
+}
+/* TRY FREE tag: gradient pop with a slow, tasteful sheen sweep */
+.freetag{
+  background:linear-gradient(135deg,#0b8fc4,#0d9d6c);
+  color:#fff; border:none;
+  box-shadow:0 3px 10px rgba(11,143,196,.35);
+  overflow:hidden;
+}
+.freetag::after{
+  content:""; position:absolute; top:0; left:0; width:60%; height:100%;
+  background:linear-gradient(100deg, transparent, rgba(255,255,255,.45), transparent);
+  transform:translateX(-160%);
+  animation:bbSheen 5.5s var(--ease-snappy) infinite;
+  animation-delay:calc(var(--i,0)*450ms);
+}
+@keyframes bbSheen{0%{transform:translateX(-160%);}55%,100%{transform:translateX(300%);}}
+/* progress bars: richer gradients with inner highlight */
+.dbar > div{
+  background:linear-gradient(180deg, rgba(255,255,255,.25), transparent 45%),
+             linear-gradient(90deg,var(--cyan),var(--green));
+}
+.qbar > span{
+  background:linear-gradient(180deg, rgba(255,255,255,.3), transparent 50%),
+             linear-gradient(90deg,var(--acc,#0b8fc4),var(--cyan));
+}
+/* results: passing feels like an event — gradient headline */
+.rescard.passed .res-headline{
+  background:linear-gradient(92deg,#0d9d6c 20%,#0b8fc4 80%);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+/* proofbar: numbers get quiet gradient confidence */
+.proofbar .pstat b{
+  background:linear-gradient(180deg,#0b1e42,#1b3a7a);
+  -webkit-background-clip:text; background-clip:text; color:transparent;
+}
+/* section accent bars: already tri-color — deepen saturation */
+#screen-home .secttl::before{
+  background:linear-gradient(90deg,#0b8fc4,#0d9d6c,#f0ad3c,#f472b6);
+}
+/* exam topbar: subtle living gradient */
+.examtop{background:linear-gradient(135deg,#0b1e42 0%,#132c5e 60%,#1b3a7a 100%);}
+
+/* ============================================================
+   FUN — delightful details (2026-10-18)
+   Personality in the margins. Never in the way of the task.
+   ============================================================ */
+/* streak flame: already flickers — give it a warm glow halo */
+.flame.flick{filter:drop-shadow(0 0 6px rgba(240,173,60,.55));}
+/* badge unlock icon: celebratory shimmer (extends existing badgeshine) */
+.unlockcard .ubi{filter:drop-shadow(0 4px 12px rgba(240,173,60,.4));}
+/* coach line mascot: subtle attention bob when it updates */
+#coachmascot{display:inline-flex; animation:bbCoachBob 2.2s ease-in-out infinite;}
+@keyframes bbCoachBob{0%,100%{transform:translateY(0);}50%{transform:translateY(-2.5px);}}
+/* empty states: warm gradient wash (the mascot provides the life) */
+.emptystate{
+  background:linear-gradient(180deg,#fffdf6,#fff);
+}
+/* proctor mascot: idle sway so the terminal feels watched-over, warmly */
+.tproctor svg{animation:bbProctorSway 6s ease-in-out infinite;}
+@keyframes bbProctorSway{0%,100%{transform:rotate(0);}25%{transform:rotate(-4deg);}75%{transform:rotate(4deg);}}
+
+/* ============================================================
+   POLISH — sweat the small stuff (2026-10-18)
+   Cori: "be sure to check your work, nothing sloppy or visually odd"
+   ============================================================ */
+/* consistent, beautiful focus rings — keyboard users deserve delight too */
+button:focus-visible,a:focus-visible,input:focus-visible,select:focus-visible{
+  outline:2.5px solid var(--cyan);
+  outline-offset:2px;
+}
+/* tabular numbers: timers, scores, and stats never jitter as they change */
+.timer,.qprog,.pct b,.pstat b,.rrpct,.sval,#termprog,.xpline{
+  font-variant-numeric:tabular-nums;
+  font-feature-settings:"tnum";
+}
+/* on-brand text selection */
+::selection{background:rgba(11,143,196,.22);}
+/* image rendering: mascots stay crisp */
+.mascot svg{shape-rendering:geometricPrecision;}
+/* prevent horizontal overscroll bounce revealing void on iOS */
+html,body{overscroll-behavior-x:none;}
+/* long-press callout off on interactive cards (iOS) */
+.examcard,.modecard,.opt{-webkit-touch-callout:none; user-select:none;}
+
+/* ---------- mobile: choreography tighter + faster on small screens ---------- */
+@media (max-width:560px){
+  .screen-enter .wrap > *,
+  .screen-enter .exambody > *{animation-duration:.45s;}
+  .reveal{transform:translateY(22px); transition-duration:.6s;}
+  .freetag::after{animation-duration:7s;}
+}
+
 </style>
 </head>
 <body>
@@ -1241,7 +1443,7 @@ button:active{transform:scale(.97);}
         <div class="hero-orbs" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span></div>
         <div class="hero-mascot mascot-pop">
           <span class="mascot-slot" data-mascot="idle" data-size="132"></span>
-          <div class="speech"><b>Ready to pass your exam?</b><span>Pick an exam below — I'll track your progress and cheer you on.</span></div>
+          <div class="speech"><b>Hi, I'm Dot! 👋</b><span>Ready to pass your exam? Pick one below — I'll track your progress and cheer you on.</span></div>
         </div>
       </div>
       <h1>Practice like it's <span class="cy">test day.</span></h1>
@@ -1469,7 +1671,7 @@ button:active{transform:scale(.97);}
   <div class="wrap">
     <button class="backlink" id="brief-back">← Choose mode</button>
     <div class="brief">
-      <div class="resmascot" style="margin-bottom:0;"><span class="mascot-slot" data-mascot="idle" data-size="54"></span></div>
+      <div class="resmascot" style="margin-bottom:0;"><span class="mascot-slot" data-mascot="determined" data-size="54"></span></div>
       <h2 id="brief-title">Exam simulation</h2>
       <p style="color:var(--mut); margin:0 0 8px; font-size:15px;" id="brief-sub"></p>
       <p style="color:var(--mut); margin:0 0 14px; font-size:13.5px;" id="brief-note"></p>
@@ -3064,43 +3266,144 @@ function refreshBadges(){
    MASCOT — ByteBar's dot-bot. Inline SVG, states:
    idle · happy · encourage · nervous · celebrate · sleep
    ============================================================ */
+/* ============================================================
+   DOT — the ByteBar study buddy (mascot redesign 2026-10-18)
+   Cori: "i want our character improved... just give it more so
+   people can connect to it"
+
+   Dot is a little robot who's read every exam objective ever
+   published and believes in you more than you believe in yourself.
+   Same recognizable body across all states — the emotion lives in
+   the eyes, mouth, posture, and tiny props. Pixar, not Clippy.
+
+   States: idle, happy, proud, sympathetic, encourage, excited,
+   thoughtful, sleep, determined, surprised, celebrate, nervous,
+   cheering. Unknown states fall back to idle.
+   ============================================================ */
 function mascotSVG(state, size){
-  const s=size||56, eye="#0b1e42";
-  let face="";
-  if(state==="happy"||state==="celebrate"){
-    face='<path d="M36.5 47 Q41 42 45.5 47" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
-         '<path d="M50.5 47 Q55 42 59.5 47" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
-         '<path d="M38 52 Q48 64 58 52 Q48 57.5 38 52Z" fill="#0b8fc4"/>';
-  } else if(state==="nervous"){
-    face='<circle cx="41" cy="44" r="3.4" fill="'+eye+'"/><circle cx="55" cy="44" r="3.4" fill="'+eye+'"/>'+
-         '<path d="M41 56 q2.5 -2.5 5 0 t5 0 t5 0" stroke="#0b8fc4" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+
-         '<path d="M71 34 q6 8 0 12 q-6 -4 0 -12" fill="#7fd4f7"/>';
-  } else if(state==="sleep"){
-    face='<path d="M37 46 Q41 48.5 45 46" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
-         '<path d="M51 46 Q55 48.5 59 46" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
-         '<path d="M45 56 Q48 57.5 51 56" stroke="#0b8fc4" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+
-         '<text x="68" y="38" font-size="13" font-weight="800" fill="#7fd4f7" font-family="sans-serif">z</text>'+
-         '<text x="75" y="28" font-size="17" font-weight="800" fill="#7fd4f7" font-family="sans-serif">z</text>';
-  } else {
-    face='<circle cx="41" cy="46" r="3.4" fill="'+eye+'"/><circle cx="55" cy="46" r="3.4" fill="'+eye+'"/>'+
-         (state==="encourage"
-           ? '<path d="M42 54 Q48 59 54 54" stroke="#0b8fc4" stroke-width="2.6" fill="none" stroke-linecap="round"/>'
-           : '<path d="M43 55 Q48 58 53 55" stroke="#0b8fc4" stroke-width="2.4" fill="none" stroke-linecap="round"/>');
+  const s=size||56, eye="#0b1e42", mouthc="#0b8fc4";
+  const st=state||"idle";
+  /* 4-point sparkle star, centered at 0,0 with radius 7, scaled */
+  const star=(cx,cy,r,fill)=>{
+    const k=(r/7).toFixed(2);
+    return '<path d="M0,-7 C1,-2.1 2.1,-1 7,0 C2.1,1 1,2.1 0,7 C-1,2.1 -2.1,1 -7,0 C-2.1,-1 -1,-2.1 0,-7 Z"'+
+      ' transform="translate('+cx+' '+cy+') scale('+k+')" fill="'+fill+'"/>';
+  };
+  /* mood-tinted face screens — Dot's mood literally colors their face */
+  const tints={happy:"#e8fdf3",proud:"#e8fdf3",excited:"#e8fdf3",celebrate:"#e8fdf3",cheering:"#e8fdf3",
+    sympathetic:"#fdf3e8",determined:"#dbeafe",sleep:"#e6e9f7"};
+  const tint=tints[st]||"#e9f5fd";
+  /* posable arms (pivots at shoulders) */
+  const armL='<rect x="13" y="42" width="9" height="20" rx="4.5" fill="#0b1e42"/>';
+  const armR='<rect x="74" y="42" width="9" height="20" rx="4.5" fill="#0b1e42"/>';
+  const raise='<g transform="rotate(120 17 48)">'+armL+'</g><g transform="rotate(-120 79 48)">'+armR+'</g>';
+  const cheer='<g transform="rotate(135 17 48)">'+armL+'</g><g transform="rotate(-135 79 48)">'+armR+'</g>';
+  const droop='<g transform="rotate(-15 17 48)">'+armL+'</g><g transform="rotate(15 79 48)">'+armR+'</g>';
+  const spread='<g transform="rotate(90 17 48)">'+armL+'</g><g transform="rotate(-90 79 48)">'+armR+'</g>';
+  const blush='<ellipse cx="36" cy="52" rx="2.6" ry="1.8" fill="#f472b6" opacity=".45"/>'+
+              '<ellipse cx="60" cy="52" rx="2.6" ry="1.8" fill="#f472b6" opacity=".45"/>';
+  const catchlight='<circle cx="42" cy="45" r="1" fill="#fff" opacity=".8"/><circle cx="56" cy="45" r="1" fill="#fff" opacity=".8"/>';
+  let arms=armL+armR, tilt=0, face="", behind="", front="";
+  switch(st){
+    case "happy":
+      face='<path d="M36.5 47 Q41 42 45.5 47" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
+           '<path d="M50.5 47 Q55 42 59.5 47" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
+           '<path d="M38 52 Q48 64 58 52 Q48 57.5 38 52Z" fill="'+mouthc+'"/>'+blush;
+      break;
+    case "proud":
+      face='<circle cx="41" cy="47" r="3.1" fill="'+eye+'"/><circle cx="55" cy="47" r="3.1" fill="'+eye+'"/>'+
+           '<path d="M35.5 42.5 Q41 40.5 46.5 42.5" stroke="'+eye+'" stroke-width="2.2" fill="none" stroke-linecap="round"/>'+
+           '<path d="M49.5 42.5 Q55 40.5 60.5 42.5" stroke="'+eye+'" stroke-width="2.2" fill="none" stroke-linecap="round"/>'+
+           '<path d="M42 55 Q50 58.5 55 52.5" stroke="'+mouthc+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
+      tilt=-4;
+      behind=star(72,28,6,"#f0ad3c");
+      break;
+    case "sympathetic":
+      face='<circle cx="41" cy="47" r="2.8" fill="'+eye+'"/><circle cx="55" cy="47" r="2.8" fill="'+eye+'"/>'+
+           '<path d="M43 55 Q48 58 53 55" stroke="'+mouthc+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+
+           '<ellipse cx="36" cy="52" rx="2.8" ry="2" fill="#f472b6" opacity=".55"/>'+
+           '<ellipse cx="60" cy="52" rx="2.8" ry="2" fill="#f472b6" opacity=".55"/>';
+      arms=droop; tilt=3;
+      break;
+    case "encourage":
+      face='<circle cx="41" cy="46" r="3.4" fill="'+eye+'"/><circle cx="55" cy="46" r="3.4" fill="'+eye+'"/>'+catchlight+
+           '<path d="M40 53 Q48 60 56 53 Q48 57 40 53Z" fill="'+mouthc+'"/>'+blush;
+      tilt=3;
+      break;
+    case "excited":
+      face=star(41,46,7,eye)+star(55,46,7,eye)+
+           '<path d="M38 52 Q48 64 58 52 Q48 57.5 38 52Z" fill="'+mouthc+'"/>'+blush;
+      arms=raise;
+      behind='<path d="M8 44 q-3 6 0 12" stroke="#7fd4f7" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
+             '<path d="M88 44 q3 6 0 12" stroke="#7fd4f7" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
+      break;
+    case "thoughtful":
+      face='<circle cx="43" cy="44" r="3" fill="'+eye+'"/><circle cx="57" cy="44" r="3" fill="'+eye+'"/>'+
+           '<path d="M44 57 L52 56" stroke="'+mouthc+'" stroke-width="2.4" stroke-linecap="round"/>';
+      behind='<circle cx="68" cy="30" r="2" fill="#b9c6e4"/><circle cx="74" cy="24" r="2.8" fill="#b9c6e4"/>'+
+             '<ellipse cx="82" cy="15" rx="8" ry="6" fill="#e9f5fd" stroke="#b9c6e4" stroke-width="1.5"/>'+
+             '<text x="82" y="18" font-size="8" font-weight="800" fill="#6f7a94" text-anchor="middle" font-family="sans-serif">...</text>';
+      tilt=-3;
+      break;
+    case "sleep":
+      face='<path d="M37 46 Q41 48.5 45 46" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
+           '<path d="M51 46 Q55 48.5 59 46" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
+           '<path d="M45 56 Q48 57.5 51 56" stroke="'+mouthc+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+
+           '<text x="68" y="38" font-size="13" font-weight="800" fill="#7fd4f7" font-family="sans-serif">z</text>'+
+           '<text x="75" y="28" font-size="17" font-weight="800" fill="#7fd4f7" font-family="sans-serif">z</text>';
+      break;
+    case "determined":
+      face='<path d="M35 40 L46 43.5" stroke="'+eye+'" stroke-width="2.6" stroke-linecap="round"/>'+
+           '<path d="M61 40 L50 43.5" stroke="'+eye+'" stroke-width="2.6" stroke-linecap="round"/>'+
+           '<circle cx="41" cy="48" r="3" fill="'+eye+'"/><circle cx="55" cy="48" r="3" fill="'+eye+'"/>'+
+           '<path d="M42 57 L54 57" stroke="'+mouthc+'" stroke-width="2.6" stroke-linecap="round"/>';
+      break;
+    case "surprised":
+      face='<circle cx="41" cy="46" r="4.4" fill="'+eye+'"/><circle cx="55" cy="46" r="4.4" fill="'+eye+'"/>'+
+           '<circle cx="42.5" cy="44.5" r="1.4" fill="#fff" opacity=".85"/><circle cx="56.5" cy="44.5" r="1.4" fill="#fff" opacity=".85"/>'+
+           '<circle cx="48" cy="57" r="3.4" fill="none" stroke="'+mouthc+'" stroke-width="2.4"/>';
+      arms=spread;
+      break;
+    case "celebrate":
+      face='<path d="M36.5 47 Q41 42 45.5 47" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
+           '<path d="M50.5 47 Q55 42 59.5 47" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
+           '<path d="M38 52 Q48 64 58 52 Q48 57.5 38 52Z" fill="'+mouthc+'"/>'+blush;
+      arms=raise;
+      behind='<circle cx="16" cy="18" r="2.6" fill="#f472b6"/><circle cx="80" cy="20" r="2.6" fill="#f0ad3c"/>'+
+             '<circle cx="12" cy="56" r="2.6" fill="#0d9d6c"/><circle cx="84" cy="54" r="2.6" fill="#818cf8"/>';
+      front='<g transform="rotate(14 48 22)">'+
+            '<polygon points="37,27 59,27 48,3" fill="#f472b6"/>'+
+            '<polygon points="41.5,19 54.5,19 48,3" fill="#f0ad3c" opacity=".85"/>'+
+            '<circle cx="48" cy="4" r="3.6" fill="#0d9d6c"/></g>';
+      break;
+    case "nervous":
+      face='<circle cx="41" cy="44" r="3.4" fill="'+eye+'"/><circle cx="55" cy="44" r="3.4" fill="'+eye+'"/>'+
+           '<path d="M41 56 q2.5 -2.5 5 0 t5 0 t5 0" stroke="'+mouthc+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
+      behind='<path d="M71 32 q6 8 0 13 q-6 -5 0 -13" fill="#7fd4f7"/>';
+      break;
+    case "cheering":
+      face=star(41,46,7.5,eye)+star(55,46,7.5,eye)+
+           '<path d="M37 51 Q48 65 59 51 Q48 57 37 51Z" fill="'+mouthc+'"/>'+blush;
+      arms=cheer;
+      behind='<path d="M6 40 q-4 8 0 16" stroke="#f0ad3c" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
+             '<path d="M90 40 q4 8 0 16" stroke="#f0ad3c" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
+             star(14,22,5,"#f472b6")+star(82,24,5,"#0d9d6c");
+      break;
+    default: /* idle — Dot at rest: soft, approachable, a little blush */
+      face='<circle cx="41" cy="46" r="3" fill="'+eye+'"/><circle cx="55" cy="46" r="3" fill="'+eye+'"/>'+catchlight+
+           '<path d="M42 55 Q48 58.5 54 55" stroke="'+mouthc+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+blush;
   }
-  const extras = state==="celebrate"
-    ? '<circle cx="18" cy="20" r="2.6" fill="#f472b6"/><circle cx="78" cy="22" r="2.6" fill="#f0ad3c"/>'+
-      '<circle cx="14" cy="58" r="2.6" fill="#0d9d6c"/><circle cx="82" cy="56" r="2.6" fill="#818cf8"/>'
-    : "";
-  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 96 96" role="img" aria-label="ByteBar mascot">'+extras+
-    '<line x1="48" y1="16" x2="48" y2="27" stroke="#0b8fc4" stroke-width="4" stroke-linecap="round"/>'+
-    '<circle cx="48" cy="12" r="5" fill="#0b8fc4"/>'+
-    '<rect x="13" y="42" width="9" height="20" rx="4.5" fill="#0b1e42"/>'+
-    '<rect x="74" y="42" width="9" height="20" rx="4.5" fill="#0b1e42"/>'+
+  const bot='<line x1="48" y1="16" x2="48" y2="27" stroke="#0b8fc4" stroke-width="4" stroke-linecap="round"/>'+
+    '<circle cx="48" cy="12" r="5" fill="#0b8fc4"/>'+arms+
     '<rect x="32" y="74" width="12" height="9" rx="4.5" fill="#0b1e42"/>'+
     '<rect x="52" y="74" width="12" height="9" rx="4.5" fill="#0b1e42"/>'+
     '<rect x="22" y="26" width="52" height="52" rx="17" fill="#0b1e42"/>'+
-    '<rect x="30" y="34" width="36" height="28" rx="10" fill="#e9f5fd"/>'+face+'</svg>';
+    '<rect x="30" y="34" width="36" height="28" rx="10" fill="'+tint+'"/>'+face;
+  const body=tilt?'<g transform="rotate('+tilt+' 48 55)">'+bot+'</g>':bot;
+  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 96 96" role="img" aria-label="Dot, your ByteBar study buddy">'+
+    '<title>Dot — your study buddy</title>'+behind+body+front+'</svg>';
 }
+
 
 /* lightweight canvas confetti — no libraries.
    burstConfetti(n)        → big celebration from screen center
@@ -3217,7 +3520,7 @@ function buddyOnMilestone(){
   const pct=paintTrack();
   let hit=null;
   [25,50,75].forEach(m=>{ if(pct>=m && !S.milestonesHit.has(m)){ S.milestonesHit.add(m); hit=m; } });
-  if(hit) coachSay(MILESTONES[hit], "happy");
+  if(hit) coachSay(MILESTONES[hit], "excited");
 }
 function buddyOnAnswer(wasRight){
   if(!S) return;
@@ -3229,7 +3532,7 @@ function buddyOnAnswer(wasRight){
       xpFloat("+10 XP");
       const sm=STREAK_MSGS[S.streak];
       if(sm){
-        coachSay(sm, "happy");
+        coachSay(sm, "cheering");
         const pill=$("streakpill");
         if(pill && !pill.classList.contains("hidden")){
           const r=pill.getBoundingClientRect();
@@ -3860,7 +4163,7 @@ function finishExam(expired){
   else { vb.className="verdictbox notyet"; vb.innerHTML="<b>Not yet.</b> The domain breakdown below is your study plan — attack the weakest domains first, then run another simulation."; }
 
   /* mascot reacts to the result + confetti on a pass */
-  $("res-mascot").innerHTML='<span class="mascot floaty">'+mascotSVG(pass?"celebrate":"encourage",84)+"</span>";
+  $("res-mascot").innerHTML='<span class="mascot floaty">'+mascotSVG(pct>=85?"proud":pass?"celebrate":"sympathetic",84)+"</span>";
   const rHead=$("res-headline");
   if(rHead){
     const modeName=S.mode==="sim"?"Simulation":(S.mode==="custom"?"Custom quiz":"Practice");
