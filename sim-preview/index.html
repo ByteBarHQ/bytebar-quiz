@@ -127,6 +127,71 @@ body{
 .upgradecard .uc-head{font-size:17px; font-weight:800; letter-spacing:-.01em; margin-bottom:6px; color:var(--navy);}
 .upgradecard .uc-sub{font-size:13.5px; color:var(--mut); line-height:1.55; margin-bottom:14px;}
 .upgradecard .ub-cta{font-size:15px; padding:13px 24px;}
+/* === PRO PITCH — end-of-free-trial conversion moment (Cori 2026-10-18) ===
+   The single most important conversion point. Results first (above),
+   then this: concrete numbers, blurred domain teaser, one clear CTA. */
+.upgradecard.pro-pitch{
+  flex-direction:column; align-items:stretch; text-align:center;
+  padding:28px 24px; gap:0;
+  background:linear-gradient(180deg, var(--card) 0%, #fdf8ef 100%);
+  border:2px solid #f0d9a8;
+}
+.pp-mascot{margin-bottom:8px;}
+.pp-head{
+  font-size:22px; font-weight:800; letter-spacing:-.02em;
+  color:var(--navy); margin-bottom:8px;
+}
+.pp-sub{font-size:14px; color:var(--mut); line-height:1.5; margin-bottom:18px; max-width:420px; margin-left:auto; margin-right:auto;}
+.pp-progress{margin-bottom:20px;}
+.pp-progress-track{
+  height:10px; border-radius:99px; background:#e8e0d0;
+  overflow:hidden; max-width:320px; margin:0 auto 8px;
+}
+.pp-progress-fill{
+  height:100%; width:0.5%; border-radius:99px;
+  background:linear-gradient(90deg, var(--cyan), #0d9d6c);
+  transition:width 1.2s cubic-bezier(.2,.7,.2,1);
+}
+.pp-progress-label{font-size:13px; color:var(--mut);}
+.pp-progress-label b{color:var(--navy); font-size:15px;}
+.pp-teaser{
+  position:relative; border-radius:14px; overflow:hidden;
+  background:var(--bg); border:1px solid var(--line);
+  padding:16px; margin-bottom:20px; text-align:left;
+  max-width:420px; margin-left:auto; margin-right:auto;
+}
+.pp-teaser-title{font-size:13px; font-weight:700; color:var(--navy); margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;}
+.pp-lock{font-size:11px; background:#fef3c7; color:#92400e; padding:3px 8px; border-radius:99px; font-weight:700;}
+.pp-teaser-blur{filter:blur(6px); opacity:.7; pointer-events:none; user-select:none;}
+.pp-teaser-row{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
+.pp-teaser-row:last-child{margin-bottom:0;}
+.pp-teaser-name{font-size:12px; font-weight:600; color:var(--ink); flex:1; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}
+.pp-teaser-bar{flex:2; height:8px; border-radius:99px; background:#e2e8f0; overflow:hidden;}
+.pp-teaser-bar div{height:100%; border-radius:99px; background:var(--cyan);}
+.pp-teaser-pct{font-size:12px; font-weight:700; color:var(--mut); min-width:36px; text-align:right;}
+.pp-teaser-overlay{
+  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+  font-size:13.5px; font-weight:700; color:var(--navy);
+  background:rgba(255,253,248,.55); text-align:center; padding:0 24px;
+}
+ul.pp-feats{
+  list-style:none; margin:0 0 22px; padding:0; text-align:left;
+  max-width:380px; margin-left:auto; margin-right:auto;
+}
+ul.pp-feats li{
+  font-size:14px; color:var(--ink); line-height:1.45;
+  padding:7px 0; display:flex; gap:10px; align-items:flex-start;
+}
+.pp-check{
+  flex:none; width:22px; height:22px; border-radius:99px;
+  background:#dcfce7; color:#0d9d6c; font-weight:800; font-size:13px;
+  display:flex; align-items:center; justify-content:center; margin-top:1px;
+}
+.pp-cta{
+  font-size:17px; padding:16px 32px; width:100%; max-width:380px;
+  margin:0 auto; display:block;
+}
+.pp-fine{font-size:12px; color:var(--mut); margin-top:12px;}
 /* legacy: retired gradient banner (kept selector harmless) */
 .upgrade-banner{display:none !important;}
 /* ---------- mascot idle wiggle ---------- */
@@ -4239,16 +4304,50 @@ function finishExam(expired){
   if(upSlot){
     upSlot.innerHTML="";
     if(S.mode==="practice" && !isPro()){
+      /* === PRO CONVERSION MOMENT (Cori 2026-10-18) ===
+         The single most important conversion point in the app.
+         Results shown above (score only — that's all free gets).
+         Now: make them FEEL what they're missing. Concrete numbers,
+         visual teaser of the domain breakdown, one clear CTA. */
       const up=document.createElement("div");
-      up.className="upgradecard";
-      up.innerHTML=
-        '<div class="uc-mascot"><span class="mascot-slot">'+mascotSVG("happy",52)+'</span></div>'+
-        '<div class="uc-body"><div class="uc-head">You\'ve tasted '+curExam.code+' — ready for the full thing?</div>'+
-        '<div class="uc-sub">That was '+CONFIG.PRACTICE_COUNT+' questions. Pro unlocks the full '+QCOUNT_DISPLAY_TXT+'-question bank, '+curExam.code+'-realistic timed simulations, domain-by-domain breakdowns, missed-question review, and readiness prediction — for all 12 exams.</div>'+
-        '<button class="btn ub-cta" id="ub-go">Unlock Pro — '+CONFIG.PRICE+' one-time</button></div>';
+      up.className="upgradecard pro-pitch";
+      /* Build a teaser domain breakdown from their actual answers — blurred */
+      const teaserDoms = Object.keys(doms).slice(0, 3).map(d => {
+        const t = doms[d].t, c = doms[d].c;
+        const p = t > 0 ? Math.round(c / t * 100) : 0;
+        return { name: d, pct: p };
+      });
+      let teaserBars = "";
+      teaserDoms.forEach(td => {
+        teaserBars += '<div class="pp-teaser-row"><span class="pp-teaser-name">' + escapeHtml(td.name) + '</span>' +
+          '<div class="pp-teaser-bar"><div style="width:' + td.pct + '%"></div></div>' +
+          '<span class="pp-teaser-pct">' + td.pct + '%</span></div>';
+      });
+      up.innerHTML =
+        '<div class="pp-mascot"><span class="mascot-slot floaty">' + mascotSVG("excited", 72) + '</span></div>' +
+        '<div class="pp-head">You just scratched the surface</div>' +
+        '<div class="pp-sub">That was ' + CONFIG.PRACTICE_COUNT + ' questions out of ' + QCOUNT_DISPLAY_TXT + '. Here\'s what Pro unlocks for ' + curExam.code + ':</div>' +
+        '<div class="pp-progress"><div class="pp-progress-track"><div class="pp-progress-fill"></div></div>' +
+        '<div class="pp-progress-label"><b>' + CONFIG.PRACTICE_COUNT + '</b> of <b>' + QCOUNT_DISPLAY_TXT + '</b> questions tried</div></div>' +
+        '<div class="pp-teaser"><div class="pp-teaser-title">Your domain breakdown <span class="pp-lock">🔒 Pro</span></div>' +
+        '<div class="pp-teaser-blur">' + teaserBars + '</div>' +
+        '<div class="pp-teaser-overlay">Unlock Pro to see exactly what to study next</div></div>' +
+        '<ul class="pp-feats">' +
+        '<li><span class="pp-check">✓</span> Full ' + QCOUNT_DISPLAY_TXT + '-question bank per exam — all 12 exams</li>' +
+        '<li><span class="pp-check">✓</span> Timed simulations that feel like test day</li>' +
+        '<li><span class="pp-check">✓</span> Domain breakdowns + missed-question review</li>' +
+        '<li><span class="pp-check">✓</span> Exam readiness prediction + custom quiz builder</li>' +
+        '</ul>' +
+        '<button class="btn pp-cta" id="ub-go">Unlock Pro — ' + CONFIG.PRICE + ' one-time</button>' +
+        '<div class="pp-fine">One payment · Yours forever · 30-day pass guarantee</div>';
       upSlot.appendChild(up);
       const go=$("ub-go");
       if(go) go.addEventListener("click",openPaywall);
+      /* Animate the "5 of 1,000" progress bar — the visual gap sells Pro */
+      requestAnimationFrame(()=>{ requestAnimationFrame(()=>{
+        const fill = up.querySelector(".pp-progress-fill");
+        if(fill) fill.style.width = "0.5%";
+      }); });
     }
   }
 
