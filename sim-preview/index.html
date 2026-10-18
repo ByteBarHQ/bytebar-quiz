@@ -1508,7 +1508,7 @@ html,body{overscroll-behavior-x:none;}
         <div class="hero-orbs" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span></div>
         <div class="hero-mascot mascot-pop">
           <span class="mascot-slot" data-mascot="idle" data-size="132"></span>
-          <div class="speech"><b>Hi, I'm Dot! 👋</b><span>Ready to pass your exam? Pick one below — I'll track your progress and cheer you on.</span></div>
+          <div class="speech"><b>Hi, I'm Sprout! 🌱</b><span>Ready to pass your exam? Pick one below — I'll grow right alongside you.</span></div>
         </div>
       </div>
       <h1>Practice like it's <span class="cy">test day.</span></h1>
@@ -3328,145 +3328,189 @@ function refreshBadges(){
 }
 
 /* ============================================================
-   MASCOT — ByteBar's dot-bot. Inline SVG, states:
-   idle · happy · encourage · nervous · celebrate · sleep
-   ============================================================ */
-/* ============================================================
-   DOT — the ByteBar study buddy (mascot redesign 2026-10-18)
-   Cori: "i want our character improved... just give it more so
-   people can connect to it"
+   SPROUT — the ByteBar study buddy (mascot redesign 2026-10-18)
+   Cori: "can't use dot... needs to be more adorable, do your homework"
 
-   Dot is a little robot who's read every exam objective ever
-   published and believes in you more than you believe in yourself.
-   Same recognizable body across all states — the emotion lives in
-   the eyes, mouth, posture, and tiny props. Pixar, not Clippy.
+   Research-backed cute design (see README.md "Mascot design research"):
+   - Kindchenschema: huge eyes, round chubby body, protruding cheeks
+   - Kawaii: centralized features, open smiles + blush (top-ranked),
+     pastel-warm palette, simple shapes, slight head tilt = endearing
+   - Duo lesson: radical simplicity (body + eyes + one accent), full
+     emotional range, chubby frame, no sharp edges
+   - Warm peach body (not cold navy), soft brown outlines (not harsh
+     black), no face-screen barrier, no mechanical antenna — a tiny
+     sprout gives a distinctive silhouette and ties to the name.
+
+   Sprout is a little creature who's growing right alongside you —
+   every question you answer helps them grow too.
 
    States: idle, happy, proud, sympathetic, encourage, excited,
    thoughtful, sleep, determined, surprised, celebrate, nervous,
    cheering. Unknown states fall back to idle.
    ============================================================ */
 function mascotSVG(state, size){
-  const s=size||56, eye="#0b1e42", mouthc="#0b8fc4";
+  const s=size||56;
   const st=state||"idle";
-  /* 4-point sparkle star, centered at 0,0 with radius 7, scaled */
+  /* warm, soft palette — nothing harsh or cold */
+  const BODY="#FFDDB8", BELLY="#FFE9D1", LINE="#8B5A3B",
+        CHEEK="#FF9EAA", PUPIL="#3A3340",
+        LEAF="#58B368", LEAFD="#3E8E4F";
+  /* 4-point sparkle star helper */
   const star=(cx,cy,r,fill)=>{
     const k=(r/7).toFixed(2);
     return '<path d="M0,-7 C1,-2.1 2.1,-1 7,0 C2.1,1 1,2.1 0,7 C-1,2.1 -2.1,1 -7,0 C-2.1,-1 -1,-2.1 0,-7 Z"'+
       ' transform="translate('+cx+' '+cy+') scale('+k+')" fill="'+fill+'"/>';
   };
-  /* mood-tinted face screens — Dot's mood literally colors their face */
-  const tints={happy:"#e8fdf3",proud:"#e8fdf3",excited:"#e8fdf3",celebrate:"#e8fdf3",cheering:"#e8fdf3",
-    sympathetic:"#fdf3e8",determined:"#dbeafe",sleep:"#e6e9f7"};
-  const tint=tints[st]||"#e9f5fd";
-  /* posable arms (pivots at shoulders) */
-  const armL='<rect x="13" y="42" width="9" height="20" rx="4.5" fill="#0b1e42"/>';
-  const armR='<rect x="74" y="42" width="9" height="20" rx="4.5" fill="#0b1e42"/>';
-  const raise='<g transform="rotate(120 17 48)">'+armL+'</g><g transform="rotate(-120 79 48)">'+armR+'</g>';
-  const cheer='<g transform="rotate(135 17 48)">'+armL+'</g><g transform="rotate(-135 79 48)">'+armR+'</g>';
-  const droop='<g transform="rotate(-15 17 48)">'+armL+'</g><g transform="rotate(15 79 48)">'+armR+'</g>';
-  const spread='<g transform="rotate(90 17 48)">'+armL+'</g><g transform="rotate(-90 79 48)">'+armR+'</g>';
-  const blush='<ellipse cx="36" cy="52" rx="2.6" ry="1.8" fill="#f472b6" opacity=".45"/>'+
-              '<ellipse cx="60" cy="52" rx="2.6" ry="1.8" fill="#f472b6" opacity=".45"/>';
-  const catchlight='<circle cx="42" cy="45" r="1" fill="#fff" opacity=".8"/><circle cx="56" cy="45" r="1" fill="#fff" opacity=".8"/>';
-  let arms=armL+armR, tilt=0, face="", behind="", front="";
+  /* big kawaii eyes: white + pupil + catchlights. ex,ey = center, rx,ry = size */
+  const bigEyes=(ex1,ex2,ey,rx,ry,pr,px,py)=>{
+    return '<ellipse cx="'+ex1+'" cy="'+ey+'" rx="'+rx+'" ry="'+ry+'" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+      '<ellipse cx="'+ex2+'" cy="'+ey+'" rx="'+rx+'" ry="'+ry+'" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+      '<circle cx="'+(ex1+px)+'" cy="'+(ey+py)+'" r="'+pr+'" fill="'+PUPIL+'"/>'+
+      '<circle cx="'+(ex2+px)+'" cy="'+(ey+py)+'" r="'+pr+'" fill="'+PUPIL+'"/>'+
+      '<circle cx="'+(ex1+px+pr*0.45)+'" cy="'+(ey+py-pr*0.55)+'" r="'+(pr*0.42).toFixed(1)+'" fill="#fff"/>'+
+      '<circle cx="'+(ex2+px+pr*0.45)+'" cy="'+(ey+py-pr*0.55)+'" r="'+(pr*0.42).toFixed(1)+'" fill="#fff"/>';
+  };
+  /* blush cheeks — research top-ranked cute cue */
+  const cheeks=(op)=>{
+    const o=op||0.55;
+    return '<ellipse cx="28" cy="61" rx="6.5" ry="4.2" fill="'+CHEEK+'" opacity="'+o+'"/>'+
+           '<ellipse cx="68" cy="61" rx="6.5" ry="4.2" fill="'+CHEEK+'" opacity="'+o+'"/>';
+  };
+  /* tiny sprout on head — Sprout's signature silhouette */
+  const sprout=(droop)=>{
+    const tip=droop?22:14, bend=droop?6:0;
+    return '<path d="M48,29 Q'+(48+bend)+','+(29-(29-tip)/2)+' 48,'+tip+'" stroke="'+LEAFD+'" stroke-width="3" fill="none" stroke-linecap="round"/>'+
+      '<ellipse cx="'+(41-bend*0.4)+'" cy="'+(tip+7)+'" rx="6" ry="3.4" fill="'+LEAF+'" stroke="'+LEAFD+'" stroke-width="1.4" transform="rotate(-28 '+(41-bend*0.4)+' '+(tip+7)+')"/>'+
+      '<ellipse cx="'+(55+bend*0.4)+'" cy="'+(tip+7)+'" rx="6" ry="3.4" fill="'+LEAF+'" stroke="'+LEAFD+'" stroke-width="1.4" transform="rotate(28 '+(55+bend*0.4)+' '+(tip+7)+')"/>';
+  };
+  /* stubby little arms */
+  const armL='<ellipse cx="18" cy="60" rx="5" ry="9" fill="'+BODY+'" stroke="'+LINE+'" stroke-width="2"/>';
+  const armR='<ellipse cx="78" cy="60" rx="5" ry="9" fill="'+BODY+'" stroke="'+LINE+'" stroke-width="2"/>';
+  const raise='<g transform="rotate(140 18 60)">'+armL+'</g><g transform="rotate(-140 78 60)">'+armR+'</g>';
+  const cheer='<g transform="rotate(155 18 60)">'+armL+'</g><g transform="rotate(-155 78 60)">'+armR+'</g>';
+  const spread='<g transform="rotate(80 18 60)">'+armL+'</g><g transform="rotate(-80 78 60)">'+armR+'</g>';
+
+  let arms=armL+armR, tilt=0, squash=0, face="", behind="", topper=sprout(false);
   switch(st){
-    case "happy":
-      face='<path d="M36.5 47 Q41 42 45.5 47" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
-           '<path d="M50.5 47 Q55 42 59.5 47" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
-           '<path d="M38 52 Q48 64 58 52 Q48 57.5 38 52Z" fill="'+mouthc+'"/>'+blush;
+    case "happy": /* closed happy arcs + open smile — the plushie look */
+      face='<path d="M28,50 Q37,41 46,50" stroke="'+PUPIL+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
+           '<path d="M50,50 Q59,41 68,50" stroke="'+PUPIL+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
+           '<path d="M38,63 Q48,76 58,63 Q48,68.5 38,63Z" fill="'+LINE+'"/>'+cheeks(0.7);
       break;
-    case "proud":
-      face='<circle cx="41" cy="47" r="3.1" fill="'+eye+'"/><circle cx="55" cy="47" r="3.1" fill="'+eye+'"/>'+
-           '<path d="M35.5 42.5 Q41 40.5 46.5 42.5" stroke="'+eye+'" stroke-width="2.2" fill="none" stroke-linecap="round"/>'+
-           '<path d="M49.5 42.5 Q55 40.5 60.5 42.5" stroke="'+eye+'" stroke-width="2.2" fill="none" stroke-linecap="round"/>'+
-           '<path d="M42 55 Q50 58.5 55 52.5" stroke="'+mouthc+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>';
+    case "proud": /* confident half-lids, gaze up, smirk */
+      face='<ellipse cx="37" cy="52" rx="9" ry="9" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="59" cy="52" rx="9" ry="9" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<circle cx="37" cy="49" r="5" fill="'+PUPIL+'"/><circle cx="59" cy="49" r="5" fill="'+PUPIL+'"/>'+
+           '<circle cx="38.8" cy="47.2" r="1.9" fill="#fff"/><circle cx="60.8" cy="47.2" r="1.9" fill="#fff"/>'+
+           '<path d="M29,45 Q37,42.5 45,45" stroke="'+LINE+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+
+           '<path d="M51,45 Q59,42.5 67,45" stroke="'+LINE+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+
+           '<path d="M42,67 Q51,69.5 56,65" stroke="'+LINE+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+cheeks(0.5);
       tilt=-4;
-      behind=star(72,28,6,"#f0ad3c");
+      behind=star(74,26,6,"#f0ad3c");
       break;
-    case "sympathetic":
-      face='<circle cx="41" cy="47" r="2.8" fill="'+eye+'"/><circle cx="55" cy="47" r="2.8" fill="'+eye+'"/>'+
-           '<path d="M43 55 Q48 58 53 55" stroke="'+mouthc+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+
-           '<ellipse cx="36" cy="52" rx="2.8" ry="2" fill="#f472b6" opacity=".55"/>'+
-           '<ellipse cx="60" cy="52" rx="2.8" ry="2" fill="#f472b6" opacity=".55"/>';
-      arms=droop; tilt=3;
+    case "sympathetic": /* droopy gentle eyes, soft tilt — feels WITH you */
+      face='<ellipse cx="37" cy="52" rx="9" ry="9.5" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="59" cy="52" rx="9" ry="9.5" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<circle cx="37" cy="54.5" r="5" fill="'+PUPIL+'"/><circle cx="59" cy="54.5" r="5" fill="'+PUPIL+'"/>'+
+           '<circle cx="38.8" cy="52.7" r="1.9" fill="#fff"/><circle cx="60.8" cy="52.7" r="1.9" fill="#fff"/>'+
+           '<path d="M30,47 Q37,45 44,47" stroke="'+LINE+'" stroke-width="2.2" fill="none" stroke-linecap="round"/>'+
+           '<path d="M52,47 Q59,45 66,47" stroke="'+LINE+'" stroke-width="2.2" fill="none" stroke-linecap="round"/>'+
+           '<path d="M43,68 Q48,70 53,68" stroke="'+LINE+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
+           '<ellipse cx="28" cy="61" rx="7.5" ry="5" fill="'+CHEEK+'" opacity="0.7"/>'+
+           '<ellipse cx="68" cy="61" rx="7.5" ry="5" fill="'+CHEEK+'" opacity="0.7"/>';
+      tilt=4;
       break;
-    case "encourage":
-      face='<circle cx="41" cy="46" r="3.4" fill="'+eye+'"/><circle cx="55" cy="46" r="3.4" fill="'+eye+'"/>'+catchlight+
-           '<path d="M40 53 Q48 60 56 53 Q48 57 40 53Z" fill="'+mouthc+'"/>'+blush;
+    case "encourage": /* warm open eyes + open smile — "you've got this" */
+      face=bigEyes(37,59,50,10,12,5.5,0,2.5)+
+           '<path d="M39,63 Q48,74 57,63 Q48,68 39,63Z" fill="'+LINE+'"/>'+cheeks(0.6);
       tilt=3;
       break;
-    case "excited":
-      face=star(41,46,7,eye)+star(55,46,7,eye)+
-           '<path d="M38 52 Q48 64 58 52 Q48 57.5 38 52Z" fill="'+mouthc+'"/>'+blush;
-      arms=raise;
-      behind='<path d="M8 44 q-3 6 0 12" stroke="#7fd4f7" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
-             '<path d="M88 44 q3 6 0 12" stroke="#7fd4f7" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
+    case "excited": /* sparkle eyes, big open mouth, arms up */
+      face=star(37,50,8,PUPIL)+star(59,50,8,PUPIL)+
+           '<ellipse cx="48" cy="68" rx="7" ry="6" fill="'+LINE+'"/>'+cheeks(0.7);
+      arms=raise; squash=1;
+      behind='<path d="M8,44 q-3,7 0,14" stroke="#7fd4f7" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
+             '<path d="M88,44 q3,7 0,14" stroke="#7fd4f7" stroke-width="2.5" fill="none" stroke-linecap="round"/>';
       break;
-    case "thoughtful":
-      face='<circle cx="43" cy="44" r="3" fill="'+eye+'"/><circle cx="57" cy="44" r="3" fill="'+eye+'"/>'+
-           '<path d="M44 57 L52 56" stroke="'+mouthc+'" stroke-width="2.4" stroke-linecap="round"/>';
-      behind='<circle cx="68" cy="30" r="2" fill="#b9c6e4"/><circle cx="74" cy="24" r="2.8" fill="#b9c6e4"/>'+
-             '<ellipse cx="82" cy="15" rx="8" ry="6" fill="#e9f5fd" stroke="#b9c6e4" stroke-width="1.5"/>'+
-             '<text x="82" y="18" font-size="8" font-weight="800" fill="#6f7a94" text-anchor="middle" font-family="sans-serif">...</text>';
+    case "thoughtful": /* gaze drifts up, flat thinking mouth */
+      face='<ellipse cx="37" cy="50" rx="10" ry="12" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="59" cy="50" rx="10" ry="12" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<circle cx="34.5" cy="46.5" r="5.5" fill="'+PUPIL+'"/><circle cx="56.5" cy="46.5" r="5.5" fill="'+PUPIL+'"/>'+
+           '<circle cx="36.3" cy="44.7" r="2" fill="#fff"/><circle cx="58.3" cy="44.7" r="2" fill="#fff"/>'+
+           '<path d="M43,68 L53,67" stroke="'+LINE+'" stroke-width="2.5" stroke-linecap="round"/>'+cheeks(0.4);
+      behind='<circle cx="70" cy="32" r="2.2" fill="#b9c6e4"/><circle cx="76" cy="25" r="3" fill="#b9c6e4"/>'+
+             '<ellipse cx="84" cy="15" rx="8" ry="6" fill="#fff" stroke="#b9c6e4" stroke-width="1.5"/>';
       tilt=-3;
       break;
-    case "sleep":
-      face='<path d="M37 46 Q41 48.5 45 46" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
-           '<path d="M51 46 Q55 48.5 59 46" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
-           '<path d="M45 56 Q48 57.5 51 56" stroke="'+mouthc+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+
-           '<text x="68" y="38" font-size="13" font-weight="800" fill="#7fd4f7" font-family="sans-serif">z</text>'+
-           '<text x="75" y="28" font-size="17" font-weight="800" fill="#7fd4f7" font-family="sans-serif">z</text>';
+    case "sleep": /* closed lashes, drooping sprout, floating z's */
+      face='<path d="M29,50 Q37,54 45,50" stroke="'+PUPIL+'" stroke-width="3" fill="none" stroke-linecap="round"/>'+
+           '<path d="M51,50 Q59,54 67,50" stroke="'+PUPIL+'" stroke-width="3" fill="none" stroke-linecap="round"/>'+
+           '<path d="M45,67 Q48,68.5 51,67" stroke="'+LINE+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+cheeks(0.5);
+      topper=sprout(true);
+      behind='<text x="70" y="36" font-size="14" font-weight="800" fill="#7fd4f7" font-family="sans-serif">z</text>'+
+             '<text x="78" y="24" font-size="18" font-weight="800" fill="#7fd4f7" font-family="sans-serif">z</text>';
       break;
-    case "determined":
-      face='<path d="M35 40 L46 43.5" stroke="'+eye+'" stroke-width="2.6" stroke-linecap="round"/>'+
-           '<path d="M61 40 L50 43.5" stroke="'+eye+'" stroke-width="2.6" stroke-linecap="round"/>'+
-           '<circle cx="41" cy="48" r="3" fill="'+eye+'"/><circle cx="55" cy="48" r="3" fill="'+eye+'"/>'+
-           '<path d="M42 57 L54 57" stroke="'+mouthc+'" stroke-width="2.6" stroke-linecap="round"/>';
+    case "determined": /* angled brows, locked-in gaze, firm mouth */
+      face='<path d="M27,40 L45,44.5" stroke="'+PUPIL+'" stroke-width="3" stroke-linecap="round"/>'+
+           '<path d="M69,40 L51,44.5" stroke="'+PUPIL+'" stroke-width="3" stroke-linecap="round"/>'+
+           '<ellipse cx="37" cy="53" rx="9.5" ry="10.5" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="59" cy="53" rx="9.5" ry="10.5" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<circle cx="37" cy="54" r="5.5" fill="'+PUPIL+'"/><circle cx="59" cy="54" r="5.5" fill="'+PUPIL+'"/>'+
+           '<circle cx="38.9" cy="52.1" r="2" fill="#fff"/><circle cx="60.9" cy="52.1" r="2" fill="#fff"/>'+
+           '<path d="M41,68 L55,68" stroke="'+LINE+'" stroke-width="2.8" stroke-linecap="round"/>'+cheeks(0.35);
       break;
-    case "surprised":
-      face='<circle cx="41" cy="46" r="4.4" fill="'+eye+'"/><circle cx="55" cy="46" r="4.4" fill="'+eye+'"/>'+
-           '<circle cx="42.5" cy="44.5" r="1.4" fill="#fff" opacity=".85"/><circle cx="56.5" cy="44.5" r="1.4" fill="#fff" opacity=".85"/>'+
-           '<circle cx="48" cy="57" r="3.4" fill="none" stroke="'+mouthc+'" stroke-width="2.4"/>';
+    case "surprised": /* huge eyes, tiny pupils, little "o" mouth */
+      face='<ellipse cx="37" cy="50" rx="11.5" ry="13.5" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="59" cy="50" rx="11.5" ry="13.5" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<circle cx="37" cy="51" r="4" fill="'+PUPIL+'"/><circle cx="59" cy="51" r="4" fill="'+PUPIL+'"/>'+
+           '<circle cx="38.4" cy="49.4" r="1.6" fill="#fff"/><circle cx="60.4" cy="49.4" r="1.6" fill="#fff"/>'+
+           '<ellipse cx="48" cy="69" rx="4.2" ry="5" fill="none" stroke="'+LINE+'" stroke-width="2.6"/>'+cheeks(0.5);
       arms=spread;
       break;
-    case "celebrate":
-      face='<path d="M36.5 47 Q41 42 45.5 47" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
-           '<path d="M50.5 47 Q55 42 59.5 47" stroke="'+eye+'" stroke-width="2.6" fill="none" stroke-linecap="round"/>'+
-           '<path d="M38 52 Q48 64 58 52 Q48 57.5 38 52Z" fill="'+mouthc+'"/>'+blush;
+    case "celebrate": /* party hat, happy arcs, confetti */
+      face='<path d="M28,50 Q37,41 46,50" stroke="'+PUPIL+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
+           '<path d="M50,50 Q59,41 68,50" stroke="'+PUPIL+'" stroke-width="3.2" fill="none" stroke-linecap="round"/>'+
+           '<path d="M37,62 Q48,77 59,62 Q48,68 37,62Z" fill="'+LINE+'"/>'+cheeks(0.75);
       arms=raise;
-      behind='<circle cx="16" cy="18" r="2.6" fill="#f472b6"/><circle cx="80" cy="20" r="2.6" fill="#f0ad3c"/>'+
-             '<circle cx="12" cy="56" r="2.6" fill="#0d9d6c"/><circle cx="84" cy="54" r="2.6" fill="#818cf8"/>';
-      front='<g transform="rotate(14 48 22)">'+
-            '<polygon points="37,27 59,27 48,3" fill="#f472b6"/>'+
-            '<polygon points="41.5,19 54.5,19 48,3" fill="#f0ad3c" opacity=".85"/>'+
-            '<circle cx="48" cy="4" r="3.6" fill="#0d9d6c"/></g>';
+      topper='<g transform="rotate(12 48 28)">'+
+        '<polygon points="36,30 60,30 48,4" fill="#f472b6" stroke="'+LINE+'" stroke-width="1.6"/>'+
+        '<polygon points="41,21 55,21 48,4" fill="#f0ad3c" opacity="0.9"/>'+
+        '<circle cx="48" cy="5" r="4" fill="#0d9d6c" stroke="'+LINE+'" stroke-width="1.4"/></g>';
+      behind='<circle cx="14" cy="20" r="3" fill="#f472b6"/><circle cx="82" cy="22" r="3" fill="#f0ad3c"/>'+
+             '<circle cx="10" cy="58" r="3" fill="#0d9d6c"/><circle cx="86" cy="56" r="3" fill="#818cf8"/>'+
+             star(20,40,4,"#f0ad3c")+star(76,44,4,"#f472b6");
       break;
-    case "nervous":
-      face='<circle cx="41" cy="44" r="3.4" fill="'+eye+'"/><circle cx="55" cy="44" r="3.4" fill="'+eye+'"/>'+
-           '<path d="M41 56 q2.5 -2.5 5 0 t5 0 t5 0" stroke="'+mouthc+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>';
-      behind='<path d="M71 32 q6 8 0 13 q-6 -5 0 -13" fill="#7fd4f7"/>';
+    case "nervous": /* darting eyes, wavy mouth, sweat drop */
+      face='<ellipse cx="37" cy="51" rx="8.5" ry="10" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<ellipse cx="59" cy="51" rx="8.5" ry="10" fill="#fff" stroke="'+LINE+'" stroke-width="2"/>'+
+           '<circle cx="40" cy="52" r="4.5" fill="'+PUPIL+'"/><circle cx="62" cy="52" r="4.5" fill="'+PUPIL+'"/>'+
+           '<path d="M40,68 q3,-3 6,0 t6,0" stroke="'+LINE+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+cheeks(0.45);
+      behind='<path d="M73,32 q6.5,8.5 0,14 q-6.5,-5.5 0,-14" fill="#7fd4f7" stroke="'+LINE+'" stroke-width="1.2"/>';
       break;
-    case "cheering":
-      face=star(41,46,7.5,eye)+star(55,46,7.5,eye)+
-           '<path d="M37 51 Q48 65 59 51 Q48 57 37 51Z" fill="'+mouthc+'"/>'+blush;
+    case "cheering": /* star eyes, huge grin, arms sky-high */
+      face=star(37,50,8.5,PUPIL)+star(59,50,8.5,PUPIL)+
+           '<ellipse cx="48" cy="69" rx="8.5" ry="7.5" fill="'+LINE+'"/>'+cheeks(0.75);
       arms=cheer;
-      behind='<path d="M6 40 q-4 8 0 16" stroke="#f0ad3c" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
-             '<path d="M90 40 q4 8 0 16" stroke="#f0ad3c" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
-             star(14,22,5,"#f472b6")+star(82,24,5,"#0d9d6c");
+      behind='<path d="M6,40 q-4,9 0,18" stroke="#f0ad3c" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
+             '<path d="M90,40 q4,9 0,18" stroke="#f0ad3c" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+
+             star(13,22,5,"#f472b6")+star(83,24,5,"#0d9d6c");
       break;
-    default: /* idle — Dot at rest: soft, approachable, a little blush */
-      face='<circle cx="41" cy="46" r="3" fill="'+eye+'"/><circle cx="55" cy="46" r="3" fill="'+eye+'"/>'+catchlight+
-           '<path d="M42 55 Q48 58.5 54 55" stroke="'+mouthc+'" stroke-width="2.4" fill="none" stroke-linecap="round"/>'+blush;
+    default: /* idle — big warm eyes, gentle smile, soft blush */
+      face=bigEyes(37,59,50,10,12,5.5,0,2.5)+
+           '<path d="M42,67 Q48,70.5 54,67" stroke="'+LINE+'" stroke-width="2.5" fill="none" stroke-linecap="round"/>'+cheeks(0.55);
   }
-  const bot='<line x1="48" y1="16" x2="48" y2="27" stroke="#0b8fc4" stroke-width="4" stroke-linecap="round"/>'+
-    '<circle cx="48" cy="12" r="5" fill="#0b8fc4"/>'+arms+
-    '<rect x="32" y="74" width="12" height="9" rx="4.5" fill="#0b1e42"/>'+
-    '<rect x="52" y="74" width="12" height="9" rx="4.5" fill="#0b1e42"/>'+
-    '<rect x="22" y="26" width="52" height="52" rx="17" fill="#0b1e42"/>'+
-    '<rect x="30" y="34" width="36" height="28" rx="10" fill="'+tint+'"/>'+face;
-  const body=tilt?'<g transform="rotate('+tilt+' 48 55)">'+bot+'</g>':bot;
-  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 96 96" role="img" aria-label="Dot, your ByteBar study buddy">'+
-    '<title>Dot — your study buddy</title>'+behind+body+front+'</svg>';
+  /* chubby unified body — one soft blob, no separate head.
+     face sits on top of body; outline redrawn last for a crisp edge */
+  const assembled=behind+
+    '<ellipse cx="48" cy="56" rx="30" ry="28" fill="'+BODY+'"/>'+
+    '<ellipse cx="48" cy="68" rx="19" ry="12" fill="'+BELLY+'" opacity="0.65"/>'+
+    arms+topper+face+
+    '<ellipse cx="48" cy="56" rx="30" ry="28" fill="none" stroke="'+LINE+'" stroke-width="2.5"/>';
+  let inner=assembled;
+  if(squash) inner='<g transform="translate(48 84) scale(1.08 0.94) translate(-48 -84)">'+assembled+'</g>';
+  const body=tilt?'<g transform="rotate('+tilt+' 48 58)">'+inner+'</g>':inner;
+  return '<svg width="'+s+'" height="'+s+'" viewBox="0 0 96 96" role="img" aria-label="Sprout, your ByteBar study buddy">'+
+    '<title>Sprout — your study buddy</title>'+body+'</svg>';
 }
 
 
