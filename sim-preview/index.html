@@ -4508,7 +4508,13 @@ $("mode-sim").addEventListener("click",()=>{
 function openPaywall(){
   $("paywall").classList.remove("hidden"); $("pw-msg").textContent="";
 }
-function closePaywall(){ $("paywall").classList.add("hidden"); }
+function closePaywall(){
+  $("paywall").classList.add("hidden");
+  /* If user arrived via ?buy=1 from the landing page, X takes them back home to bytebarhq.com */
+  if(window._cameFromBuy){
+    window.location.href = "https://bytebarhq.com";
+  }
+}
 $("pw-close").addEventListener("click",closePaywall);
 $("paywall").addEventListener("click",e=>{ if(e.target.id==="paywall") closePaywall(); });
 $("pw-buy").addEventListener("click",()=>{
@@ -6322,6 +6328,8 @@ refreshAccount();
     if(params.get('buy') === '1') {
       /* Clean the URL so a refresh doesn't re-trigger the paywall */
       try { history.replaceState(null, '', location.pathname); } catch(e) {}
+      /* Flag for the X button: user came from landing page, X goes back home */
+      window._cameFromBuy = true;
       /* For buy flow: render home silently behind the boot loader, then swap
          boot loader directly for paywall — no home flash, no double transition */
       renderHome();
