@@ -6310,8 +6310,8 @@ wireReveals();
 wireCounters();
 wireHero();
 refreshAccount();
-/* Hide the boot loader once the app is ready */
-(function(){ var b=document.getElementById('bb-boot'); if(b){ b.classList.add('done'); setTimeout(function(){ b.remove(); }, 400); } })();
+/* Hide the boot loader once the app is ready — UNLESS ?buy=1 (keep it up until paywall opens) */
+(function(){ var params=new URLSearchParams(window.location.search); if(params.get('buy')==='1') return; var b=document.getElementById('bb-boot'); if(b){ b.classList.add('done'); setTimeout(function(){ b.remove(); }, 400); } })();
 /* Deep-link support: ?exam=<slug> jumps straight to exam — skip home render to avoid flash.
    ?buy=1 opens the Pro paywall over the home screen (for "Get Pro" CTAs).
    Backend boot (Supabase session restore / magic-link code exchange) runs
