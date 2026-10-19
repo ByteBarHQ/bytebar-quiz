@@ -1609,6 +1609,26 @@ html,body{overscroll-behavior-x:none;}
 </style>
 </head>
 <body>
+<!-- Loading state: shows immediately before JS bundle parses -->
+<div id="bb-boot" aria-hidden="true">
+  <div class="bb-boot-card">
+    <div class="bb-boot-spin"></div>
+    <div class="bb-boot-txt">Loading the simulator…</div>
+    <div class="bb-boot-sub">Grabbing 16,000 questions — one sec.</div>
+  </div>
+</div>
+<style>
+#bb-boot{position:fixed; inset:0; z-index:99999; display:flex; align-items:center; justify-content:center;
+  background:#f6f1e6; transition:opacity .3s}
+#bb-boot.done{opacity:0; pointer-events:none}
+#bb-boot .bb-boot-card{text-align:center; padding:40px}
+#bb-boot .bb-boot-spin{width:56px; height:56px; margin:0 auto 20px; border-radius:50%;
+  border:5px solid #e6dcc4; border-top-color:#0b8fc4; animation:bbspin .8s linear infinite}
+@keyframes bbspin{to{transform:rotate(360deg)}}
+#bb-boot .bb-boot-txt{font-weight:800; font-size:18px; color:#0b1e42; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+#bb-boot .bb-boot-sub{font-size:14px; color:#6f695c; margin-top:6px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+@media(prefers-reduced-motion:reduce){#bb-boot .bb-boot-spin{animation:none}}
+</style>
 
 <!-- ================= HOME ================= -->
 <canvas id="confetti"></canvas>
@@ -1881,7 +1901,7 @@ html,body{overscroll-behavior-x:none;}
       <div class="tchip">✓ One-time payment, no subscription</div>
     </div>
   </div>
-  <div class="foot"><div class="wm">B Y T E B A R</div>bytebarhq.com</div>
+  <div class="foot"><div class="wm">B Y T E B A R</div><a href="https://bytebarhq.com" style="color:inherit; text-decoration:underline; text-underline-offset:3px">← bytebarhq.com</a></div>
 </div>
 
 <!-- ================= BRIEFING ================= -->
@@ -2030,7 +2050,7 @@ html,body{overscroll-behavior-x:none;}
     </div>
     <div id="res-upgrade"></div>
   </div></div>
-  <div class="foot"><div class="wm">B Y T E B A R</div>bytebarhq.com</div>
+  <div class="foot"><div class="wm">B Y T E B A R</div><a href="https://bytebarhq.com" style="color:inherit; text-decoration:underline; text-underline-offset:3px">← bytebarhq.com</a></div>
 </div>
 
 <!-- ================= DASHBOARD (Pro) ================= -->
@@ -2071,7 +2091,7 @@ html,body{overscroll-behavior-x:none;}
       <div id="dash-ready"></div>
     </div>
   </div>
-  <div class="foot"><div class="wm">B Y T E B A R</div>bytebarhq.com</div>
+  <div class="foot"><div class="wm">B Y T E B A R</div><a href="https://bytebarhq.com" style="color:inherit; text-decoration:underline; text-underline-offset:3px">← bytebarhq.com</a></div>
 </div>
 
 <!-- ================= PROFILE ================= -->
@@ -2108,7 +2128,7 @@ html,body{overscroll-behavior-x:none;}
     <div class="secttl">Your stats</div>
     <div class="dashgrid" id="profile-stats"></div>
   </div>
-  <div class="foot"><div class="wm">B Y T E B A R</div>bytebarhq.com</div>
+  <div class="foot"><div class="wm">B Y T E B A R</div><a href="https://bytebarhq.com" style="color:inherit; text-decoration:underline; text-underline-offset:3px">← bytebarhq.com</a></div>
 </div>
 
 <!-- ================= QUIZ BUILDER (Pro) ================= -->
@@ -2154,7 +2174,7 @@ html,body{overscroll-behavior-x:none;}
       <div class="fineprint" id="builder-msg" style="min-height:20px;"></div>
     </div>
   </div>
-  <div class="foot"><div class="wm">B Y T E B A R</div>bytebarhq.com</div>
+  <div class="foot"><div class="wm">B Y T E B A R</div><a href="https://bytebarhq.com" style="color:inherit; text-decoration:underline; text-underline-offset:3px">← bytebarhq.com</a></div>
 </div>
 
 <!-- ================= AUTH ================= -->
@@ -6289,6 +6309,8 @@ wireReveals();
 wireCounters();
 wireHero();
 refreshAccount();
+/* Hide the boot loader once the app is ready */
+(function(){ var b=document.getElementById('bb-boot'); if(b){ b.classList.add('done'); setTimeout(function(){ b.remove(); }, 400); } })();
 /* Deep-link support: ?exam=<slug> jumps straight to exam — skip home render to avoid flash.
    ?buy=1 opens the Pro paywall over the home screen (for "Get Pro" CTAs).
    Backend boot (Supabase session restore / magic-link code exchange) runs
