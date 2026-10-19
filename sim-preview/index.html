@@ -432,11 +432,12 @@ ul.pp-feats li{
   /* top bar: declutter on narrow screens */
   .topbar .inner{padding:11px 14px; gap:8px;}
   .homebtn{width:36px; height:36px; border-radius:11px;}
-  .brandmark{font-size:11px; letter-spacing:.3em;}
+  .brandmark{font-size:10px; letter-spacing:.18em; white-space:nowrap;}
   .brandsub{display:none;}
   .lvlpill{display:none;}
-  .acctbtn{padding:6px 12px; font-size:12px;}
-  .probadge{font-size:10px; padding:5px 10px;}
+  .acctbtn{padding:6px 10px; font-size:11px; white-space:nowrap;}
+  .goprobtn{padding:6px 10px; font-size:11px; white-space:nowrap;}
+  .probadge{display:none;}
   .wrap{padding:24px 14px 56px;}
   .hero h1{font-size:28px;}
   .hero p{font-size:15px;}
@@ -6317,8 +6318,15 @@ refreshAccount();
   renderHome();
   }
   if(window.BB){
-    // BB.boot resolves immediately when unconfigured (local-only mode).
-    try { BB.boot().then(route, route); } catch(e){ route(); }
+    // BB.boot restores the Supabase session / exchanges magic-link codes.
+    // Never leave the user staring at a blank page: route after 1.5s max —
+    // boot finishes in the background and re-renders when it lands.
+    try {
+      let routed = false;
+      const go = function(){ if(!routed){ routed = true; route(); } };
+      setTimeout(go, 1500);
+      BB.boot().then(go, go);
+    } catch(e){ route(); }
   } else { route(); }
 })();
 </script>
