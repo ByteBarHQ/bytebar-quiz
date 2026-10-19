@@ -1639,7 +1639,7 @@ html,body{overscroll-behavior-x:none;}
     <div class="spacer"></div>
     <span class="lvlpill hidden" id="home-lvlpill"></span>
     <span id="home-acctslot"><button class="acctbtn" id="home-acctbtn" onclick="openAuth()">Sign in</button></span>
-    <button class="goprobtn" id="home-gopro" onclick="openPaywall()" title="Unlock all 16 exams — $19.99 one-time">Go Pro</button>
+    <button class="goprobtn" id="home-gopro" onclick="openPaywall()" title="Unlock all 16 exams — $9.99 one-time">Go Pro</button>
     <div class="probadge free" id="home-probadge">Free tier</div>
   </div></div>
   <div class="wrap">
@@ -1843,8 +1843,8 @@ html,body{overscroll-behavior-x:none;}
       <div class="faqitem"><button class="fq">What score should I aim for before booking the real exam?</button><div class="fa">Consistently above 85% on timed simulations with no domain below 70%. The readiness meter on your results page tracks this for you and tells you when you're there.</div></div>
       <div class="faqitem"><button class="fq">What if I fail the real exam after using ByteBar?</button><div class="fa">Bring us your score report. We'll point you at the exact domains to rebuild and extend your access — we'd rather you pass late than pay twice.</div></div>
       <div class="faqitem"><button class="fq">Can I use it on my phone?</button><div class="fa">Yes. The simulator is fully responsive — practice on your phone, run full timed simulations on desktop. Your progress syncs to your account on each device.</div></div>
-      <div class="faqitem"><button class="fq">Is this a subscription?</button><div class="fa">No. Pro is a one-time payment of $19.99 for all 16 exams. No renewals, no expiring access — yours until you pass.</div></div>
-      <div class="faqitem"><button class="fq">Is $19.99 per exam or for all exams?</button><div class="fa">All exams. One $19.99 payment unlocks all 16 exams — full 1,000-question banks, timed and adaptive simulations, terminal tasks, everything. Others charge $99 per exam. We charge $19.99 for all of them.</div></div>
+      <div class="faqitem"><button class="fq">Is this a subscription?</button><div class="fa">No. Pro is a one-time payment of $9.99 for all 16 exams. No renewals, no expiring access — yours until you pass.</div></div>
+      <div class="faqitem"><button class="fq">Is $9.99 per exam or for all exams?</button><div class="fa">All exams. One $9.99 payment unlocks all 16 exams — full 1,000-question banks, timed and adaptive simulations, terminal tasks, everything. Others charge $99 per exam. We charge $9.99 for all of them.</div></div>
       <div class="faqitem"><button class="fq">How is this different from free practice questions?</button><div class="fa">Depth and realism. The free taste gives you 5 questions per exam. ByteBar Pro gives you full timed simulations, an explanation for every answer, domain-level analytics, and a readiness prediction trained on your own attempts.</div></div>
     </div></div>
 
@@ -1893,7 +1893,7 @@ html,body{overscroll-behavior-x:none;}
         <h3>Exam Simulation</h3>
         <p id="modes-sim-p">The full question bank under real exam conditions. This is the closest thing to test day.</p>
         <ul id="sim-feats"><li>Exam-realistic questions · timer · auto-submit</li><li>Domain-level score report &amp; readiness prediction</li><li>Custom quiz builder — your domains, your rules</li><li>Performance analytics &amp; study plan</li></ul>
-        <div class="price">$19.99 <small>one-time · all 16 exams</small></div>
+        <div class="price">$9.99 <small>one-time · all 16 exams</small></div>
       </button>
     </div>
     <div class="trustchips">
@@ -2276,7 +2276,7 @@ html,body{overscroll-behavior-x:none;}
     <h2 id="tease-name">—</h2>
     <p id="tease-desc">—</p>
     <div class="btnrow" style="justify-content:center;margin-top:18px;gap:10px;flex-wrap:wrap;">
-      <button class="btn gold" id="tease-go" style="padding:12px 26px;font-size:15px;">Go Pro — $19.99</button>
+      <button class="btn gold" id="tease-go" style="padding:12px 26px;font-size:15px;">Go Pro — $9.99</button>
       <button class="btn ghost" id="tease-ok" style="padding:12px 26px;font-size:15px;">Later</button>
     </div>
   </div>
@@ -2323,8 +2323,8 @@ html,body{overscroll-behavior-x:none;}
         <div class="tchip">🔒 Secure checkout</div>
         <div class="tchip">✓ One-time payment, no subscription</div>
       </div>
-      <div class="priceline"><span class="was">$99</span><span class="p">$19.99</span><span class="per">one-time · all 16 exams</span></div>
-      <button class="btn block" id="pw-buy">Get Pro — $19.99 · All 16 exams</button>
+      <div class="priceline"><span class="was">$99</span><span class="p">$9.99</span><span class="per">one-time · all 16 exams</span></div>
+      <button class="btn block" id="pw-buy">Get Pro — $9.99 · All 16 exams</button>
       <div class="fineprint">Secure checkout · Instant access · Yours forever<br>No subscription, no renewals.</div>
       <div class="keyrow">
         <input id="pw-key" type="text" placeholder="BB19-XXXXXX-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" style="font-family:ui-monospace,Menlo,monospace; letter-spacing:.04em;">
@@ -2752,7 +2752,7 @@ window.BB = (function(){
 
 /* ================= CONFIG ================= */
 const CONFIG = {
-  PRICE: "$19.99",
+  PRICE: "$9.99",
   PAYMENT_URL: "https://payhip.com/b/03TJp",
   PASS_PCT: 70,
   SIM_MINUTES: 90,
@@ -3882,7 +3882,7 @@ const PBQ_QUESTIONS = {
    the form BB19-<BODY>-<CHECK>; CHECK is an FNV-1a checksum over
    "bytebar-sim-v1|<BODY>|<pepper>". Stops casual key-guessing cold; a
    determined reader of this source can mint keys (pepper ships client-side)
-   - the honest posture for a static $19.99 product whose questions are
+   - the honest posture for a static $9.99 product whose questions are
    already in the file. Upgrade path: server-side Payhip license-verify API
    behind a secret-holding proxy. */
 const KEY_ALPHABET="ABCDEFGHJKMNPQRSTUVWXYZ23456789";
@@ -5519,7 +5519,7 @@ function openAccountMenu(){
   const dispU = (u.indexOf("sb:")==0 && r && r.username) ? r.username : u;
   const proBadge = (r && r.pro)
     ? '<div class="acctmenu-pro">⭐ <b>Pro member</b>'+(r.proSince?' · since '+new Date(r.proSince).toLocaleDateString("en-US",{month:"short",year:"numeric"}):'')+'</div>'
-    : '<button class="acctmenu-upgrade" id="acctmenu-upgrade">⭐ <b>Go Pro</b><span>$19.99 one-time · all 16 exams, forever</span></button>';
+    : '<button class="acctmenu-upgrade" id="acctmenu-upgrade">⭐ <b>Go Pro</b><span>$9.99 one-time · all 16 exams, forever</span></button>';
   // simple action sheet via confirm-free menu overlay
   const ov=document.createElement("div"); ov.className="overlay"; ov.id="acctmenu";
   ov.innerHTML='<div class="sheetwrap"><div class="sheet"><div class="shead"><div class="kick">Account</div>'+
@@ -6059,7 +6059,7 @@ function renderProfile(){
       proBlock.innerHTML='<button class="procard locked" id="profile-procta">'+
         '<div class="procard-badge dim">Free tier</div>'+
         '<div class="procard-title">Unlock ByteBar Pro</div>'+
-        '<div class="procard-feats">Full simulations for all 16 exams · $19.99 one-time, yours forever</div>'+
+        '<div class="procard-feats">Full simulations for all 16 exams · $9.99 one-time, yours forever</div>'+
         '</button>';
       proBlock.classList.remove("hidden");
       const cta=$("profile-procta");
