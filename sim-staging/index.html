@@ -4519,7 +4519,7 @@ function renderModes(slug){
   if(slot) slot.innerHTML=
     '<div style="font-size:12.5px;color:var(--mut);font-weight:600;">Question bank: '+QCOUNT_DISPLAY_TXT+' exam-style questions</div>';
   /* Simulation card mirrors the real exam's format — no two exams look alike. */
-  const fmt=examFormat(slug), fl=$("sim-feats");
+  const fmt=examFormat(slug), fl=$("sim-feats"), sp=$("modes-sim-p");
   if(fl){
     const unit=fmt.types[0]==="terminal"?"tasks":"questions";
     const items=[
@@ -4540,8 +4540,7 @@ function renderModes(slug){
     } else if(simH3) simH3.textContent="Exam Simulation";
     fl.innerHTML=items.map(t=>"<li>"+t+"</li>").join("");
   }
-  const sp=$("modes-sim-p");
-  if(sp) sp.textContent="The "+QCOUNT_DISPLAY_TXT+"-question bank under real "+curExam.code+" conditions. This is the closest thing to test day.";
+  if(sp && fmt.types.indexOf("cat")===-1) sp.textContent="The "+QCOUNT_DISPLAY_TXT+"-question bank under real "+curExam.code+" conditions. This is the closest thing to test day.";
   refreshBadges();
   show("screen-modes");
 }
