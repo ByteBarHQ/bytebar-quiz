@@ -353,6 +353,10 @@ ul.pp-feats li{
 .pal.fl::after{content:""; position:absolute; top:4px; right:4px; width:8px; height:8px; border-radius:50%; background:var(--gold);}
 .palkey{display:flex; gap:12px; margin-top:14px; font-size:11.5px; color:var(--mut); flex-wrap:wrap;}
 .palkey span{display:flex; align-items:center; gap:5px;}
+/* end-of-exam review overlay: wider card, denser scrollable palette grid */
+.reviewcard{max-width:640px; width:94vw;}
+.revgrid{grid-template-columns:repeat(10,1fr); max-height:42vh; overflow-y:auto; padding:6px 2px;}
+@media(max-width:560px){ .revgrid{grid-template-columns:repeat(6,1fr);} }
 .dot{width:10px; height:10px; border-radius:3px; background:#fbf8f1; border:1.5px solid var(--line); display:inline-block;}
 .dot.a{background:var(--navy); border-color:var(--navy);}
 .dot.f{background:var(--gold); border:0; border-radius:50%;}
@@ -2018,6 +2022,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
         <span><i class="dot a"></i>Answered</span>
         <span><i class="dot f"></i>Flagged</span>
       </div>
+      <button class="btn ghost block hidden" id="reviewbtn" style="margin-top:14px;">Review &amp; submit</button>
     </div>
   </div>
 </div>
@@ -2274,6 +2279,25 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <button class="menubtn" id="migrate-use-cloud"><span class="mi">☁️</span><span>Cloud account<small id="migrate-cloud-desc">—</small></span></button>
     </div></div>
   </div></div>
+</div>
+
+<!-- ================= END-OF-EXAM REVIEW ================= -->
+<div id="reviewov" class="unlockov hidden">
+  <div class="unlockcard reviewcard">
+    <div class="uk">Before you submit</div>
+    <h2>Review your answers</h2>
+    <p id="revsum"></p>
+    <div class="palgrid revgrid" id="revgrid"></div>
+    <div class="palkey" style="justify-content:center;">
+      <span><i class="dot"></i>Unanswered</span>
+      <span><i class="dot a"></i>Answered</span>
+      <span><i class="dot f"></i>Flagged</span>
+    </div>
+    <div class="btnrow" style="justify-content:center;margin-top:18px;gap:10px;">
+      <button class="btn ghost" id="rev-back">Back to exam</button>
+      <button class="btn gold" id="rev-submit">Submit exam</button>
+    </div>
+  </div>
 </div>
 
 <!-- ================= BADGE UNLOCK ================= -->
@@ -2868,27 +2892,41 @@ const QCOUNT_DISPLAY_TXT = "1,000";
    simulation draws the exam-realistic count from it, so each exam feels
    like its real counterpart instead of a generic 100-question quiz.
    types: "mcq" (multiple choice), "pbq" (multi-select performance-based),
-          "terminal" (hands-on typed-command tasks, CKA/CKAD style). */
+          "terminal" (hands-on typed-command tasks, CKA/CKAD style).
+   pass: the exam's passing mark as a raw-% equivalent. Most vendors report
+          scaled scores (e.g. CompTIA 750/900, AWS 720/1000, Microsoft 700),
+          so these are approximations of the scaled mark, not the vendor's
+          literal number. DCA/GCP/Terraform publish no official mark and
+          TEAS/HESI marks are school-set — those are estimates. NCLEX has no
+          pass % at all: the CAT engine decides against its logit standard. */
 const EXAM_FORMATS = {
-  az900:        { count: 45, minutes: 65,  types: ["mcq"] },
-  az104:        { count: 50, minutes: 100, types: ["mcq"] },
-  saa_c03:      { count: 65, minutes: 130, types: ["mcq"] },
-  cysa_cs0_004: { count: 85, minutes: 165, types: ["mcq","pbq"] },
-  linuxplus_xk0_006: { count: 90, minutes: 90, types: ["mcq","pbq"] },
-  cka:          { count: 17, minutes: 120, types: ["terminal"] },
-  ckad:         { count: 19, minutes: 120, types: ["terminal"] },
-  dca:          { count: 55, minutes: 80,  types: ["mcq"] },
-  terraform_004:{ count: 57, minutes: 60,  types: ["mcq"] },
-  cloudplus_cv0_004: { count: 90, minutes: 90, types: ["mcq"] },
-  gcp_ace:      { count: 55, minutes: 120, types: ["mcq"] },
-  itil4:        { count: 40, minutes: 60,  types: ["mcq"] },
-  nclex_rn:     { count: 145, minutes: 300, types: ["mcq","sata","cat"] },
-  nclex_pn:     { count: 145, minutes: 300, types: ["mcq","sata","cat"] },
-  teas7:        { count: 170, minutes: 209, types: ["mcq"] },
-  hesi_a2:      { count: 150, minutes: 240, types: ["mcq"] },
+  az900:        { count: 45, minutes: 45,  pass: 70, types: ["mcq"] },
+  az104:        { count: 50, minutes: 100, pass: 70, types: ["mcq"] },
+  saa_c03:      { count: 65, minutes: 130, pass: 72, types: ["mcq"] },
+  cysa_cs0_004: { count: 85, minutes: 165, pass: 80, types: ["mcq","pbq"] },
+  secplus_sy0_701: { count: 90, minutes: 90, pass: 80, types: ["mcq"] },
+  linuxplus_xk0_006: { count: 90, minutes: 90, pass: 77, types: ["mcq","pbq"] },
+  netplus_n10_009: { count: 90, minutes: 90, pass: 77, types: ["mcq"] },
+  aplus_1101_1102: { count: 90, minutes: 90, pass: 75, types: ["mcq"] },
+  cka:          { count: 17, minutes: 120, pass: 66, types: ["terminal"] },
+  ckad:         { count: 19, minutes: 120, pass: 66, types: ["terminal"] },
+  dca:          { count: 55, minutes: 90,  pass: 70, types: ["mcq"] },
+  terraform_004:{ count: 57, minutes: 60,  pass: 70, types: ["mcq"] },
+  cloudplus_cv0_004: { count: 90, minutes: 90, pass: 80, types: ["mcq"] },
+  gcp_ace:      { count: 55, minutes: 120, pass: 70, types: ["mcq"] },
+  itil4:        { count: 40, minutes: 60,  pass: 65, types: ["mcq"] },
+  nclex_rn:     { count: 150, minutes: 300, types: ["mcq","sata","cat"] },
+  nclex_pn:     { count: 150, minutes: 300, types: ["mcq","sata","cat"] },
+  teas7:        { count: 170, minutes: 209, pass: 70, types: ["mcq"] },
+  hesi_a2:      { count: 150, minutes: 240, pass: 70, types: ["mcq"] },
 };
 function examFormat(slug){
   return EXAM_FORMATS[slug] || {count:CONFIG.SIM_COUNT, minutes:CONFIG.SIM_MINUTES, types:["mcq"]};
+}
+/* Per-exam passing mark (raw %); falls back to the global default. */
+function passPct(slug){
+  const f=EXAM_FORMATS[slug];
+  return (f&&f.pass!=null)?f.pass:CONFIG.PASS_PCT;
 }
 function formatLabel(fmt){
   if(fmt.types.indexOf("terminal")!==-1) return "Hands-on terminal tasks";
@@ -2907,7 +2945,7 @@ function buildSimBank(slug){
   let pool=mcqs.map(q=>q.qtype==="sata"?prepSATA(q):prepQ(q));
   if(fmt.types.indexOf("pbq")!==-1 && PBQ_QUESTIONS[slug]){
     const pbqs=shuffle(PBQ_QUESTIONS[slug].slice()).slice(0,6).map(prepMS);
-    pool=pbqs.concat(shuffle(mcqs).slice(0,Math.max(0,fmt.count-pbqs.length)).map(prepQ));
+    pool=pbqs.concat(shuffle(mcqs).slice(0,Math.max(0,fmt.count-pbqs.length)).map(q=>q.qtype==="sata"?prepSATA(q):prepQ(q)));
     return shuffle(pool);
   }
   return pool.slice(0,fmt.count);
@@ -4569,7 +4607,7 @@ function renderModes(slug){
     if(fmt.types[0]==="terminal") items[1]="Hands-on tasks — type real commands, like the real exam";
     const simH3=document.querySelector("#mode-sim h3");
     if(fmt.types.indexOf("cat")!==-1){
-      items[0]="75–145 questions · up to 5 hours · auto-submit";
+      items[0]="85–150 questions · up to 5 hours · auto-submit";
       items[1]="Adaptive difficulty — questions adjust to your ability, like the real "+curExam.code;
       items[2]="Pass/fail decided at 95% confidence — no two runs alike";
       items[3]="Domain-level score report & missed-question review";
@@ -4730,7 +4768,7 @@ function renderBrief(slug){
   const fmt=examFormat(slug);
   if(fmt.types.indexOf("cat")!==-1){
     $("brief-title").textContent=curExam.code+" — adaptive simulation";
-    $("brief-sub").textContent=curExam.name+" · 75–145 questions · up to 5 hours · "+formatLabel(fmt);
+    $("brief-sub").textContent=curExam.name+" · 85–150 questions · up to 5 hours · "+formatLabel(fmt);
     const bn0=$("brief-note");
     if(bn0) bn0.textContent="The computer adapts to you: answer well and questions get harder. It ends when the engine is 95% confident — just like the real "+curExam.code+". No going back; each answer is final.";
     show("screen-brief"); return;
@@ -4791,13 +4829,14 @@ function autoSubmit(){
    difficulty b mapped from the 1-5 bank tags ((d-3)). After each response theta
    updates toward the observed outcome, the next item is drawn near the current
    estimate, and the exam stops when the 95% CI clears the passing standard
-   (theta=0) after 75 items, or at the 145-item cap. Forward-only: answers are
-   final, like the real NCLEX. */
+   after the 85-item minimum, or at the 150-item cap. The standard is per exam
+   (std, in logits): RN 0.00, PN -0.18 — the published NCLEX cut scores.
+   Forward-only: answers are final, like the real NCLEX. */
 function startCAT(slug){
   const exam=EXAMS.find(e=>e.slug===slug);
   S={mode:"cat",exam,bank:[],idx:0,answers:[],flags:[],t0:Date.now(),submitted:false,
      minutes:300,score:0,misses:[],streak:0,bestStreak:0,answered:false,
-     cat:{theta:0,info:0,n:0,minQ:75,maxQ:145,asked:{},decision:null,maxed:false}};
+     cat:{theta:0,info:0,n:0,minQ:85,maxQ:150,std:(slug==="nclex_pn"?-0.18:0),asked:{},decision:null,maxed:false}};
   const first=catSelectNext();
   if(!first){ renderModes(slug); return; }
   S.bank.push(first); S.answers.push(null); S.flags.push(false);
@@ -4838,10 +4877,10 @@ function catSE(){ return 1/Math.sqrt(Math.max(0.25,S.cat.info)); }
 function catShouldStop(){
   const c=S.cat, se=catSE();
   if(c.n>=c.minQ){
-    if(c.theta-1.96*se>0){ c.decision="pass"; return true; }
-    if(c.theta+1.96*se<0){ c.decision="fail"; return true; }
+    if(c.theta-1.96*se>c.std){ c.decision="pass"; return true; }
+    if(c.theta+1.96*se<c.std){ c.decision="fail"; return true; }
   }
-  if(c.n>=c.maxQ){ c.decision=c.theta>=0?"pass":"fail"; c.maxed=true; return true; }
+  if(c.n>=c.maxQ){ c.decision=c.theta>=c.std?"pass":"fail"; c.maxed=true; return true; }
   return false;
 }
 /* SATA prep: answer letters -> shuffled indices, then the shared multi-select path. */
@@ -4873,8 +4912,9 @@ function catNext(){
 /* ================= exam chrome ================= */
 function renderExamChrome(){
   const n=S.bank.length;
+  const rb=$("reviewbtn"); if(rb) rb.classList.toggle("hidden", isLiveMode()||S.mode==="cat");
   if(S.mode==="cat"){
-    $("palsub").textContent="Adaptive CAT · question "+(S.idx+1)+" of 75–145";
+    $("palsub").textContent="Adaptive CAT · question "+(S.idx+1)+" of "+S.cat.minQ+"–"+S.cat.maxQ;
     $("palgrid").innerHTML="";
     $("qprog").textContent="Q "+(S.idx+1);
     paintTrack(); return;
@@ -4892,7 +4932,7 @@ function renderExamChrome(){
 }
 function paintPalette(){
   if(S.mode==="cat"){
-    $("palsub").textContent="Adaptive CAT · question "+(S.idx+1)+" of 75–145";
+    $("palsub").textContent="Adaptive CAT · question "+(S.idx+1)+" of "+S.cat.minQ+"–"+S.cat.maxQ;
     $("qprog").textContent="Q "+(S.idx+1); paintTrack(); return;
   }
   const grid=$("palgrid").children;
@@ -4947,7 +4987,7 @@ function renderQ(){
   }
   }
   $("prevbtn").disabled=(S.idx===0||S.mode==="cat");
-  $("nextbtn").textContent = S.mode==="cat" ? "Next →" : (S.idx===n-1 ? (S.mode==="sim"?"Review →":"See results →") : "Next →");
+  $("nextbtn").textContent = S.mode==="cat" ? "Next →" : (S.idx===n-1 ? (!isLiveMode()?"Review →":"See results →") : "Next →");
   paintPalette();
 }
 /* ---------- multi-select (PBQ) ---------- */
@@ -5177,6 +5217,7 @@ $("prevbtn").addEventListener("click",()=>{ if(S&&S.mode==="cat") return; if(S.i
 $("nextbtn").addEventListener("click",()=>{
   if(S&&S.mode==="cat"){ catNext(); return; }
   if(S.idx<S.bank.length-1){ S.idx++; S.answered=false; renderQ(); saveResume(); }
+  else if(!isLiveMode()){ showReview(); }
   else finishExam(false);
 });
 $("endbtn").addEventListener("click",()=>{
@@ -5186,6 +5227,40 @@ $("endbtn").addEventListener("click",()=>{
   const msg="End the exam now?\n\n"+un+" unanswered · "+fl+" flagged for review\n\nYou can't resume after submitting.";
   if(confirm(msg)) finishExam(false);
 });
+
+/* ================= end-of-exam review =================
+   Deferred modes only (live modes grade on click, CAT is forward-only):
+   every question with answered / unanswered / flagged status, tap a
+   number to jump back and change the answer, then submit for real.
+   Replaces the old behaviour where the last question's "Review →"
+   button submitted the exam immediately. */
+function showReview(){
+  if(!S||S.submitted||isLiveMode()||S.mode==="cat") return;
+  const g=$("revgrid"); if(!g) return;
+  g.innerHTML="";
+  let un=0, fl=0; const unNums=[];
+  S.bank.forEach((q,i)=>{
+    const answered=S.answers[i]!=null;
+    if(!answered){ un++; unNums.push(i+1); }
+    if(S.flags[i]) fl++;
+    const b=document.createElement("button");
+    b.className="pal"; b.type="button"; b.textContent=i+1;
+    b.classList.toggle("cur", i===S.idx);
+    b.classList.toggle("ans", answered);
+    b.classList.toggle("fl", !!S.flags[i]);
+    b.addEventListener("click",()=>{ hideReview(); S.idx=i; S.answered=false; renderQ(); saveResume(); });
+    g.appendChild(b);
+  });
+  const n=S.bank.length;
+  $("revsum").innerHTML="<b>"+(n-un)+" answered</b> · "+un+" unanswered"+
+    (un?" (Q"+unNums.join(", Q")+")":"")+" · "+fl+" flagged<br>Tap any number to jump back and change an answer.";
+  $("reviewov").classList.remove("hidden");
+}
+function hideReview(){ const ov=$("reviewov"); if(ov) ov.classList.add("hidden"); }
+$("reviewbtn").addEventListener("click",()=>{ showReview(); });
+$("rev-back").addEventListener("click",()=>{ hideReview(); });
+$("rev-submit").addEventListener("click",()=>{ hideReview(); finishExam(false); });
+$("reviewov").addEventListener("click",e=>{ if(e.target.id==="reviewov") hideReview(); });
 
 /* ================= results ================= */
 function finishExam(expired){
@@ -5225,7 +5300,8 @@ function finishExam(expired){
     });
   }
   const pct=Math.round(score/n*100);
-  const pass=pct>=CONFIG.PASS_PCT;
+  const passMark=passPct(S.exam.slug);
+  const pass=pct>=passMark;
   const secs=Math.round((Date.now()-S.t0)/1000);
   const used=Math.floor(secs/60)+"m "+String(secs%60).padStart(2,"0")+"s";
   /* SATA tally for the SATA Slayer badge (Pro). */
@@ -5255,7 +5331,7 @@ function finishExam(expired){
   const pf=$("res-passfail"); pf.textContent=pass?"✓ Pass":"✗ Not yet"; pf.className="passfail "+(pass?"pass":"fail");
   const ring=$("ringfg"), C=465;
   ring.style.strokeDashoffset=C;
-  ring.style.stroke=pass?"#0d9d6c":(pct>=CONFIG.PASS_PCT-10?"#c77408":"#d63a3a");
+  ring.style.stroke=pass?"#0d9d6c":(pct>=passMark-10?"#c77408":"#d63a3a");
   requestAnimationFrame(()=>{ ring.style.transition="stroke-dashoffset 1.1s cubic-bezier(.2,.7,.2,1)"; ring.style.strokeDashoffset=C*(1-pct/100); });
 
   const vb=$("res-verdictbox");
@@ -5265,11 +5341,11 @@ function finishExam(expired){
   const freeTaste = (S.mode==="practice" && !isPro());
   if(freeTaste){
     if(pct>=85){ vb.className="verdictbox ready"; vb.innerHTML="<b>Nice work.</b> That was just a taste — Pro shows you exactly what to study next."; }
-    else if(pct>=CONFIG.PASS_PCT){ vb.className="verdictbox close"; vb.innerHTML="<b>Solid start.</b> Imagine what a full breakdown would tell you — that's Pro."; }
+    else if(pct>=passMark){ vb.className="verdictbox close"; vb.innerHTML="<b>Solid start.</b> Imagine what a full breakdown would tell you — that's Pro."; }
     else { vb.className="verdictbox notyet"; vb.innerHTML="<b>Good first try.</b> Pro's domain breakdown would show you exactly where to focus."; }
   }
   else if(pct>=85){ vb.className="verdictbox ready"; vb.innerHTML="<b>Exam ready.</b> You're scoring in the passing zone with margin — book the exam and keep this sharp with light review."; }
-  else if(pct>=CONFIG.PASS_PCT){ vb.className="verdictbox close"; vb.innerHTML="<b>Close — but not comfortable.</b> You're at the passing line with no safety margin. Shore up the red domains below, then re-simulate."; }
+  else if(pct>=passMark){ vb.className="verdictbox close"; vb.innerHTML="<b>Close — but not comfortable.</b> You're at the passing line with no safety margin. Shore up the red domains below, then re-simulate."; }
   else { vb.className="verdictbox notyet"; vb.innerHTML="<b>Not yet.</b> The domain breakdown below is your study plan — attack the weakest domains first, then run another simulation."; }
 
   /* mascot reacts to the result + confetti on a pass */
@@ -5282,8 +5358,8 @@ function finishExam(expired){
   /* CAT verdict override (NCLEX): the adaptive engine's decision leads. */
   if(S.mode==="cat"&&S.cat){
     const c=S.cat, se=catSE();
-    const decision=c.decision||(c.theta>=0?"pass":"fail");
-    const why=c.maxed?("after the full 145 questions"):("with 95% confidence after "+c.n+" questions");
+    const decision=c.decision||(c.theta>=(c.std||0)?"pass":"fail");
+    const why=c.maxed?("after the full "+c.maxQ+" questions"):("with 95% confidence after "+c.n+" questions");
     const rEx=$("res-exam");
     if(rEx) rEx.insertAdjacentHTML("afterend",
       '<div class="catverdict '+(decision==="pass"?"pass":"fail")+'">'+
@@ -5307,10 +5383,10 @@ function finishExam(expired){
   dw.classList.toggle("hidden", freeTaste);
   if(!freeTaste) Object.keys(doms).sort().forEach(d=>{
     const t=doms[d].t, c=doms[d].c, p=Math.round(c/t*100);
-    const cls=p>=85?"s":(p>=CONFIG.PASS_PCT?"w":"r");
-    const col=p>=85?"var(--green)":(p>=CONFIG.PASS_PCT?"var(--amber)":"var(--red)");
-    const solid=p>=85?"#0d9d6c":(p>=CONFIG.PASS_PCT?"#c77408":"#d63a3a");
-    const tag=p>=85?'<span class="domtag s">Strength</span>':(p>=CONFIG.PASS_PCT?'<span class="domtag w">Shaky</span>':'<span class="domtag r">Study this</span>');
+    const cls=p>=85?"s":(p>=passMark?"w":"r");
+    const col=p>=85?"var(--green)":(p>=passMark?"var(--amber)":"var(--red)");
+    const solid=p>=85?"#0d9d6c":(p>=passMark?"#c77408":"#d63a3a");
+    const tag=p>=85?'<span class="domtag s">Strength</span>':(p>=passMark?'<span class="domtag w">Shaky</span>':'<span class="domtag r">Study this</span>');
     const row=document.createElement("div"); row.className="domrow";
     row.innerHTML='<div class="dl"><span class="dlgroup"><span class="wic" style="background:'+solid+'">'+TARGET_SVG+'</span><span class="dn"></span></span><span><span class="dp" style="color:'+col+'">'+p+'%</span> <span style="color:var(--mut);font-size:12.5px;">'+c+'/'+t+'</span>'+tag+'</span></div>'+
       '<div class="dbar"><div style="width:0%;background:'+col+'"></div></div>';
@@ -5944,7 +6020,7 @@ function saveResume(){
       misses:S.misses, answers:S.answers||null, flags:S.flags||null, timed:!!S.timed,
       minutes:S.minutes||0,
       bank:S.bank.map(q=>({q:q.q||q.task||"",options:q.options||null,answer:(q.answer!=null?q.answer:null),
-        answers:q.answers||null,explain:q.explain,domain:q.domain,__res:q.__res||null,
+        answers:q.answers||null,sata:q.sata||null,explain:q.explain,domain:q.domain,__res:q.__res||null,
         kind:q.kind||"mcq",task:q.task||null,ctx:q.ctx||null,accept:q.accept||null,
         hints:q.hints||null,solution:q.solution||null,_revealed:!!q._revealed,_lastInput:q._lastInput||null})),
       deadline:(S.mode==="sim"||(S.mode==="custom"&&S.timed))?deadline:0};
@@ -5996,12 +6072,13 @@ function readiness(slug){
     const s=latest.domains[d], p=Math.round(s.c/s.t*100);
     if(!weak||p<weak.p) weak={d,p};
   });
-  if(weak&&weak.p<70) score=Math.max(0,score-8); // shaky domain drags readiness
+  const pm=passPct(slug);
+  if(weak&&weak.p<pm) score=Math.max(0,score-8); // domain under the pass mark drags readiness
   score=Math.min(99,score);
-  const verdict = score>=85 ? "Likely to pass" : score>=70 ? "Borderline" : "Not yet";
-  const color = score>=85 ? "var(--green)" : score>=70 ? "var(--amber)" : "var(--red)";
+  const verdict = score>=85 ? "Likely to pass" : score>=pm ? "Borderline" : "Not yet";
+  const color = score>=85 ? "var(--green)" : score>=pm ? "var(--amber)" : "var(--red)";
   return {score, verdict, color, n:atts.length,
-    conf: "Based on "+atts.length+" logged attempt"+(atts.length>1?"s":"")+" for "+slug.toUpperCase()+". Aim for 85%+ with no domain under 70%."};
+    conf: "Based on "+atts.length+" logged attempt"+(atts.length>1?"s":"")+" for "+slug.toUpperCase()+". Aim for 85%+ with no domain under "+pm+"%."};
 }
 function renderReadinessPanel(slug){
   const box=$("res-readiness"); if(!box) return;
