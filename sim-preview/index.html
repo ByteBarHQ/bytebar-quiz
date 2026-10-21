@@ -414,6 +414,11 @@ ul.pp-feats li{
 .keyrow input{flex:1; border:1.5px solid var(--line); border-radius:11px; padding:12px 14px; font-size:14.5px; font-family:inherit;}
 .keyrow input:focus{outline:none; border-color:var(--cyan);}
 .sheet .close-x{position:absolute; top:14px; right:16px; z-index:6; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.14); border:0; color:#fff; width:36px; height:36px; border-radius:50%; font-size:16px; cursor:pointer;}
+/* Badge-detail card sits on a light card, not a navy sheet — same chip
+   geometry as .sheet .close-x, contrast flipped for the light surface.
+   Without this, #bov-close matched no close-x rule at all and rendered
+   as an unstyled in-flow button. */
+.unlockcard .close-x{position:absolute; top:14px; right:16px; z-index:6; display:flex; align-items:center; justify-content:center; background:var(--bg); box-shadow:inset 0 0 0 1px rgba(10,25,60,.14); border:0; color:var(--navy); font-weight:700; width:36px; height:36px; border-radius:50%; font-size:16px; cursor:pointer;}
 .sheetwrap{position:relative;}
 
 /* ---------- footer ---------- */
@@ -666,7 +671,7 @@ ul.pp-feats li{
 .btn.gold:active{transform:scale(.98);}
 .unlockov{position:fixed; inset:0; z-index:200; background:rgba(8,18,40,.7); backdrop-filter:blur(5px);
   display:flex; align-items:center; justify-content:center; padding:20px;}
-.unlockcard{background:var(--card); border-radius:24px; padding:40px 44px; text-align:center; max-width:400px;
+.unlockcard{position:relative; background:var(--card); border-radius:24px; padding:40px 44px; text-align:center; max-width:400px;
   box-shadow:0 30px 80px rgba(60,40,10,.4); animation:badgepop .5s cubic-bezier(.2,1.4,.4,1);}
 @keyframes badgepop{from{transform:scale(.6); opacity:0;}}
 .unlockcard .ubi{font-size:72px; display:block; margin-bottom:12px; animation:badgeshine 1.2s ease infinite;}
@@ -2519,6 +2524,19 @@ window.BB = (function(){
   function hasProgress(r){
     return !!(r && (r.xp > 0 || (r.attempts && r.attempts.length) || r.pro));
   }
+  /* Deep links (?exam= / ?buy=1 / ?profile=1) are painted by the app
+     router once boot settles. Session restore finishing late (after
+     the router's 1.5s fallback timer) must not stomp the routed screen
+     with a home render — that race dropped ?exam= arrivals back on
+     the home screen. The router sets window._bbDeepLinked because it
+     cleans buy/profile out of the URL before boot may finish. */
+  BB.deepLinkPending = function(){
+    if(window._bbDeepLinked) return true;
+    try {
+      const qp = new URLSearchParams(window.location.search);
+      return !!(qp.get("exam") || qp.get("buy") === "1" || qp.get("profile") === "1");
+    } catch(e){ return false; }
+  };
   BB.onSignedIn = async function(u){
     BB.user = u;
     const email = (u.email || "").toLowerCase();
@@ -2553,7 +2571,8 @@ window.BB = (function(){
     if(devKey && !r.pro){ BB.pendingKey = devKey; }
     localStorage.removeItem("bb_pro"); localStorage.removeItem("bb_pro_key");
     closeAuth();
-    refreshAccount(); refreshBadges(); renderHome();
+    refreshAccount(); refreshBadges();
+    if(!BB.deepLinkPending()) renderHome();
     BB.pushNow(); // ensure server has what we have
     if(BB.pendingKey){ const k = BB.pendingKey; BB.pendingKey = null; BB.redeemKeyOnline(k); }
     else if(authReturnTo === "paywall"){ authReturnTo = null; setTimeout(openPaywall, 350); }
@@ -2571,7 +2590,7 @@ window.BB = (function(){
     // Both cloud and this device have progress — let the user choose.
     const ov = $("migrate"); if(!ov){ // fallback: cloud wins
       BB.establishSession(skey, BB.recordFromBackend(email, b));
-      closeAuth(); refreshAccount(); refreshBadges(); renderHome(); return;
+      closeAuth(); refreshAccount(); refreshBadges(); if(!BB.deepLinkPending()) renderHome(); return;
     }
     const lxp = (lr.xp || 0).toLocaleString(), lat = (lr.attempts || []).length;
     const rxp = (b.profile.xp || 0).toLocaleString(), rat = b.attempts.length;
@@ -2748,8 +2767,14 @@ window.BB = (function(){
 
   /* ---------- sign out ---------- */
   BB.onSignOut = async function(){
-    try { if(BB._supa) await BB._supa.auth.signOut(); } catch(e){}
+    /* Clear local state FIRST, synchronously. app.js signOut() repaints
+       (refreshAccount / refreshBadges / renderHome) immediately after
+       calling us — it does not await — and isPro() reads BB.user /
+       BB.proCache. Clearing only after the network sign-out resolved
+       left the repaint using the stale Pro state, and nothing repainted
+       again afterwards: Pro badges/cards stayed visible until a reload. */
     BB.user = null; BB.proCache = null; BB.pendingKey = null; BB.syncedThrough = 0;
+    try { if(BB._supa) await BB._supa.auth.signOut(); } catch(e){}
   };
 
   /* ---------- tiny toast ---------- */
@@ -6411,6 +6436,9 @@ refreshAccount();
   try {
     var params = new URLSearchParams(window.location.search);
     var examSlug = params.get('exam');
+    /* Tell the backend a deep link owns the first paint (it checks this
+       before rendering home at the end of session restore). */
+    if(examSlug || params.get('buy') === '1' || params.get('profile') === '1') window._bbDeepLinked = true;
     if(examSlug && EXAMS.some(function(e){ return e.slug === examSlug; })) {
       examCardClick(examSlug);
       return;
@@ -6430,6 +6458,7 @@ refreshAccount();
       setTimeout(function(){
         var pro=false; try{ pro=isPro(); }catch(e){}
         if(!pro){ try{ openPaywall(); }catch(e){} }
+        else if(window.BB && BB.toast){ try{ BB.toast("You're Pro — everything's unlocked"); }catch(e){} }
         var b=document.getElementById('bb-boot');
         if(b){ b.classList.add('done'); setTimeout(function(){ b.remove(); }, 400); }
       }, 600);
