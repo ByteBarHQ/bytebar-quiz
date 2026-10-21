@@ -231,6 +231,10 @@ ul.pp-feats li{
   background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 100%);
   position:relative; overflow:hidden;
 }
+/* The paywall ✕ lives inside the header (its positioned parent) so no
+   scroll-container or wrapper quirk can hide it; high-contrast chip so
+   it reads clearly on the navy on any screen. */
+#paywall .sheet .shead .close-x{top:12px; right:14px; background:rgba(255,255,255,.28); box-shadow:inset 0 0 0 1px rgba(255,255,255,.5); font-weight:700;}
 #paywall .sheet .shead::before{
   content:""; position:absolute; inset:0;
   background:radial-gradient(circle at 80% 10%, rgba(255,255,255,.08), transparent 45%);
@@ -2327,8 +2331,8 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
 <!-- ================= PAYWALL ================= -->
 <div id="paywall" class="overlay hidden">
   <div class="sheetwrap"><div class="sheet">
-    <button class="close-x" id="pw-close">✕</button>
     <div class="shead">
+      <button class="close-x" id="pw-close" aria-label="Close">✕</button>
       <div class="kick">ByteBar Pro</div>
       <div class="resmascot"><span class="mascot-slot floaty" data-mascot="happy" data-size="64"></span></div>
       <h2>ByteBar Pro</h2>
@@ -2356,6 +2360,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       </div>
       <div class="fineprint" style="margin-top:8px; text-align:left;">Have a key? Enter it to unlock Pro — or restore it on a new device.<br>Lost your key? It's in your Payhip purchase email.</div>
       <div class="fineprint" id="pw-msg" style="min-height:20px;"></div>
+      <button class="btn ghost block" id="pw-close2" style="margin-top:10px;">Close</button>
     </div>
   </div></div>
 </div>
@@ -4569,6 +4574,7 @@ function closePaywall(){
      of the simulator entirely instead of landing on the free tier. */
 }
 $("pw-close").addEventListener("click",closePaywall);
+$("pw-close2").addEventListener("click",closePaywall);
 $("paywall").addEventListener("click",e=>{ if(e.target.id==="paywall") closePaywall(); });
 $("pw-buy").addEventListener("click",()=>{
   /* Pro lives on the account — guests create one first (positive framing). */
