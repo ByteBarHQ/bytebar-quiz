@@ -1617,6 +1617,12 @@ html,body{overscroll-behavior-x:none;}
     <div class="bb-boot-sub">Grabbing 19,000 questions — one sec.</div>
   </div>
 </div>
+<script>
+/* Boot watchdog: the loader must never hang forever. Independent of the
+   app bundle — if anything in the app throws before it removes #bb-boot,
+   this force-removes it after 6s so the visitor is never stranded. */
+setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.classList.contains('done')){ b.classList.add('done'); setTimeout(function(){ if(b.parentNode) b.remove(); }, 400); } }, 6000);
+</script>
 <style>
 #bb-boot{position:fixed; inset:0; z-index:99999; display:flex; align-items:center; justify-content:center;
   background:#f6f1e6; transition:opacity .3s}
@@ -4566,7 +4572,11 @@ $("pw-close").addEventListener("click",closePaywall);
 $("paywall").addEventListener("click",e=>{ if(e.target.id==="paywall") closePaywall(); });
 $("pw-buy").addEventListener("click",()=>{
   /* Pro lives on the account — guests create one first (positive framing). */
-  if(!currentUser()){ closePaywall(); openAuth("paywall"); return; }
+  /* Pro lives on the account — guests create one first (positive framing).
+     Hide the paywall directly instead of closePaywall(): for ?buy=1
+     arrivals closePaywall() fires the _cameFromBuy redirect and ejects
+     the guest to bytebarhq.com before the auth modal can ever open. */
+  if(!currentUser()){ $("paywall").classList.add("hidden"); openAuth("paywall"); return; }
   window.open(CONFIG.PAYMENT_URL,"_blank");
 });
 /* Key entry: auto-uppercase + dash formatting as they type (mobile-friendly).
@@ -4595,6 +4605,10 @@ $("pw-activate").addEventListener("click",()=>{
 /* Central Pro activation: ties the key to the signed-in account when there
    is one, keeps the device flag for guests, and celebrates. */
 function activatePro(k){
+  /* A successful activation means the visitor is staying — clear the
+     buy-arrival flag so closePaywall() below can't eject them to the
+     landing page in the middle of the Pro welcome. */
+  window._cameFromBuy = false;
   /* Backend on: keys redeem server-side (single-use). Guests sign in first. */
   if(window.BB && BB.enabled){
     if(!BB.user){ BB.pendingKey=k; BB.openAuthUI("paywall"); BB.toast("Sign in to secure your key on your account"); return; }
@@ -6401,9 +6415,14 @@ refreshAccount();
       /* For buy flow: render home silently behind the boot loader, then swap
          boot loader directly for paywall — no home flash, no double transition */
       renderHome();
-      if(!isPro()) setTimeout(function(){
+      /* The boot loader comes down for EVERYONE after the swap: guests get
+         the paywall, Pro users land on home (already unlocked). Previously
+         the removal timer only existed inside if(!isPro()), so a Pro
+         visitor arriving via ?buy=1 was left on the boot spinner forever. */
+      setTimeout(function(){
+        var pro=false; try{ pro=isPro(); }catch(e){}
+        if(!pro){ try{ openPaywall(); }catch(e){} }
         var b=document.getElementById('bb-boot');
-        openPaywall();
         if(b){ b.classList.add('done'); setTimeout(function(){ b.remove(); }, 400); }
       }, 600);
       return;
