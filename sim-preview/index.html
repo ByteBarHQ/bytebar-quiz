@@ -391,7 +391,7 @@ ul.pp-feats li{
 
 /* ---------- paywall modal ---------- */
 .overlay{position:fixed; inset:0; background:rgba(8,18,40,.62); backdrop-filter:blur(4px); z-index:100; display:flex; align-items:flex-start; justify-content:center; padding:20px; overflow-y:auto; -webkit-overflow-scrolling:touch;}
-.sheet{background:var(--card); border-radius:24px; max-width:520px; width:100%; padding:0; overflow:hidden; box-shadow:0 30px 80px rgba(60,40,10,.35); animation:pop .25s cubic-bezier(.2,.9,.3,1.2); margin:auto 0; max-height:calc(100vh - 40px); overflow-y:auto; -webkit-overflow-scrolling:touch;}
+.sheet{position:relative; background:var(--card); border-radius:24px; max-width:520px; width:100%; padding:0; overflow:hidden; box-shadow:0 30px 80px rgba(60,40,10,.35); animation:pop .25s cubic-bezier(.2,.9,.3,1.2); margin:auto 0; max-height:calc(100vh - 40px); overflow-y:auto; -webkit-overflow-scrolling:touch;}
 @keyframes pop{from{transform:scale(.94) translateY(10px); opacity:0;}}
 .sheet .shead{background:linear-gradient(135deg,var(--navy),var(--navy3)); color:#fff; padding:28px 30px 24px; text-align:center;}
 .sheet .shead .kick{font-size:11.5px; font-weight:800; letter-spacing:.22em; color:#7fd4f7; text-transform:uppercase;}
@@ -409,7 +409,7 @@ ul.pp-feats li{
 .keyrow{display:flex; gap:8px; margin-top:16px;}
 .keyrow input{flex:1; border:1.5px solid var(--line); border-radius:11px; padding:12px 14px; font-size:14.5px; font-family:inherit;}
 .keyrow input:focus{outline:none; border-color:var(--cyan);}
-.sheet .close-x{position:absolute; top:14px; right:16px; background:rgba(255,255,255,.14); border:0; color:#fff; width:32px; height:32px; border-radius:50%; font-size:16px; cursor:pointer;}
+.sheet .close-x{position:absolute; top:14px; right:16px; z-index:6; display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,.14); border:0; color:#fff; width:36px; height:36px; border-radius:50%; font-size:16px; cursor:pointer;}
 .sheetwrap{position:relative;}
 
 /* ---------- footer ---------- */
@@ -4563,10 +4563,10 @@ function openPaywall(){
 }
 function closePaywall(){
   $("paywall").classList.add("hidden");
-  /* If user arrived via ?buy=1 from the landing page, X takes them back home to bytebarhq.com */
-  if(window._cameFromBuy){
-    window.location.href = "https://bytebarhq.com";
-  }
+  /* Closing the paywall NEVER navigates away. The old _cameFromBuy eject
+     (buy arrivals bounced to bytebarhq.com on X / backdrop / any close)
+     broke the flow: a visitor who closed the sales sheet was thrown out
+     of the simulator entirely instead of landing on the free tier. */
 }
 $("pw-close").addEventListener("click",closePaywall);
 $("paywall").addEventListener("click",e=>{ if(e.target.id==="paywall") closePaywall(); });
