@@ -445,6 +445,7 @@ ul.pp-feats li{
 .miss{border-top:1px solid var(--line); padding:16px 2px; font-size:14.5px; line-height:1.55; text-align:left;}
 .miss .mq{font-weight:700; margin-bottom:6px;}
 .miss .ma{color:var(--green); font-weight:600;}
+.miss .mpart{color:var(--amber); font-weight:600;}
 .miss .me{color:var(--mut); margin-top:6px;}
 .miss .yours{color:var(--red); font-weight:600;}
 
@@ -805,6 +806,8 @@ select.builder{border:1.5px solid var(--line); border-radius:11px; padding:11px 
 .explainbox.right .exhead .exic{background:var(--green);}
 .explainbox.wrong .exhead{background:var(--red-soft); color:#8f1f1f; border-bottom:1px solid #f5c6c6;}
 .explainbox.wrong .exhead .exic{background:var(--red);}
+.explainbox.partial .exhead{background:var(--amber-soft); color:#7a4a06; border-bottom:1px solid #f3d9a8;}
+.explainbox.partial .exhead .exic{background:var(--amber);}
 .explainbox .exbody{padding:15px 18px; color:#26405e;}
 .explainbox .exbody b{color:var(--navy);}
 .opt.correct{border-color:var(--green); background:var(--green-soft); box-shadow:0 0 0 3px rgba(13,157,108,.14);}
@@ -3049,11 +3052,75 @@ function prepTerminal(t){
           solution:t.solution, explain:t.explain, domain:t.domain||"General",
           _attempts:0, _revealed:false, __res:null};
 }
-/* Validate a typed command: normalize, then every fragment of ANY accept
-   group must appear (order-independent, alias-tolerant). */
-function terminalMatches(input, accept){
-  const norm=(" "+input.toLowerCase().replace(/\s+/g," ").trim()+" ");
-  return (accept||[]).some(group=>group.every(f=>norm.indexOf(f.toLowerCase())!==-1));
+/* Terminal matcher v2 (Phase A2, 2026-10-22): a principled equivalence
+   layer over the accept-group spec. The spec stays presence-based — every
+   fragment of ANY one group must be satisfied, order-independent — but a
+   fragment is now satisfied by canonical TOKENS, never by substrings of a
+   lowercased string (v1 let fragment "3" match "--replicas=13" and folded
+   case, so "-r" passed for "-R"). Matching is case-sensitive throughout.
+   The ONLY equivalences:
+   (a) whitespace runs collapse; leading/trailing space is ignored;
+   (b) short-flag groups: a fragment like "-it" is satisfied by any maximal
+       run of consecutive short-flag tokens whose combined letters cover it
+       ("-it" = "-ti" = "-i -t"); letters are case-sensitive;
+   (c) a trailing "/" on a path is optional on either side;
+   (d) a leading "sudo" in the input is ignored ONLY when the task's own
+       solution is a sudo command — either form passes there.
+   Atom rules (what a token yields): itself, its comma-separated parts, the
+   parts of a "k=v" token around the first "=" ("--image=nginx:1.25" yields
+   "--image" and "nginx:1.25"; "--limits=cpu=500m,memory=512Mi" yields
+   "cpu=500m" and "memory=512Mi"), and the "/" segments of a path or
+   type/name token ("deployment/web" yields "deployment" and "web").
+   On top of that sits ONE closed alias table — kubectl's own resource
+   shortnames/singulars (deploy=deployment, svc=service, ns=namespace,
+   po=pod, incl. plural forms) applied per "/" segment, and the flag pair
+   -n = --namespace. That table is the whole of the "alias-tolerant" the
+   spec data was written against; nothing else is forgiven. Partial credit
+   never applies: a terminal answer is right or wrong. */
+const _TERM_ALIAS={deployment:"deploy",deployments:"deploy",service:"svc",services:"svc",namespace:"ns",namespaces:"ns",pod:"po",pods:"po"};
+function _termCanon(s){ return s.split("/").map(w=>_TERM_ALIAS[w]||w).join("/"); }
+function _termAtoms(tokens){
+  const atoms=new Set();
+  const add=s=>{ if(!s) return; atoms.add(s); if(s.length>1&&s.endsWith("/")) atoms.add(s.slice(0,-1)); };
+  tokens.forEach(t=>{
+    add(t);
+    t.split(",").forEach(part=>{
+      add(part);
+      const eq=part.indexOf("=");
+      if(eq>0){ add(part.slice(0,eq)); add(part.slice(eq+1)); }
+    });
+    t.split("/").forEach(seg=>add(seg));
+  });
+  if(atoms.has("--namespace")) atoms.add("-n");
+  if(atoms.has("-n")) atoms.add("--namespace");
+  return atoms;
+}
+function _termFlagRuns(tokens){
+  const runs=[]; let cur=null;
+  tokens.forEach(t=>{
+    if(/^-[a-zA-Z]+$/.test(t)){ if(!cur){ cur=[]; runs.push(cur); } cur.push.apply(cur,t.slice(1).split("")); }
+    else cur=null;
+  });
+  return runs;
+}
+function _termFragMet(frag, atoms, catoms, runs){
+  const f=String(frag);
+  const fBare=(f.length>1&&f.endsWith("/"))?f.slice(0,-1):f;
+  if(atoms.has(f)||atoms.has(fBare)) return true;
+  if(catoms.has(_termCanon(f))||catoms.has(_termCanon(fBare))) return true;
+  if(/^-[a-zA-Z]+$/.test(f)){ /* short-flag (group) fragment: set cover, case-sensitive */
+    const need=f.slice(1).split("");
+    return runs.some(run=>need.every(ch=>run.indexOf(ch)!==-1));
+  }
+  return false;
+}
+function terminalMatches(input, accept, solution){
+  let tokens=String(input==null?"":input).replace(/\s+/g," ").trim().split(" ").filter(Boolean);
+  if(tokens.length&&tokens[0]==="sudo"&&/^\s*sudo\s/.test(solution||"")) tokens=tokens.slice(1);
+  const atoms=_termAtoms(tokens);
+  const catoms=new Set(); atoms.forEach(a=>catoms.add(_termCanon(a)));
+  const runs=_termFlagRuns(tokens);
+  return (accept||[]).some(group=>group.every(f=>_termFragMet(f, atoms, catoms, runs)));
 }
 /* ================= TERMINAL TASKS (CKA/CKAD hands-on) ================= */
 const TERMINAL_TASKS = {
@@ -3223,7 +3290,7 @@ const TERMINAL_TASKS = {
      "kubectl",
      "taint",
      "worker1",
-     "spot=true:noschedule"
+     "spot=true:NoSchedule"
     ]
    ],
    "hints": [
@@ -3598,7 +3665,7 @@ const TERMINAL_TASKS = {
      "api",
      "--limits",
      "cpu=500m",
-     "memory=512mi"
+     "memory=512Mi"
     ]
    ],
    "hints": [
@@ -5011,6 +5078,34 @@ function startCAT(slug){
   $("timer").style.display="flex"; $("endbtn").textContent="End exam";
   show("screen-exam"); renderExamChrome(); renderQ(); startTimer(); buddyInit();
 }
+/* CAT blueprint shares (Phase A2): the domain weights are read from the
+   bank itself — the pool's own domain distribution IS the blueprint the
+   bank was built to (NCLEX-RN pool: 20/18/14/12/12/8/8/8 across its 8
+   Client-Needs domains). Nothing is hardcoded per exam: shares are the
+   pool proportions of whatever bank is loaded, so any bank is balanced
+   toward its own composition. */
+function catBlueprintShares(raw){
+  const counts={}, shares={}; let n=0;
+  raw.forEach(q=>{ const d=q.domain||"General"; counts[d]=(counts[d]||0)+1; n++; });
+  Object.keys(counts).forEach(d=>{ shares[d]=counts[d]/n; });
+  return shares;
+}
+/* Among the candidates at the nearest difficulty, prefer the domain that
+   is furthest behind its blueprint share of the run so far (largest
+   deficit); random among the candidates in the top-deficit domain(s). */
+function catBalancedPick(cands, raw){
+  const shares=catBlueprintShares(raw);
+  const asked={}; let total=0;
+  S.bank.forEach(q=>{ const d=q.domain||"General"; asked[d]=(asked[d]||0)+1; total++; });
+  let best=-Infinity; const deficit={};
+  Object.keys(shares).forEach(d=>{
+    deficit[d]=shares[d]*(total+1)-(asked[d]||0);
+    if(deficit[d]>best) best=deficit[d];
+  });
+  const top=cands.filter(i=>{ const d=raw[i].domain||"General"; return (deficit[d]!=null?deficit[d]:-Infinity)>=best-1e-9; });
+  const pool=top.length?top:cands;
+  return pool[Math.floor(Math.random()*pool.length)];
+}
 function catSelectNext(){
   const c=S.cat, raw=BANKS[S.exam.slug];
   const target=Math.max(1,Math.min(5,Math.round(c.theta)+3));
@@ -5026,15 +5121,19 @@ function catSelectNext(){
     }
   }
   if(!cands.length) return null;
-  const i=cands[Math.floor(Math.random()*cands.length)];
+  const i=catBalancedPick(cands, raw);
   c.asked[i]=1;
   const q=raw[i];
   return q.qtype==="sata"?prepSATA(q):prepQ(q);
 }
-function catAdapt(q, wasRight){
+function catAdapt(q, outcome){
   const c=S.cat, b=(q.difficulty||3)-3;
   const P=1/(1+Math.exp(-(c.theta-b)));
-  c.theta+=0.6*((wasRight?1:0)-P);
+  /* outcome is 1/0 for single-answer items; SATA items pass their partial-
+     credit fraction (Phase A2), so theta moves by the earned share of the
+     item instead of all-or-nothing. Stop rules below are untouched. */
+  const y=(typeof outcome==="number")?outcome:(outcome?1:0);
+  c.theta+=0.6*(y-P);
   c.info+=Math.max(0.05,P*(1-P));
   c.n++;
 }
@@ -5064,8 +5163,8 @@ function catNext(){
     if(card&&!REDUCED()){ card.classList.remove("qnudge"); void card.offsetWidth; card.classList.add("qnudge"); }
     return;
   }
-  const wasRight=q.kind==="ms"?msCorrect(q,cur):(cur===q.answer);
-  catAdapt(q,wasRight);
+  const outcome=q.kind==="ms"?msScore(q,cur):((cur===q.answer)?1:0);
+  catAdapt(q,outcome);
   if(catShouldStop()){ finishExam(false); return; }
   const nq=catSelectNext();
   if(!nq){ finishExam(false); return; }
@@ -5191,11 +5290,11 @@ function renderMulti(q,box){
       S.answered=true;
       const opts=box.querySelectorAll(".opt");
       q.answers.forEach(a=>opts[a].classList.add("correct"));
-      if(q.__res==="wrong"){
+      if(q.__res==="wrong"||q.__res==="partial"){
         const miss=S.misses.find(m=>m.q===q);
         (miss&&miss.picked||[]).forEach(p=>{ if(opts[p]&&q.answers.indexOf(p)===-1) opts[p].classList.add("wrong"); });
       }
-      showExplanationMS(q, q.__res==="right");
+      showExplanationMS(q, q.__res==="right", q.__res==="partial");
       box.querySelectorAll(".opt").forEach(o=>o.disabled=true);
       chk.disabled=true;
     }
@@ -5205,27 +5304,61 @@ function msCorrect(q, picked){
   const a=(q.answers||[]).slice().sort().join(","), b=(picked||[]).slice().sort().join(",");
   return a===b && picked.length>0;
 }
+/* NCLEX-style SATA partial credit (Phase A2, 2026-10-22): for an item with
+   C correct options, score = max(0, (right picks − wrong picks)) / C.
+   Empty selection scores 0; more wrong than right floors at 0. This is the
+   single scoring rule for every multi-select item — SATA and PBQ alike —
+   in live feedback, deferred results, domain breakdowns, and CAT. */
+function msScore(q, picked){
+  const corr=q.answers||[]; if(!corr.length) return 0;
+  let good=0, bad=0;
+  (picked||[]).forEach(p=>{ if(corr.indexOf(p)!==-1) good++; else bad++; });
+  return Math.max(0,(good-bad)/corr.length);
+}
+/* Integer points a partial-credit display quotes: "Partial — {earned} of {C}". */
+function msEarned(q, picked){
+  const corr=q.answers||[];
+  let good=0, bad=0;
+  (picked||[]).forEach(p=>{ if(corr.indexOf(p)!==-1) good++; else bad++; });
+  return Math.max(0,good-bad);
+}
+/* Point totals can be fractional since Phase A2 (SATA partial credit):
+   render whole points bare, fractions with one decimal. */
+function fmtPts(x){ const r=Math.round((+x||0)*10)/10; return (r%1===0)?String(r|0):r.toFixed(1); }
 function answerMS(q){
   if(S.answered) return;
   S.answered=true;
   const opts=[...$("opts").querySelectorAll(".opt")];
   const picked=opts.map((o,i)=>o.classList.contains("sel")?i:-1).filter(i=>i!==-1);
-  const wasRight=msCorrect(q,picked);
+  /* Partial credit (Phase A2): the fraction is banked on the question
+     (__resScore) so finishExam's live rebuild credits domains and totals
+     exactly; a partial still goes to the review like any imperfect item. */
+  const frac=msScore(q,picked);
+  const wasRight=frac>=1, partial=!wasRight&&frac>0;
   q.answers.forEach(a=>opts[a].classList.add("correct","ding"));
   if(!wasRight){ picked.forEach(p=>{ if(q.answers.indexOf(p)===-1) opts[p].classList.add("wrong"); });
-    S.misses.push({q, picked}); q.__res="wrong"; }
-  else { S.score++; q.__res="right"; }
-  showExplanationMS(q, wasRight);
+    S.misses.push({q, picked}); }
+  q.__res=wasRight?"right":(partial?"partial":"wrong");
+  q.__resScore=frac; q.__resPicked=picked;
+  S.score+=frac;
+  showExplanationMS(q, wasRight, partial);
   opts.forEach(o=>o.disabled=true);
   const chk=$("ms-check"); if(chk) chk.disabled=true;
   buddyOnAnswer(wasRight); paintPalette(); saveResume();
 }
-function showExplanationMS(q, wasRight){
+function showExplanationMS(q, wasRight, partial){
   const ex=$("explain");
-  ex.className="explainbox show "+(wasRight?"right":"wrong");
-  const head=wasRight
-    ? '<div class="exhead"><span class="mascot">'+mascotSVG("happy",42)+'</span><span class="exic">✓</span> Correct — nice work</div>'
-    : '<div class="exhead"><span class="mascot">'+mascotSVG("encourage",42)+'</span><span class="exic">✗</span> Not quite — here\'s why</div>';
+  ex.className="explainbox show "+(wasRight?"right":(partial?"partial":"wrong"));
+  let head;
+  if(wasRight){
+    head='<div class="exhead"><span class="mascot">'+mascotSVG("happy",42)+'</span><span class="exic">✓</span> Correct — nice work</div>';
+  } else if(partial){
+    const miss=(typeof S!=="undefined"&&S&&S.misses)?S.misses.find(m=>m.q===q):null;
+    const pk=q.__resPicked||(miss&&miss.picked)||[];
+    head='<div class="exhead"><span class="mascot">'+mascotSVG("encourage",42)+'</span><span class="exic">◐</span> Partial — '+msEarned(q,pk)+' of '+(q.answers||[]).length+'</div>';
+  } else {
+    head='<div class="exhead"><span class="mascot">'+mascotSVG("encourage",42)+'</span><span class="exic">✗</span> Not quite — here\'s why</div>';
+  }
   const correctLine='<div style="margin-bottom:8px;"><b>Correct answer'+(q.answers.length>1?"s":"")+':</b> '+
     escapeHtml(q.answers.map(a=>String.fromCharCode(65+a)+". "+q.options[a]).join(" · "))+'</div>';
   ex.innerHTML=head+'<div class="exbody">'+correctLine+escapeHtml(q.explain)+'</div>';
@@ -5276,7 +5409,7 @@ function termSubmit(){
   q._attempts=(q._attempts||0)+1;
   q._lastInput=val;
   termPrint("$ "+val, "tin");
-  if(terminalMatches(val, q.accept)){
+  if(terminalMatches(val, q.accept, q.solution)){
     q.__res="right";
     termPrint("✓ Task complete — nicely done.", "tok");
     termDone(q,true);
@@ -5564,8 +5697,9 @@ function finishExam(expired){
       else misses.push({q,picked:null,terminal:true});
     } else if(q.kind==="ms"){
       const pk=S.answers[i];
-      if(pk && msCorrect(q,pk)){ score++; doms[d].c++; }
-      else misses.push({q,picked:pk||[]});
+      const frac=pk?msScore(q,pk):0;
+      score+=frac; doms[d].c+=frac;
+      if(frac<1) misses.push({q,picked:pk||[]});
     } else {
       if(picked===q.answer){ score++; doms[d].c++; }
       else misses.push({q,picked});
@@ -5576,8 +5710,8 @@ function finishExam(expired){
     Object.keys(doms).forEach(k=>{doms[k]={t:0,c:0};});
     S.bank.forEach((q,i)=>{
       const d=q.domain||"General"; doms[d].t++;
-      if(q.__res==="right") doms[d].c++;
-      else if(!q.__res) misses.push({q, picked:null});
+      if(q.__res) doms[d].c+=(typeof q.__resScore==="number")?q.__resScore:(q.__res==="right"?1:0);
+      else misses.push({q, picked:null});
     });
   }
   const pct=Math.round(score/n*100);
@@ -5603,7 +5737,7 @@ function finishExam(expired){
 
   $("res-exam").textContent=S.exam.code+" · "+S.exam.name+(expired?" · time expired":"");
   $("res-pct").textContent=pct+"%";
-  $("res-correct").textContent=score+" / "+n;
+  $("res-correct").textContent=fmtPts(score)+" / "+n;
   const rStreak=$("res-streak");
   if(rStreak) rStreak.textContent=(S.bestStreak>1)?S.bestStreak+" in a row 🔥":"—";
   $("res-time").textContent=used;
@@ -5702,7 +5836,7 @@ function finishExam(expired){
     const tag=p>=85?'<span class="domtag s">Strength</span>':(p>=passMark?'<span class="domtag w">Shaky</span>':'<span class="domtag r">Study this</span>');
     const row=document.createElement("div"); row.className="domrow";
     row.innerHTML='<div class="dl"><span class="wic" style="background:'+solid+'">'+TARGET_SVG+'</span><span class="dn"></span></div>'+
-      '<div class="dstats"><div class="dbar"><div style="width:0%;background:'+col+'"></div></div><span class="dstat"><span class="dp" style="color:'+col+'">'+p+'%</span> <span style="color:var(--mut);font-size:12.5px;">'+c+'/'+t+'</span>'+tag+'</span></span></div>';
+      '<div class="dstats"><div class="dbar"><div style="width:0%;background:'+col+'"></div></div><span class="dstat"><span class="dp" style="color:'+col+'">'+p+'%</span> <span style="color:var(--mut);font-size:12.5px;">'+fmtPts(c)+'/'+t+'</span>'+tag+'</span></span></div>';
     row.querySelector(".dn").textContent=d;
     dw.appendChild(row);
     requestAnimationFrame(()=>{ row.querySelector(".dbar>div").style.width=p+"%"; });
@@ -5715,7 +5849,7 @@ function finishExam(expired){
   else if(!misses.length){ mw.innerHTML='<div style="color:var(--green);font-weight:700;padding:8px 2px;">Perfect run — nothing to review. 🎯</div>'; }
   else misses.forEach((m,ix)=>{
     const d=document.createElement("div"); d.className="miss";
-    let yourTxt, qTxt, corrTxt, maLabel;
+    let yourTxt, qTxt, corrTxt, maLabel, partTxt="";
     if(m.terminal || m.q.kind==="terminal"){
       yourTxt = m.q._lastInput ? "$ "+m.q._lastInput : "Task forfeited";
       qTxt = m.q.task; corrTxt = m.q.solution; maLabel="⌨ Solution: ";
@@ -5724,14 +5858,20 @@ function finishExam(expired){
       qTxt = m.q.q;
       corrTxt = m.q.answers.map(a=>String.fromCharCode(65+a)+". "+m.q.options[a]).join(" · ");
       maLabel="✓ Correct: ";
+      /* Partial credit (Phase A2): one quiet line when the item earned a
+         fraction — same story in the review as in the live feedback. */
+      const fr=msScore(m.q, m.picked||[]);
+      if(fr>0&&fr<1) partTxt="◐ Partial — "+msEarned(m.q, m.picked||[])+" of "+(m.q.answers||[]).length;
     } else {
       yourTxt = (m.picked==null ? "No answer given" : m.q.options[m.picked]);
       qTxt = m.q.q; corrTxt = m.q.options[m.q.answer]; maLabel="✓ Correct: ";
     }
     d.innerHTML='<div class="mq">'+(ix+1)+'. </div>'+
       '<div class="ma">'+maLabel+'</div>'+
+      (partTxt?'<div class="mpart"></div>':"")+
       '<div class="yours">✗ Yours: </div>'+
       '<div class="me"></div>';
+    const mpEl=d.querySelector(".mpart"); if(mpEl) mpEl.textContent=partTxt;
     d.querySelector(".mq").append(document.createTextNode(qTxt));
     d.querySelector(".ma").append(document.createTextNode(corrTxt));
     d.querySelector(".yours").append(document.createTextNode(yourTxt));
@@ -5802,7 +5942,7 @@ function finishExam(expired){
         insightHtml =
           '<div class="pp-insight"><div class="pp-insight-label' + (featuredStrong ? ' strong' : '') + '">' + featuredLabel + '</div>' +
           featuredRow(featured, barCol) +
-          '<div class="pp-insight-note">' + featured.c + ' of ' + featured.t + ' correct in this taste</div></div>';
+          '<div class="pp-insight-note">' + fmtPts(featured.c) + ' of ' + featured.t + ' correct in this taste</div></div>';
       }
       let blurredBars = "";
       domRows.filter(r => r !== featured).slice(0, 3).forEach(r => { blurredBars += teaserRow(r); });
