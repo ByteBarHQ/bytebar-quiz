@@ -347,6 +347,24 @@ ul.pp-feats li{
 .flagbtn{margin-left:auto; background:var(--bg); border:1px solid var(--line); border-radius:9px; font-size:13px; font-weight:700; color:var(--mut); padding:7px 13px; cursor:pointer; font-family:inherit;}
 .flagbtn.on{background:var(--amber-soft); border-color:#f3d9a8; color:var(--gold);}
 .qtext{font-size:19px; line-height:1.55; font-weight:600; margin:0 0 20px; letter-spacing:-.005em;}
+/* NGN case-study panel (Phase A3): a contained chart-style region pinned
+   above the question — labeled rows, no wall of text. It is the only new
+   element on the question screen, and only during a study's items. */
+.casepanel{background:#f6f9fc; border:1px solid #d7e3ee; border-left:4px solid var(--cyan,#1b9bd8); border-radius:13px; padding:13px 16px 11px; margin:0 0 18px;}
+.casehead{display:flex; align-items:baseline; gap:9px; flex-wrap:wrap;}
+.casebadge{font-size:11.5px; font-weight:800; letter-spacing:.07em; text-transform:uppercase; color:var(--cyan,#1b9bd8); white-space:nowrap;}
+.casetitle{font-size:14.5px; font-weight:700; color:var(--navy);}
+.casetoggle{margin-left:auto; background:none; border:1px solid #c9dae8; border-radius:8px; font-size:12px; font-weight:700; color:var(--mut); padding:4px 10px; cursor:pointer; font-family:inherit;}
+.casebody{margin-top:10px;}
+.caserow{display:flex; gap:10px; padding:4.5px 0; border-top:1px dashed #dde7f0; font-size:13.5px; line-height:1.45;}
+.caserow:first-child{border-top:none;}
+.caselab{flex:0 0 86px; font-weight:800; color:var(--navy); font-size:11.5px; letter-spacing:.05em; text-transform:uppercase; padding-top:2px;}
+.caseval{color:var(--ink); overflow-wrap:break-word;}
+@media (max-width:560px){ .caselab{flex-basis:70px;} .casepanel{padding:11px 12px 9px;} }
+/* Results review: one scenario header grouping a study's misses (Phase A3). */
+.casegroup{background:#f6f9fc; border:1px solid #d7e3ee; border-left:4px solid var(--cyan,#1b9bd8); border-radius:11px; padding:11px 14px; margin:16px 0 10px;}
+.casegroup .cg-title{font-weight:800; font-size:14px; color:var(--navy);}
+.casegroup .cg-body{font-size:12.5px; line-height:1.5; color:var(--mut); margin-top:4px;}
 .opt{
   display:flex; gap:13px; align-items:flex-start; width:100%; text-align:left; margin:0 0 11px; padding:15px 16px;
   font-size:15.5px; line-height:1.45; color:var(--ink); background:#fbf8f1; border:1.5px solid var(--line);
@@ -2072,6 +2090,10 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       </div>
       <div class="qdomain hidden" id="qdomain"></div>
       <div id="coachline" class="coachline"><span class="mascot" id="coachmascot"></span><span id="coachtext">Let's go — you've got this.</span></div>
+      <div id="casepanel" class="casepanel hidden">
+        <div class="casehead"><span class="casebadge">📋 <span id="caselabel">Case study</span></span><span class="casetitle" id="casetitle"></span><button type="button" class="casetoggle" id="casetoggle">Hide</button></div>
+        <div class="casebody" id="casebody"></div>
+      </div>
       <p class="qtext" id="qtext"></p>
       <div id="opts"></div>
       <div id="termwrap" class="hidden">
@@ -2935,7 +2957,7 @@ function isFreeExam(slug){ return FREE_EXAMS.indexOf(slug) !== -1; }
 function examCardClick(slug){
   renderModes(slug);
 }
-const EXAMS = [{"slug": "az900", "name": "Azure Fundamentals", "code": "AZ-900", "tagline": "Cloud concepts & Azure services", "accent": "#38bdf8", "domains": ["Domain 1: Describe cloud concepts", "Domain 2: Describe Azure architecture and services", "Domain 3: Describe Azure management and governance"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Describe cloud concepts": 333, "Domain 2: Describe Azure architecture and services": 335, "Domain 3: Describe Azure management and governance": 332}}, {"slug": "az104", "name": "Azure Administrator", "code": "AZ-104", "tagline": "Azure identity, governance & compute", "accent": "#0ea5e9", "domains": ["Domain 1: Manage identities and governance in Azure", "Domain 2: Implement and manage storage", "Domain 3: Deploy and manage Azure compute resources", "Domain 4: Implement and manage virtual networking", "Domain 5: Monitor and maintain Azure resources"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Manage identities and governance in Azure": 205, "Domain 2: Implement and manage storage": 205, "Domain 3: Deploy and manage Azure compute resources": 205, "Domain 4: Implement and manage virtual networking": 195, "Domain 5: Monitor and maintain Azure resources": 190}}, {"slug": "saa_c03", "name": "AWS Solutions Architect", "code": "SAA-C03", "tagline": "Resilient, secure cloud architectures", "accent": "#fb923c", "domains": ["Domain 1: Design Resilient Architectures", "Domain 2: Design High-Performing Architectures", "Domain 3: Design Secure Architectures", "Domain 4: Design Cost-Optimized Architectures"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Design Resilient Architectures": 255, "Domain 2: Design High-Performing Architectures": 253, "Domain 3: Design Secure Architectures": 249, "Domain 4: Design Cost-Optimized Architectures": 243}}, {"slug": "cysa_cs0_004", "name": "CompTIA CySA+", "code": "CS0-004", "tagline": "Threat detection & incident response", "accent": "#f472b6", "domains": ["Domain 1: Security Operations", "Domain 2: Vulnerability Management", "Domain 3: Incident Response and Management", "Domain 4: Reporting and Communication"], "count": 1000, "display_count": 1000, "cat": "security", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Security Operations": 258, "Domain 2: Vulnerability Management": 255, "Domain 3: Incident Response and Management": 245, "Domain 4: Reporting and Communication": 242}}, {"slug": "linuxplus_xk0_006", "name": "CompTIA Linux+", "code": "XK0-006", "tagline": "Linux systems & administration", "accent": "#fbbf24", "domains": ["Domain 1: System Management", "Domain 2: Services and User Management", "Domain 3: Security", "Domain 4: Automation, Orchestration, and Scripting", "Domain 5: Troubleshooting"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "domain_counts": {"Domain 1: System Management": 218, "Domain 2: Services and User Management": 200, "Domain 3: Security": 188, "Domain 4: Automation, Orchestration, and Scripting": 182, "Domain 5: Troubleshooting": 212}}, {"slug": "cka", "name": "Certified Kubernetes Admin", "code": "CKA", "tagline": "K8s clusters & workloads", "accent": "#818cf8", "domains": ["Domain 1: Cluster Architecture, Installation & Configuration", "Domain 2: Workloads & Scheduling", "Domain 3: Services & Networking", "Domain 4: Storage", "Domain 5: Troubleshooting"], "count": 1000, "display_count": 1000, "cat": "devops", "terminal": true, "badge": "", "domain_counts": {"Domain 1: Cluster Architecture, Installation & Configuration": 205, "Domain 2: Workloads & Scheduling": 195, "Domain 3: Services & Networking": 200, "Domain 4: Storage": 190, "Domain 5: Troubleshooting": 210}}, {"slug": "ckad", "name": "K8s App Developer", "code": "CKAD", "tagline": "Cloud-native app design on K8s", "accent": "#facc15", "domains": ["Domain 1: Application Environment, Configuration and Security", "Domain 2: Application Design and Build", "Domain 3: Application Deployment", "Domain 4: Services and Networking", "Domain 5: Application Observability and Maintenance"], "count": 1000, "display_count": 1000, "cat": "devops", "terminal": true, "badge": "", "domain_counts": {"Domain 1: Application Environment, Configuration and Security": 205, "Domain 2: Application Design and Build": 200, "Domain 3: Application Deployment": 200, "Domain 4: Services and Networking": 200, "Domain 5: Application Observability and Maintenance": 195}}, {"slug": "dca", "name": "Docker Certified Associate", "code": "DCA", "tagline": "Containers, images & orchestration", "accent": "#2dd4bf", "domains": ["Domain 1: Orchestration", "Domain 2: Image Creation, Management, and Registry", "Domain 3: Installation and Configuration", "Domain 4: Networking", "Domain 5: Security", "Domain 6: Storage and Volumes"], "count": 1000, "display_count": 1000, "cat": "devops", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Orchestration": 179, "Domain 2: Image Creation, Management, and Registry": 173, "Domain 3: Installation and Configuration": 165, "Domain 4: Networking": 163, "Domain 5: Security": 159, "Domain 6: Storage and Volumes": 161}}, {"slug": "terraform_004", "name": "Terraform Associate", "code": "Terraform", "tagline": "IaC workflows & HCL", "accent": "#c084fc", "domains": ["Domain 1: Infrastructure as Code (IaC) with Terraform", "Domain 2: Terraform Fundamentals", "Domain 3: Core Terraform Workflow", "Domain 4: Terraform Configuration", "Domain 5: Terraform Modules", "Domain 6: Terraform State Management", "Domain 7: Maintaining Infrastructure with Terraform", "Domain 8: HCP Terraform"], "count": 1000, "display_count": 1000, "cat": "devops", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Infrastructure as Code (IaC) with Terraform": 123, "Domain 2: Terraform Fundamentals": 128, "Domain 3: Core Terraform Workflow": 136, "Domain 4: Terraform Configuration": 137, "Domain 5: Terraform Modules": 119, "Domain 6: Terraform State Management": 121, "Domain 7: Maintaining Infrastructure with Terraform": 117, "Domain 8: HCP Terraform": 119}}, {"slug": "cloudplus_cv0_004", "name": "CompTIA Cloud+", "code": "CV0-004", "tagline": "Cloud architecture & operations", "accent": "#a78bfa", "domains": ["Domain 1: Cloud Architecture", "Domain 2: Deployment", "Domain 3: Operations", "Domain 4: Security", "Domain 5: DevOps Fundamentals", "Domain 6: Troubleshooting"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Cloud Architecture": 176, "Domain 2: Deployment": 172, "Domain 3: Operations": 170, "Domain 4: Security": 172, "Domain 5: DevOps Fundamentals": 154, "Domain 6: Troubleshooting": 156}}, {"slug": "gcp_ace", "name": "GCP Associate Engineer", "code": "GCP-ACE", "tagline": "Deploy & manage on Google Cloud", "accent": "#34d399", "domains": ["Section 1: Setting up a cloud solution environment", "Section 2: Planning and implementing a cloud solution", "Section 3: Ensuring the successful operation of a cloud solution", "Section 4: Configuring access and security"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "domain_counts": {"Section 1: Setting up a cloud solution environment": 245, "Section 2: Planning and implementing a cloud solution": 255, "Section 3: Ensuring the successful operation of a cloud solution": 255, "Section 4: Configuring access and security": 245}}, {"slug": "itil4", "name": "ITIL 4 Foundation", "code": "ITIL-4", "tagline": "IT service management practices", "accent": "#60a5fa", "domains": ["Guiding principles (7)", "Key concepts", "Practices at a glance (8)", "Practices in detail (7)", "Service value system and dimensions"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "domain_counts": {"Practices in detail (7)": 222, "Practices at a glance (8)": 198, "Guiding principles (7)": 195, "Key concepts": 193, "Service value system and dimensions": 192}}, {"slug": "nclex_rn", "name": "NCLEX-RN", "code": "NCLEX-RN", "tagline": "RN licensure \u00b7 adaptive CAT", "accent": "#f472b6", "domains": ["Health Promotion and Maintenance", "Physiological Integrity: Basic Care and Comfort", "Physiological Integrity: Pharmacological and Parenteral Therapies", "Physiological Integrity: Physiological Adaptation", "Physiological Integrity: Reduction of Risk Potential", "Psychosocial Integrity", "Safe and Effective Care: Management of Care", "Safe and Effective Care: Safety and Infection Control"], "count": 1000, "display_count": 1000, "cat": "nursing", "terminal": false, "badge": "ADAPTIVE", "domain_counts": {"Safe and Effective Care: Management of Care": 200, "Safe and Effective Care: Safety and Infection Control": 120, "Health Promotion and Maintenance": 80, "Psychosocial Integrity": 80, "Physiological Integrity: Basic Care and Comfort": 80, "Physiological Integrity: Pharmacological and Parenteral Therapies": 140, "Physiological Integrity: Reduction of Risk Potential": 120, "Physiological Integrity: Physiological Adaptation": 180}}, {"slug": "nclex_pn", "name": "NCLEX-PN", "code": "NCLEX-PN", "tagline": "PN licensure \u00b7 adaptive CAT", "accent": "#fb7185", "domains": ["Health Promotion and Maintenance", "Physiological Integrity: Basic Care and Comfort", "Physiological Integrity: Pharmacological Therapies", "Physiological Integrity: Physiological Adaptation", "Physiological Integrity: Reduction of Risk Potential", "Psychosocial Integrity", "Safe and Effective Care: Coordinated Care", "Safe and Effective Care: Safety and Infection Control"], "count": 1000, "display_count": 1000, "cat": "nursing", "terminal": false, "badge": "ADAPTIVE", "domain_counts": {"Safe and Effective Care: Coordinated Care": 180, "Safe and Effective Care: Safety and Infection Control": 120, "Health Promotion and Maintenance": 80, "Psychosocial Integrity": 80, "Physiological Integrity: Basic Care and Comfort": 100, "Physiological Integrity: Pharmacological Therapies": 120, "Physiological Integrity: Reduction of Risk Potential": 98, "Physiological Integrity: Physiological Adaptation": 222}}, {"slug": "teas7", "name": "TEAS 7", "code": "TEAS 7", "tagline": "Nursing school entrance exam", "accent": "#38bdf8", "domains": ["English and Language Usage", "Mathematics", "Reading", "Science"], "count": 1000, "display_count": 1000, "cat": "nursing", "terminal": false, "badge": "", "domain_counts": {"Reading": 280, "Mathematics": 200, "Science": 320, "English and Language Usage": 200}}, {"slug": "hesi_a2", "name": "HESI A2", "code": "HESI A2", "tagline": "Nursing admission assessment", "accent": "#818cf8", "domains": ["Anatomy and Physiology", "Biology", "Chemistry", "Grammar", "Mathematics", "Reading Comprehension", "Vocabulary"], "count": 1000, "display_count": 1000, "cat": "nursing", "terminal": false, "badge": "", "domain_counts": {"Vocabulary": 140, "Anatomy and Physiology": 120, "Grammar": 120, "Biology": 120, "Reading Comprehension": 220, "Mathematics": 200, "Chemistry": 80}}, {"slug": "secplus_sy0_701", "name": "CompTIA Security+", "code": "SY0-701", "tagline": "Threats, architecture & operations", "accent": "#fb7185", "domains": ["Architecture/Security Design", "Governance/Risk/Compliance", "Implementation", "Operations/Incident Response", "Threats/Vulnerabilities/Mitigations"], "count": 1000, "display_count": 1000, "cat": "security", "terminal": false, "badge": "", "domain_counts": {"Governance/Risk/Compliance": 120, "Threats/Vulnerabilities/Mitigations": 220, "Architecture/Security Design": 180, "Operations/Incident Response": 280, "Implementation": 200}}, {"slug": "netplus_n10_009", "name": "CompTIA Network+", "code": "N10-009", "tagline": "Networking fundamentals & troubleshooting", "accent": "#38bdf8", "domains": ["Network Implementations", "Network Operations", "Network Security", "Network Troubleshooting", "Networking Fundamentals"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "domain_counts": {"Network Implementations": 200, "Network Troubleshooting": 240, "Network Security": 140, "Network Operations": 190, "Networking Fundamentals": 230}}, {"slug": "aplus_1101_1102", "name": "CompTIA A+", "code": "A+ 1101/1102", "tagline": "Hardware, networking & troubleshooting", "accent": "#fbbf24", "domains": ["Hardware", "Hardware/Network Troubleshooting", "Mobile Devices", "Networking", "Virtualization/Cloud"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "domain_counts": {"Hardware": 250, "Networking": 200, "Virtualization/Cloud": 110, "Hardware/Network Troubleshooting": 290, "Mobile Devices": 150}}];
+const EXAMS = [{"slug": "az900", "name": "Azure Fundamentals", "code": "AZ-900", "tagline": "Cloud concepts & Azure services", "accent": "#38bdf8", "domains": ["Domain 1: Describe cloud concepts", "Domain 2: Describe Azure architecture and services", "Domain 3: Describe Azure management and governance"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Describe cloud concepts": 333, "Domain 2: Describe Azure architecture and services": 335, "Domain 3: Describe Azure management and governance": 332}}, {"slug": "az104", "name": "Azure Administrator", "code": "AZ-104", "tagline": "Azure identity, governance & compute", "accent": "#0ea5e9", "domains": ["Domain 1: Manage identities and governance in Azure", "Domain 2: Implement and manage storage", "Domain 3: Deploy and manage Azure compute resources", "Domain 4: Implement and manage virtual networking", "Domain 5: Monitor and maintain Azure resources"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Manage identities and governance in Azure": 205, "Domain 2: Implement and manage storage": 205, "Domain 3: Deploy and manage Azure compute resources": 205, "Domain 4: Implement and manage virtual networking": 195, "Domain 5: Monitor and maintain Azure resources": 190}}, {"slug": "saa_c03", "name": "AWS Solutions Architect", "code": "SAA-C03", "tagline": "Resilient, secure cloud architectures", "accent": "#fb923c", "domains": ["Domain 1: Design Resilient Architectures", "Domain 2: Design High-Performing Architectures", "Domain 3: Design Secure Architectures", "Domain 4: Design Cost-Optimized Architectures"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Design Resilient Architectures": 255, "Domain 2: Design High-Performing Architectures": 253, "Domain 3: Design Secure Architectures": 249, "Domain 4: Design Cost-Optimized Architectures": 243}}, {"slug": "cysa_cs0_004", "name": "CompTIA CySA+", "code": "CS0-004", "tagline": "Threat detection & incident response", "accent": "#f472b6", "domains": ["Domain 1: Security Operations", "Domain 2: Vulnerability Management", "Domain 3: Incident Response and Management", "Domain 4: Reporting and Communication"], "count": 1000, "display_count": 1000, "cat": "security", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Security Operations": 258, "Domain 2: Vulnerability Management": 255, "Domain 3: Incident Response and Management": 245, "Domain 4: Reporting and Communication": 242}}, {"slug": "linuxplus_xk0_006", "name": "CompTIA Linux+", "code": "XK0-006", "tagline": "Linux systems & administration", "accent": "#fbbf24", "domains": ["Domain 1: System Management", "Domain 2: Services and User Management", "Domain 3: Security", "Domain 4: Automation, Orchestration, and Scripting", "Domain 5: Troubleshooting"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "domain_counts": {"Domain 1: System Management": 218, "Domain 2: Services and User Management": 200, "Domain 3: Security": 188, "Domain 4: Automation, Orchestration, and Scripting": 182, "Domain 5: Troubleshooting": 212}}, {"slug": "cka", "name": "Certified Kubernetes Admin", "code": "CKA", "tagline": "K8s clusters & workloads", "accent": "#818cf8", "domains": ["Domain 1: Cluster Architecture, Installation & Configuration", "Domain 2: Workloads & Scheduling", "Domain 3: Services & Networking", "Domain 4: Storage", "Domain 5: Troubleshooting"], "count": 1000, "display_count": 1000, "cat": "devops", "terminal": true, "badge": "", "domain_counts": {"Domain 1: Cluster Architecture, Installation & Configuration": 205, "Domain 2: Workloads & Scheduling": 195, "Domain 3: Services & Networking": 200, "Domain 4: Storage": 190, "Domain 5: Troubleshooting": 210}}, {"slug": "ckad", "name": "K8s App Developer", "code": "CKAD", "tagline": "Cloud-native app design on K8s", "accent": "#facc15", "domains": ["Domain 1: Application Environment, Configuration and Security", "Domain 2: Application Design and Build", "Domain 3: Application Deployment", "Domain 4: Services and Networking", "Domain 5: Application Observability and Maintenance"], "count": 1000, "display_count": 1000, "cat": "devops", "terminal": true, "badge": "", "domain_counts": {"Domain 1: Application Environment, Configuration and Security": 205, "Domain 2: Application Design and Build": 200, "Domain 3: Application Deployment": 200, "Domain 4: Services and Networking": 200, "Domain 5: Application Observability and Maintenance": 195}}, {"slug": "dca", "name": "Docker Certified Associate", "code": "DCA", "tagline": "Containers, images & orchestration", "accent": "#2dd4bf", "domains": ["Domain 1: Orchestration", "Domain 2: Image Creation, Management, and Registry", "Domain 3: Installation and Configuration", "Domain 4: Networking", "Domain 5: Security", "Domain 6: Storage and Volumes"], "count": 1000, "display_count": 1000, "cat": "devops", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Orchestration": 179, "Domain 2: Image Creation, Management, and Registry": 173, "Domain 3: Installation and Configuration": 165, "Domain 4: Networking": 163, "Domain 5: Security": 159, "Domain 6: Storage and Volumes": 161}}, {"slug": "terraform_004", "name": "Terraform Associate", "code": "Terraform", "tagline": "IaC workflows & HCL", "accent": "#c084fc", "domains": ["Domain 1: Infrastructure as Code (IaC) with Terraform", "Domain 2: Terraform Fundamentals", "Domain 3: Core Terraform Workflow", "Domain 4: Terraform Configuration", "Domain 5: Terraform Modules", "Domain 6: Terraform State Management", "Domain 7: Maintaining Infrastructure with Terraform", "Domain 8: HCP Terraform"], "count": 1000, "display_count": 1000, "cat": "devops", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Infrastructure as Code (IaC) with Terraform": 123, "Domain 2: Terraform Fundamentals": 128, "Domain 3: Core Terraform Workflow": 136, "Domain 4: Terraform Configuration": 137, "Domain 5: Terraform Modules": 119, "Domain 6: Terraform State Management": 121, "Domain 7: Maintaining Infrastructure with Terraform": 117, "Domain 8: HCP Terraform": 119}}, {"slug": "cloudplus_cv0_004", "name": "CompTIA Cloud+", "code": "CV0-004", "tagline": "Cloud architecture & operations", "accent": "#a78bfa", "domains": ["Domain 1: Cloud Architecture", "Domain 2: Deployment", "Domain 3: Operations", "Domain 4: Security", "Domain 5: DevOps Fundamentals", "Domain 6: Troubleshooting"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "domain_counts": {"Domain 1: Cloud Architecture": 176, "Domain 2: Deployment": 172, "Domain 3: Operations": 170, "Domain 4: Security": 172, "Domain 5: DevOps Fundamentals": 154, "Domain 6: Troubleshooting": 156}}, {"slug": "gcp_ace", "name": "GCP Associate Engineer", "code": "GCP-ACE", "tagline": "Deploy & manage on Google Cloud", "accent": "#34d399", "domains": ["Section 1: Setting up a cloud solution environment", "Section 2: Planning and implementing a cloud solution", "Section 3: Ensuring the successful operation of a cloud solution", "Section 4: Configuring access and security"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "domain_counts": {"Section 1: Setting up a cloud solution environment": 245, "Section 2: Planning and implementing a cloud solution": 255, "Section 3: Ensuring the successful operation of a cloud solution": 255, "Section 4: Configuring access and security": 245}}, {"slug": "itil4", "name": "ITIL 4 Foundation", "code": "ITIL-4", "tagline": "IT service management practices", "accent": "#60a5fa", "domains": ["Guiding principles (7)", "Key concepts", "Practices at a glance (8)", "Practices in detail (7)", "Service value system and dimensions"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "domain_counts": {"Practices in detail (7)": 222, "Practices at a glance (8)": 198, "Guiding principles (7)": 195, "Key concepts": 193, "Service value system and dimensions": 192}}, {"slug": "nclex_rn", "name": "NCLEX-RN", "code": "NCLEX-RN", "tagline": "RN licensure \u00b7 adaptive CAT", "accent": "#f472b6", "domains": ["Health Promotion and Maintenance", "Physiological Integrity: Basic Care and Comfort", "Physiological Integrity: Pharmacological and Parenteral Therapies", "Physiological Integrity: Physiological Adaptation", "Physiological Integrity: Reduction of Risk Potential", "Psychosocial Integrity", "Safe and Effective Care: Management of Care", "Safe and Effective Care: Safety and Infection Control"], "count": 1000, "display_count": 1000, "cat": "nursing", "terminal": false, "badge": "ADAPTIVE", "domain_counts": {"Safe and Effective Care: Management of Care": 198, "Safe and Effective Care: Safety and Infection Control": 120, "Health Promotion and Maintenance": 79, "Psychosocial Integrity": 79, "Physiological Integrity: Basic Care and Comfort": 80, "Physiological Integrity: Pharmacological and Parenteral Therapies": 141, "Physiological Integrity: Reduction of Risk Potential": 122, "Physiological Integrity: Physiological Adaptation": 181}}, {"slug": "nclex_pn", "name": "NCLEX-PN", "code": "NCLEX-PN", "tagline": "PN licensure \u00b7 adaptive CAT", "accent": "#fb7185", "domains": ["Health Promotion and Maintenance", "Physiological Integrity: Basic Care and Comfort", "Physiological Integrity: Pharmacological Therapies", "Physiological Integrity: Physiological Adaptation", "Physiological Integrity: Reduction of Risk Potential", "Psychosocial Integrity", "Safe and Effective Care: Coordinated Care", "Safe and Effective Care: Safety and Infection Control"], "count": 1000, "display_count": 1000, "cat": "nursing", "terminal": false, "badge": "ADAPTIVE", "domain_counts": {"Safe and Effective Care: Coordinated Care": 180, "Safe and Effective Care: Safety and Infection Control": 120, "Health Promotion and Maintenance": 80, "Psychosocial Integrity": 80, "Physiological Integrity: Basic Care and Comfort": 100, "Physiological Integrity: Pharmacological Therapies": 120, "Physiological Integrity: Reduction of Risk Potential": 98, "Physiological Integrity: Physiological Adaptation": 222}}, {"slug": "teas7", "name": "TEAS 7", "code": "TEAS 7", "tagline": "Nursing school entrance exam", "accent": "#38bdf8", "domains": ["English and Language Usage", "Mathematics", "Reading", "Science"], "count": 1000, "display_count": 1000, "cat": "nursing", "terminal": false, "badge": "", "domain_counts": {"Reading": 280, "Mathematics": 200, "Science": 320, "English and Language Usage": 200}}, {"slug": "hesi_a2", "name": "HESI A2", "code": "HESI A2", "tagline": "Nursing admission assessment", "accent": "#818cf8", "domains": ["Anatomy and Physiology", "Biology", "Chemistry", "Grammar", "Mathematics", "Reading Comprehension", "Vocabulary"], "count": 1000, "display_count": 1000, "cat": "nursing", "terminal": false, "badge": "", "domain_counts": {"Vocabulary": 140, "Anatomy and Physiology": 120, "Grammar": 120, "Biology": 120, "Reading Comprehension": 220, "Mathematics": 200, "Chemistry": 80}}, {"slug": "secplus_sy0_701", "name": "CompTIA Security+", "code": "SY0-701", "tagline": "Threats, architecture & operations", "accent": "#fb7185", "domains": ["Architecture/Security Design", "Governance/Risk/Compliance", "Implementation", "Operations/Incident Response", "Threats/Vulnerabilities/Mitigations"], "count": 1000, "display_count": 1000, "cat": "security", "terminal": false, "badge": "", "domain_counts": {"Governance/Risk/Compliance": 120, "Threats/Vulnerabilities/Mitigations": 220, "Architecture/Security Design": 180, "Operations/Incident Response": 280, "Implementation": 200}}, {"slug": "netplus_n10_009", "name": "CompTIA Network+", "code": "N10-009", "tagline": "Networking fundamentals & troubleshooting", "accent": "#38bdf8", "domains": ["Network Implementations", "Network Operations", "Network Security", "Network Troubleshooting", "Networking Fundamentals"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "domain_counts": {"Network Implementations": 200, "Network Troubleshooting": 240, "Network Security": 140, "Network Operations": 190, "Networking Fundamentals": 230}}, {"slug": "aplus_1101_1102", "name": "CompTIA A+", "code": "A+ 1101/1102", "tagline": "Hardware, networking & troubleshooting", "accent": "#fbbf24", "domains": ["Hardware", "Hardware/Network Troubleshooting", "Mobile Devices", "Networking", "Virtualization/Cloud"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "domain_counts": {"Hardware": 250, "Networking": 200, "Virtualization/Cloud": 110, "Hardware/Network Troubleshooting": 290, "Mobile Devices": 150}}];
 const BANKS = {};
 /* Lazy bank loading (2026-10-20): question banks ship as per-exam JSON
    under data/ and are fetched on first use, so first paint carries only
@@ -3021,6 +3043,24 @@ function formatLabel(fmt){
   if(fmt.types.indexOf("pbq")!==-1) return "Multiple-choice + performance-based";
   return "Multiple-choice";
 }
+/* NGN case studies (Phase A3): items carrying a case_id are never drawn as
+   singles — a study enters a run only as one intact, consecutive block in
+   authored order, scenario first. Returns {singles, studies} for a raw bank. */
+function caseSplit(raw){
+  const studies={}, singles=[];
+  (raw||[]).forEach(q=>{
+    if(q.case_id){ (studies[q.case_id]=studies[q.case_id]||[]).push(q); }
+    else singles.push(q);
+  });
+  Object.keys(studies).forEach(k=>studies[k].sort((a,b)=>a.case_order-b.case_order));
+  return {singles, studies};
+}
+function prepAny(q){ return q.qtype==="sata"?prepSATA(q):prepQ(q); }
+function pickStudyBlock(studies){
+  const ids=Object.keys(studies);
+  if(!ids.length) return null;
+  return studies[ids[Math.floor(Math.random()*ids.length)]].map(prepAny);
+}
 /* Build a simulation bank: exam-realistic count drawn from the pool.
    Terminal exams draw hands-on tasks; pbq exams mix in multi-selects. */
 function buildSimBank(slug){
@@ -3028,23 +3068,41 @@ function buildSimBank(slug){
   if(fmt.types.indexOf("terminal")!==-1){
     return shuffle((TERMINAL_TASKS[slug]||[]).slice()).slice(0,fmt.count).map(prepTerminal);
   }
-  const mcqs=shuffle(BANKS[slug].slice());
-  let pool=mcqs.map(q=>q.qtype==="sata"?prepSATA(q):prepQ(q));
+  const cs=caseSplit(BANKS[slug]);
+  const mcqs=shuffle(cs.singles.slice());
+  let pool=mcqs.map(prepAny);
   if(fmt.types.indexOf("pbq")!==-1 && PBQ_QUESTIONS[slug]){
     const pbqs=shuffle(PBQ_QUESTIONS[slug].slice()).slice(0,6).map(prepMS);
-    pool=pbqs.concat(shuffle(mcqs).slice(0,Math.max(0,fmt.count-pbqs.length)).map(q=>q.qtype==="sata"?prepSATA(q):prepQ(q)));
+    pool=pbqs.concat(shuffle(mcqs).slice(0,Math.max(0,fmt.count-pbqs.length)).map(prepAny));
     return shuffle(pool);
   }
-  return pool.slice(0,fmt.count);
+  pool=pool.slice(0,fmt.count);
+  /* One case study per simulation, as a consecutive block (Phase A3). */
+  const block=pickStudyBlock(cs.studies);
+  if(block && pool.length>block.length){
+    pool=pool.slice(0,pool.length-block.length);
+    pool.splice(Math.floor(Math.random()*(pool.length+1)),0,...block);
+  }
+  return pool;
 }
 function buildPracticeBank(slug){
   const fmt=examFormat(slug);
   if(fmt.types.indexOf("terminal")!==-1){
     return shuffle((TERMINAL_TASKS[slug]||[]).slice()).slice(0,CONFIG.PRACTICE_COUNT).map(prepTerminal);
   }
-  let pool=BANKS[slug].slice();
+  const cs=caseSplit(BANKS[slug]);
+  let pool=cs.singles.slice();
   if(fmt.types.indexOf("sata")!==-1) pool=pool.filter(q=>q.qtype!=="sata"); /* free taste: MCQ only */
-  return shuffle(pool).slice(0,CONFIG.PRACTICE_COUNT).map(q=>q.qtype==="sata"?prepSATA(q):prepQ(q));
+  let bank=shuffle(pool).slice(0,CONFIG.PRACTICE_COUNT).map(prepAny);
+  /* NCLEX-RN practice carries one intact case study (Phase A3): the study
+     block replaces half the taste, so the run stays at PRACTICE_COUNT and
+     the study's SATA items ride inside the study, not the singles pool. */
+  const block=pickStudyBlock(cs.studies);
+  if(block && bank.length>block.length){
+    bank=bank.slice(0,CONFIG.PRACTICE_COUNT-block.length);
+    bank.splice(Math.floor(Math.random()*(bank.length+1)),0,...block);
+  }
+  return bank;
 }
 /* Terminal task prep: keep the task data intact, init session state. */
 function prepTerminal(t){
@@ -4894,22 +4952,32 @@ function _letterAnchored(ex){
 function _optOrder(q){
   return _letterAnchored(q.explain) ? q.options.map((_,i)=>i) : shuffle(q.options.map((_,i)=>i));
 }
+/* NGN case-study metadata (Phase A3): the grouping lives in the bank data
+   (case_id + case_order on every item of a study); prep carries it through
+   so the exam screen can pin the scenario panel above each item and the
+   results review can group the study's misses under their scenario. */
+function _caseFields(q){
+  return q.case_id ? {caseId:q.case_id, caseOrd:q.case_order, caseN:q.case_total,
+                      caseTitle:q.case_title||"", scenario:q.scenario||null} : {};
+}
 function prepQ(q){
   const order=_optOrder(q);
   /* banks store answers as letters ("A"–"D"); convert to the shuffled index */
   const ansIdx = (typeof q.answer==="string") ? (q.answer.charCodeAt(0)-65) : q.answer;
-  return {q:q.q, options:order.map(i=>q.options[i]), answer:order.indexOf(ansIdx),
+  return Object.assign({q:q.q, options:order.map(i=>q.options[i]), answer:order.indexOf(ansIdx),
           explain:q.explain, domain:q.domain||"General", kind:q.kind||"mcq",
           difficulty:q.difficulty||3,
-          answers:q.answers||null /* multi-select correct set (original indices) */};
+          answers:q.answers||null /* multi-select correct set (original indices) */},
+          _caseFields(q));
 }
 /* Multi-select prep: remap the correct-index set through the shuffle. */
 function prepMS(q){
   const order=_optOrder(q);
   const newOpts=order.map(i=>q.options[i]);
   const newAns=q.answers.map(a=>order.indexOf(a));
-  return {q:q.q, options:newOpts, answers:newAns, explain:q.explain,
-          domain:q.domain||"General", kind:"ms", difficulty:q.difficulty||3};
+  return Object.assign({q:q.q, options:newOpts, answers:newAns, explain:q.explain,
+          domain:q.domain||"General", kind:"ms", difficulty:q.difficulty||3},
+          _caseFields(q));
 }
 
 /* ================= simulation (pro): exam-realistic format ================= */
@@ -5086,7 +5154,9 @@ function startCAT(slug){
    toward its own composition. */
 function catBlueprintShares(raw){
   const counts={}, shares={}; let n=0;
-  raw.forEach(q=>{ const d=q.domain||"General"; counts[d]=(counts[d]||0)+1; n++; });
+  /* Case-study items are excluded from CAT (Phase A3), so they are excluded
+     from the blueprint too — shares describe the selectable pool. */
+  raw.filter(q=>!q.case_id).forEach(q=>{ const d=q.domain||"General"; counts[d]=(counts[d]||0)+1; n++; });
   Object.keys(counts).forEach(d=>{ shares[d]=counts[d]/n; });
   return shares;
 }
@@ -5115,7 +5185,9 @@ function catSelectNext(){
     for(const dd of diffs){
       if(dd<1||dd>5) continue;
       for(let i=0;i<raw.length;i++){
-        if(!c.asked[i]&&(raw[i].difficulty||3)===dd) cands.push(i);
+        /* Case-study items are never CAT singles (Phase A3): a study is a
+           block experience and stays in practice/simulation pools only. */
+        if(!c.asked[i]&&!raw[i].case_id&&(raw[i].difficulty||3)===dd) cands.push(i);
       }
       if(cands.length) break;
     }
@@ -5153,6 +5225,7 @@ function prepSATA(q){
   const p=prepMS({q:q.q, options:q.options, answers:idxs, explain:q.explain,
                  domain:q.domain, difficulty:q.difficulty});
   p.sata=true; /* SATA Slayer badge needs to tell these apart from plain MS */
+  Object.assign(p,_caseFields(q)); /* prepMS saw a rebuilt object — restore case metadata (Phase A3) */
   return p;
 }
 function catNext(){
@@ -5210,6 +5283,41 @@ function paintPalette(){
   $("qprog").textContent="Q "+(S.idx+1)+" / "+S.bank.length;
   paintTrack();
 }
+/* NGN case-study panel (Phase A3): the scenario stays pinned above every
+   item of its study, in its own contained region — the question screen
+   otherwise keeps its exact A1 layout. The only added chrome is the quiet
+   "Case study · item k of N" label. Collapsible; the choice is remembered
+   per study so it never re-opens between items. */
+let caseCollapsedId=null;
+function renderCasePanel(q){
+  const cp=$("casepanel"); if(!cp) return;
+  if(!q.caseId||!q.scenario){ cp.classList.add("hidden"); return; }
+  cp.classList.remove("hidden");
+  const lab=$("caselabel"); if(lab) lab.textContent="Case study · item "+q.caseOrd+" of "+q.caseN;
+  const tt=$("casetitle"); if(tt) tt.textContent=q.caseTitle||"";
+  const body=$("casebody");
+  if(body){
+    body.innerHTML="";
+    (q.scenario.rows||[]).forEach(r=>{
+      const row=document.createElement("div"); row.className="caserow";
+      const a=document.createElement("span"); a.className="caselab"; a.textContent=r[0];
+      const b=document.createElement("span"); b.className="caseval"; b.textContent=r[1];
+      row.appendChild(a); row.appendChild(b); body.appendChild(row);
+    });
+    const collapsed=caseCollapsedId===q.caseId;
+    body.classList.toggle("hidden",collapsed);
+    const tg=$("casetoggle"); if(tg) tg.textContent=collapsed?"Show scenario":"Hide";
+  }
+}
+const _caseTg=$("casetoggle");
+if(_caseTg) _caseTg.addEventListener("click",()=>{
+  const q=S&&S.bank&&S.bank[S.idx];
+  if(!q||!q.caseId) return;
+  const body=$("casebody"); if(!body) return;
+  const nowHidden=body.classList.toggle("hidden");
+  caseCollapsedId=nowHidden?q.caseId:null;
+  _caseTg.textContent=nowHidden?"Show scenario":"Hide";
+});
 function renderQ(){
   const q=S.bank[S.idx], n=S.bank.length;
   const isTerm=q.kind==="terminal", isMS=q.kind==="ms";
@@ -5218,6 +5326,7 @@ function renderQ(){
      appended to .qnum it wrapped ~5 lines on NCLEX and ballooned the header. */
   const qd=$("qdomain");
   if(qd){ qd.textContent=q.domain||""; qd.classList.toggle("hidden",!q.domain); }
+  renderCasePanel(q);
   $("qtext").textContent=isTerm?q.task:q.q;
   const box=$("opts"); box.innerHTML=""; box.style.display=isTerm?"none":"";
   const tw=$("termwrap"); if(tw) tw.classList.toggle("hidden",!isTerm);
@@ -5847,7 +5956,25 @@ function finishExam(expired){
   mw.classList.toggle("hidden", freeTaste);
   if(freeTaste){ /* free taste: score only — the review is Pro value */ }
   else if(!misses.length){ mw.innerHTML='<div style="color:var(--green);font-weight:700;padding:8px 2px;">Perfect run — nothing to review. 🎯</div>'; }
-  else misses.forEach((m,ix)=>{
+  else { let caseHeaded=null;
+  misses.forEach((m,ix)=>{
+    /* Case-study grouping (Phase A3): a study's misses sit under one
+       scenario header, so the review reads the way the run did. */
+    if(m.q.caseId){
+      if(caseHeaded!==m.q.caseId){
+        caseHeaded=m.q.caseId;
+        const hd=document.createElement("div"); hd.className="casegroup";
+        const ht=document.createElement("div"); ht.className="cg-title";
+        ht.textContent="📋 Case study — "+(m.q.caseTitle||"");
+        hd.appendChild(ht);
+        if(m.q.scenario&&(m.q.scenario.rows||[]).length){
+          const hb=document.createElement("div"); hb.className="cg-body";
+          hb.textContent=m.q.scenario.rows.map(r=>r[0]+": "+r[1]).join(" · ");
+          hd.appendChild(hb);
+        }
+        mw.appendChild(hd);
+      }
+    } else caseHeaded=null;
     const d=document.createElement("div"); d.className="miss";
     let yourTxt, qTxt, corrTxt, maLabel, partTxt="";
     if(m.terminal || m.q.kind==="terminal"){
@@ -5878,6 +6005,7 @@ function finishExam(expired){
     d.querySelector(".me").textContent=m.q.explain;
     mw.appendChild(d);
   });
+  }
 
   $("res-retake").onclick=()=>{
     if(S.mode==="sim") $("brief-start").click();
@@ -6514,6 +6642,7 @@ function saveResume(){
       minutes:S.minutes||0,
       bank:S.bank.map(q=>({q:q.q||q.task||"",options:q.options||null,answer:(q.answer!=null?q.answer:null),
         answers:q.answers||null,sata:q.sata||null,explain:q.explain,domain:q.domain,__res:q.__res||null,
+        caseId:q.caseId||null,caseOrd:q.caseOrd||null,caseN:q.caseN||null,caseTitle:q.caseTitle||null,scenario:q.scenario||null,
         kind:q.kind||"mcq",task:q.task||null,ctx:q.ctx||null,accept:q.accept||null,
         hints:q.hints||null,solution:q.solution||null,_revealed:!!q._revealed,_lastInput:q._lastInput||null})),
       deadline:(S.mode==="sim"||(S.mode==="custom"&&S.timed))?deadline:0};
@@ -6876,7 +7005,9 @@ async function startCustom(){
     sublabel="Custom drill · "+count+" terminal tasks";
   } else {
     if(!doms.length){ msg.textContent="Pick at least one domain."; msg.style.color="var(--red)"; return; }
-    let pool=BANKS[e.slug].filter(q=>doms.includes(q.domain||"General"));
+    /* Case-study items stay out of the custom builder (Phase A3): like CAT,
+       it draws single items, and a study only makes sense as an intact block. */
+    let pool=BANKS[e.slug].filter(q=>!q.case_id&&doms.includes(q.domain||"General"));
     if(!pool.length){ msg.textContent="No questions in those domains yet."; msg.style.color="var(--red)"; return; }
     const count=Math.min(parseInt($("builder-count").value,10)||25, pool.length);
     bank=shuffle(pool.slice()).slice(0,count).map(q=>q.qtype==="sata"?prepSATA(q):prepQ(q));
