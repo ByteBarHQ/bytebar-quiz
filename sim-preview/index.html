@@ -295,6 +295,11 @@ ul.pp-feats li{
 /* ---------- briefing ---------- */
 .brief{max-width:720px; margin:0 auto; background:linear-gradient(180deg,#fff9ee 0%,var(--card) 140px); border:1px solid var(--line); border-radius:20px; padding:34px 32px; box-shadow:var(--shadow-lg);}
 .brief h2{margin:0 0 6px; font-size:26px; letter-spacing:-.01em; color:var(--navy);}
+/* Test-day check-in (2026-10-22): eyebrow + candidate line + key hints —
+   all plain block flow in the card, wrapping text, nothing fixed/absolute. */
+.brief-eyebrow{font-size:11.5px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; color:var(--cyan); margin:2px 0 8px;}
+.brief-candidate{font-size:14.5px; font-weight:700; color:var(--navy); margin:0 0 10px; overflow-wrap:break-word;}
+.brief-keys{font-size:12.5px; font-weight:600; color:var(--mut); margin:14px 0 0; letter-spacing:.01em;}
 .brief .rule{border-top:1px solid var(--line); padding:13px 0; display:flex; gap:12px; font-size:15px; line-height:1.5;}
 .brief .rule .ic{flex:none; width:30px; height:30px; border-radius:9px; background:var(--cyan-soft); color:var(--cyan); display:flex; align-items:center; justify-content:center; font-weight:800;}
 .brief .warn{background:var(--amber-soft); border:1px solid #f3d9a8; border-radius:12px; padding:13px 16px; font-size:14px; color:#7a4a06; line-height:1.55; margin:16px 0 4px;}
@@ -354,6 +359,16 @@ ul.pp-feats li{
   font-size:14px; font-weight:800; display:flex; align-items:center; justify-content:center;
 }
 .opt.sel .key{background:var(--navy); color:#fff;}
+/* Strike-out (2026-10-22): struck text dims + line-through; the option
+   stays selectable. The ✕ control is invisible until hover/focus on
+   precise pointers, faintly present on touch — quiet when unused. */
+.opt.struck{color:var(--mut);}
+.opt.struck .key{opacity:.5;}
+.opt.struck .key + span{text-decoration:line-through; text-decoration-thickness:2px; opacity:.6;}
+.strikebtn{flex:none; margin-left:auto; align-self:center; width:24px; height:24px; border-radius:7px; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:800; color:var(--mut); background:rgba(11,30,66,.07); opacity:0; pointer-events:none; transition:opacity .12s;}
+.opt:hover .strikebtn, .opt:focus-visible .strikebtn, .opt:focus-within .strikebtn{opacity:.9; pointer-events:auto;}
+.opt.struck .strikebtn{opacity:.9; pointer-events:auto; background:var(--navy); color:#fff;}
+@media (pointer:coarse){ .strikebtn{opacity:.45; pointer-events:auto;} .opt.struck .strikebtn{opacity:.95;} }
 .explainbox{margin-top:18px; padding:16px 18px; border-radius:13px; font-size:14.5px; line-height:1.6; background:var(--cyan-soft); border:1px solid #bfe6f5; color:#14425e; display:none;}
 .explainbox.show{display:block;}
 .explainbox b{color:var(--cyan);}
@@ -376,6 +391,16 @@ ul.pp-feats li{
 /* end-of-exam review overlay: wider card, denser scrollable palette grid */
 .reviewcard{max-width:640px; width:94vw;}
 .revgrid{grid-template-columns:repeat(10,1fr); max-height:42vh; overflow-y:auto; padding:6px 2px;}
+/* Review step focused list (2026-10-22): flagged + unanswered rows only. */
+#revlist{max-height:30vh; overflow-y:auto; margin:0 0 14px; display:flex; flex-direction:column; gap:7px;}
+.revrow{display:flex; align-items:center; gap:10px; width:100%; text-align:left; padding:10px 12px; border:1.5px solid var(--line); border-radius:11px; background:#fbf8f1; cursor:pointer; font-family:inherit; font-size:13.5px; color:var(--ink);}
+.revrow.clear{cursor:default; color:var(--green); font-weight:700; justify-content:center;}
+.revq{font-weight:800; color:var(--navy); flex:none;}
+.revdom{color:var(--mut); font-weight:600; overflow-wrap:break-word; min-width:0; flex:1;}
+.revtags{flex:none; display:flex; gap:6px;}
+.revtag{font-size:11px; font-weight:800; padding:3px 8px; border-radius:999px;}
+.revtag.fl{background:var(--amber-soft); color:var(--gold);}
+.revtag.un{background:#fdecec; color:var(--red);}
 @media(max-width:560px){ .revgrid{grid-template-columns:repeat(6,1fr);} }
 .dot{width:10px; height:10px; border-radius:3px; background:#fbf8f1; border:1.5px solid var(--line); display:inline-block;}
 .dot.a{background:var(--navy); border-color:var(--navy);}
@@ -1726,35 +1751,35 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg></span><span class="ecode">AZ-900</span></span>
       <span class="ename">Azure Fundamentals</span>
       <span class="etag">Cloud concepts &amp; Azure services</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#0ea5e9;--i:1" onclick="examCardClick('az104')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg></span><span class="ecode">AZ-104</span></span>
       <span class="ename">Azure Administrator</span>
       <span class="etag">Azure identity, governance &amp; compute</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#fb923c;--i:2" onclick="examCardClick('saa_c03')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 2 7 12 12 22 7 12 2"/><polyline points="2 17 12 22 22 17"/><polyline points="2 12 12 17 22 12"/></svg></span><span class="ecode">SAA-C03</span></span>
       <span class="ename">AWS Solutions Architect</span>
       <span class="etag">Resilient, secure cloud architectures</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#a78bfa;--i:3" onclick="examCardClick('cloudplus_cv0_004')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="18" cy="5" r="3"/><circle cx="6" cy="12" r="3"/><circle cx="18" cy="19" r="3"/><line x1="8.59" y1="13.51" x2="15.42" y2="17.49"/><line x1="15.41" y1="6.51" x2="8.59" y2="10.49"/></svg></span><span class="ecode">CV0-004</span></span>
       <span class="ename">CompTIA Cloud+</span>
       <span class="etag">Cloud architecture &amp; operations</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#34d399;--i:4" onclick="examCardClick('gcp_ace')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span class="ecode">GCP-ACE</span></span>
       <span class="ename">GCP Associate Engineer</span>
       <span class="etag">Deploy &amp; manage on Google Cloud</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <div class="catchdr">🔒 Security</div>
     <button class="examcard" style="--acc:#f472b6;--i:5" onclick="examCardClick('cysa_cs0_004')">
@@ -1762,14 +1787,14 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 11.5 11 13.5 15 9.5"/></svg></span><span class="ecode">CS0-004</span></span>
       <span class="ename">CompTIA CySA+</span>
       <span class="etag">Threat detection &amp; incident response</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#fb7185;--i:6" onclick="examCardClick('secplus_sy0_701')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg></span><span class="ecode">SY0-701</span></span>
       <span class="ename">CompTIA Security+</span>
       <span class="etag">Threats, architecture &amp; operations</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <div class="catchdr">🚢 DevOps & Containers</div>
     <button class="examcard" style="--acc:#818cf8;--i:7" onclick="examCardClick('cka')">
@@ -1777,28 +1802,28 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"/></svg></span><span class="ecode">CKA</span><span class="termbadge">⌨ TERMINAL</span></span>
       <span class="ename">Certified Kubernetes Admin</span>
       <span class="etag">K8s clusters &amp; workloads</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#facc15;--i:8" onclick="examCardClick('ckad')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg></span><span class="ecode">CKAD</span><span class="termbadge">⌨ TERMINAL</span></span>
       <span class="ename">K8s App Developer</span>
       <span class="etag">Cloud-native app design on K8s</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#2dd4bf;--i:9" onclick="examCardClick('dca')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg></span><span class="ecode">DCA</span></span>
       <span class="ename">Docker Certified Associate</span>
       <span class="etag">Containers, images &amp; orchestration</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#c084fc;--i:10" onclick="examCardClick('terraform_004')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg></span><span class="ecode">Terraform</span></span>
       <span class="ename">Terraform Associate</span>
       <span class="etag">IaC workflows &amp; HCL</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <div class="catchdr">🖥️ Systems & Service</div>
     <button class="examcard" style="--acc:#fbbf24;--i:11" onclick="examCardClick('linuxplus_xk0_006')">
@@ -1806,28 +1831,28 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg></span><span class="ecode">XK0-006</span></span>
       <span class="ename">CompTIA Linux+</span>
       <span class="etag">Linux systems &amp; administration</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#60a5fa;--i:12" onclick="examCardClick('itil4')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 4 23 10 17 10"/><polyline points="1 20 1 14 7 14"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg></span><span class="ecode">ITIL-4</span></span>
       <span class="ename">ITIL 4 Foundation</span>
       <span class="etag">IT service management practices</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#38bdf8;--i:13" onclick="examCardClick('netplus_n10_009')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg></span><span class="ecode">N10-009</span></span>
       <span class="ename">CompTIA Network+</span>
       <span class="etag">Networking fundamentals &amp; troubleshooting</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#fbbf24;--i:14" onclick="examCardClick('aplus_1101_1102')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></span><span class="ecode">A+ 1101/1102</span></span>
       <span class="ename">CompTIA A+</span>
       <span class="etag">Hardware, networking &amp; troubleshooting</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <div class="catchdr">🩺 Nursing</div>
     <button class="examcard" style="--acc:#f472b6;--i:15" onclick="examCardClick('nclex_rn')">
@@ -1835,28 +1860,28 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg></span><span class="ecode">NCLEX-RN</span><span class="catbadge">⚡ ADAPTIVE</span></span>
       <span class="ename">NCLEX-RN</span>
       <span class="etag">RN licensure · adaptive CAT</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#fb7185;--i:16" onclick="examCardClick('nclex_pn')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"/><rect x="8" y="2" width="8" height="4" rx="1" ry="1"/></svg></span><span class="ecode">NCLEX-PN</span><span class="catbadge">⚡ ADAPTIVE</span></span>
       <span class="ename">NCLEX-PN</span>
       <span class="etag">PN licensure · adaptive CAT</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#38bdf8;--i:17" onclick="examCardClick('teas7')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span class="ecode">TEAS 7</span></span>
       <span class="ename">TEAS 7</span>
       <span class="etag">Nursing school entrance exam</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     <button class="examcard" style="--acc:#818cf8;--i:18" onclick="examCardClick('hesi_a2')">
       <span class="freetag">✦ TRY FREE</span>
       <span class="erow"><span class="eicon"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></span><span class="ecode">HESI A2</span></span>
       <span class="ename">HESI A2</span>
       <span class="etag">Nursing admission assessment</span>
-      <span class="meta"><span class="qcount">1000 Qs</span> 5-question taste · free</span>
+      <span class="meta"><span class="qcount">1000 Qs</span> 10-question taste · free</span>
     </button>
     </div>
 
@@ -1902,7 +1927,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <div class="panel">
       <table class="compare">
         <tr><th></th><th>ByteBar Pro</th><th>Free quizzes</th></tr>
-        <tr class="hl"><td>Full access — all 19 exams, one price</td><td class="y">✓</td><td class="n">5-question taste each</td></tr>
+        <tr class="hl"><td>Full access — all 19 exams, one price</td><td class="y">✓</td><td class="n">10-question taste each</td></tr>
         <tr class="hl"><td>Full timed simulations at real exam length</td><td class="y">✓</td><td class="n">–</td></tr>
         <tr><td>Hands-on terminal simulations (CKA/CKAD)</td><td class="y">✓</td><td class="n">–</td></tr>
         <tr><td>Explanation on every answer</td><td class="y">✓</td><td class="n">–</td></tr>
@@ -1921,7 +1946,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <div class="faqitem"><button class="fq">Can I use it on my phone?</button><div class="fa">Yes. The simulator is fully responsive — practice on your phone, run full timed simulations on desktop. Your progress syncs to your account on each device.</div></div>
       <div class="faqitem"><button class="fq">Is this a subscription?</button><div class="fa">No. Pro is a one-time payment of $9.99 for all 19 exams. No renewals, no expiring access — yours until you pass.</div></div>
       <div class="faqitem"><button class="fq">Is $9.99 per exam or for all exams?</button><div class="fa">All exams. One $9.99 payment unlocks all 19 exams — full 1,000-question banks, timed and adaptive simulations, terminal tasks, everything. Others charge $99 per exam. We charge $9.99 for all of them.</div></div>
-      <div class="faqitem"><button class="fq">How is this different from free practice questions?</button><div class="fa">Depth and realism. The free taste gives you 5 questions per exam. ByteBar Pro gives you full timed simulations, an explanation for every answer, domain-level analytics, and a readiness prediction trained on your own attempts.</div></div>
+      <div class="faqitem"><button class="fq">How is this different from free practice questions?</button><div class="fa">Depth and realism. The free taste gives you 10 questions per exam. ByteBar Pro gives you full timed simulations, an explanation for every answer, domain-level analytics, and a readiness prediction trained on your own attempts.</div></div>
     </div></div>
 
     <div class="secttl">Why simulate?</div>
@@ -1959,8 +1984,8 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <button class="modecard" id="mode-practice">
         <span class="mchip" style="--mc:#e2f6ee;">⚡</span>
         <h3>Quick Practice</h3>
-        <p>5 questions, instant explanations. A quick taste of the real thing — no timer, no pressure.</p>
-        <ul><li>5 exam-style questions</li><li>Explanation after every answer</li><li>Free teaser · no account needed</li></ul>
+        <p>10 questions, instant explanations. A quick taste of the real thing — no timer, no pressure.</p>
+        <ul><li>10 exam-style questions</li><li>Explanation after every answer</li><li>Free teaser · no account needed</li></ul>
         <div class="price">Free</div>
       </button>
       <button class="modecard pro" id="mode-sim">
@@ -1990,15 +2015,17 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <button class="backlink" id="brief-back">← Choose mode</button>
     <div class="brief">
       <div class="resmascot" style="margin-bottom:0;"><span class="mascot-slot" data-mascot="determined" data-size="54"></span></div>
+      <div class="brief-eyebrow">Test-day check-in</div>
       <h2 id="brief-title">Exam simulation</h2>
+      <p class="brief-candidate" id="brief-candidate">Guest candidate</p>
       <p style="color:var(--mut); margin:0 0 8px; font-size:15px;" id="brief-sub"></p>
       <p style="color:var(--mut); margin:0 0 14px; font-size:13.5px;" id="brief-note"></p>
-      <div class="rule"><div class="ic">◷</div><div><b>Real exam timing.</b> The timer matches the vendor's actual exam and cannot be paused.</div></div>
-      <div class="rule"><div class="ic">▦</div><div><b>Navigate freely.</b> Use the question palette to jump around, flag questions for review, and change answers before you finish.</div></div>
-      <div class="rule"><div class="ic">✓</div><div><b id="brief-passmark">Passing score: 70%.</b> You'll get a domain-by-domain breakdown showing exactly what to study next.</div></div>
-      <div class="warn"><span class="mascot-slot" data-mascot="nervous" data-size="46" style="float:left;margin:0 12px 4px 0;"></span><b>No pausing.</b> When the timer hits zero your exam auto-submits. Treat this like the real thing — that's the point.<div style="clear:both;"></div></div>
+      <div class="rule"><div class="ic">◷</div><div><b>Timer starts on Begin.</b> It can't be paused — when it hits zero, your exam submits itself.</div></div>
+      <div class="rule"><div class="ic">▦</div><div id="brief-rule2"><b>Flag &amp; review.</b> Flag questions as you go, then review the flagged and unanswered ones before you submit.</div></div>
+      <div class="rule"><div class="ic">✓</div><div><b id="brief-passmark">Passing score: 70%.</b> Results include a domain-by-domain breakdown, so you know exactly what to study next.</div></div>
+      <p class="brief-keys" id="brief-keys">Keyboard: A–D answer · F flag · X strike out</p>
       <div class="btnrow">
-        <button class="btn block" id="brief-start">Begin simulation</button>
+        <button class="btn block" id="brief-start">Begin Exam</button>
       </div>
     </div>
   </div>
@@ -2322,6 +2349,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <div class="uk">Before you submit</div>
     <h2>Review your answers</h2>
     <p id="revsum"></p>
+    <div id="revlist"></div>
     <div class="palgrid revgrid" id="revgrid"></div>
     <div class="palkey" style="justify-content:center;">
       <span><i class="dot"></i>Unanswered</span>
@@ -2872,13 +2900,14 @@ const CONFIG = {
   PASS_PCT: 70,
   SIM_MINUTES: 90,
   SIM_COUNT: 100,
-  PRACTICE_COUNT: 5
+  PRACTICE_COUNT: 10
 };
-/* Free tier: 5-question teaser on ALL 16 exams (Cori 2026-10-18: uniform,
-   no tiers within free). Pro unlocks full banks, timed sims, analytics. */
+/* Free tier: 10-question taste on ALL exams (Cori 2026-10-18: uniform,
+   no tiers within free; raised 5 → 10 by Cori 2026-10-22). Pro unlocks
+   full banks, timed sims, analytics. */
 const FREE_EXAMS = ["az900","saa_c03","cysa_cs0_004","az104","linuxplus_xk0_006","cka","ckad","dca","terraform_004","cloudplus_cv0_004","gcp_ace","itil4","nclex_rn","nclex_pn","teas7","hesi_a2"];
 function isFreeExam(slug){ return FREE_EXAMS.indexOf(slug) !== -1; }
-/* Exam-card click router: every exam offers a free 5-question taste.
+/* Exam-card click router: every exam offers a free 10-question taste.
    Pro gates the full simulation, not the card. */
 function examCardClick(slug){
   renderModes(slug);
@@ -4546,7 +4575,7 @@ function renderHome(){
     hdr.className="catchdr"; hdr.textContent=catLabel;
     g.appendChild(hdr);
     EXAMS.filter(e=>e.cat===catSlug).forEach((e)=>{
-      /* Every exam offers a free 5-question taste; Pro unlocks the full bank. */
+      /* Every exam offers a free 10-question taste; Pro unlocks the full bank. */
       const d=document.createElement("button");
       d.className="examcard"; d.style.setProperty("--acc", e.accent); d.style.setProperty("--i", idx);
       const tag = pro
@@ -4559,7 +4588,7 @@ function renderHome(){
         '<span class="erow"><span class="eicon">'+(ICONS[e.slug]||"")+'</span><span class="ecode">'+e.code+'</span>'+term+cbadge+'</span>'+
         '<span class="ename">'+e.name+'</span>'+
         '<span class="etag">'+e.tagline+'</span>'+
-        '<span class="meta"><span class="qcount">'+QCOUNT_DISPLAY+' Qs</span> '+(pro?"Timed simulation · Score report":"5-question taste · free")+'</span>';
+        '<span class="meta"><span class="qcount">'+QCOUNT_DISPLAY+' Qs</span> '+(pro?"Timed simulation · Score report":"10-question taste · free")+'</span>';
       d.addEventListener("click",()=>examCardClick(e.slug));
       g.appendChild(d);
       idx++;
@@ -4752,7 +4781,7 @@ $("prow-ok").addEventListener("click",()=>{
   if(curExam) renderBrief(curExam.slug);
 });
 
-/* ================= practice (free: 5 questions on every exam) ================= */
+/* ================= practice (free: 10 questions on every exam) ================= */
 async function startPractice(slug){
   const exam=EXAMS.find(e=>e.slug===slug);
   if(!(examFormat(slug).types.indexOf("terminal")!==-1)){
@@ -4798,6 +4827,15 @@ function prepMS(q){
 
 /* ================= simulation (pro): exam-realistic format ================= */
 let timerId=null, deadline=0;
+/* Test-day check-in candidate line: who is sitting this exam. Signed-in
+   identity wins (Supabase email, else the local account name); a visitor
+   with neither is a guest candidate. Display only — no state changes. */
+function candidateLabel(){
+  if(window.BB && BB.user && BB.user.email) return "Candidate · "+BB.user.email;
+  const u=currentUser();
+  if(u) return "Candidate · "+u;
+  return "Guest candidate";
+}
 function renderBrief(slug){
   curExam=EXAMS.find(e=>e.slug===slug);
   const fmt=examFormat(slug);
@@ -4811,17 +4849,26 @@ function renderBrief(slug){
     const bf=EXAM_FORMATS[slug];
     bp.textContent=(bf&&bf.pass!=null)?("Passing score: "+passPct(slug)+"%."):"Passing standard: adaptive (CAT).";
   }
+  /* Check-in ritual (2026-10-22): one calm screen that makes starting feel
+     official — candidate, exam, format facts, three rules, Begin Exam. */
+  const bc=$("brief-candidate"); if(bc) bc.textContent=candidateLabel();
+  $("brief-title").textContent=curExam.name;
+  const r2=$("brief-rule2"), bk=$("brief-keys");
   if(fmt.types.indexOf("cat")!==-1){
-    $("brief-title").textContent=curExam.code+" — adaptive simulation";
-    $("brief-sub").textContent=curExam.name+" · 85–150 questions · up to 5 hours · "+formatLabel(fmt);
+    $("brief-sub").textContent=curExam.code+" · 85–150 questions · up to 5 hours · "+formatLabel(fmt);
     const bn0=$("brief-note");
     if(bn0) bn0.textContent="The computer adapts to you: answer well and questions get harder. It ends when the engine is 95% confident — just like the real "+curExam.code+". No going back; each answer is final.";
+    if(r2) r2.innerHTML="<b>No going back.</b> Each answer is final — the engine adapts after every one, just like the real "+curExam.code+".";
+    if(bk) bk.textContent="Keyboard: A–D answer · X strike out";
     show("screen-brief"); return;
   }
-  $("brief-title").textContent=curExam.code+" — exam simulation";
-  $("brief-sub").textContent=curExam.name+" · "+fmt.count+" "+(fmt.types[0]==="terminal"?"tasks":"questions")+" · "+fmt.minutes+" minutes · "+formatLabel(fmt);
+  $("brief-sub").textContent=curExam.code+" · "+fmt.count+" "+(fmt.types[0]==="terminal"?"tasks":"questions")+" · "+fmt.minutes+" minutes · "+formatLabel(fmt);
   const bn=$("brief-note");
   if(bn) bn.textContent="Drawn from the "+QCOUNT_DISPLAY_TXT+"-question "+curExam.code+" bank — just like the real "+curExam.code+", no two runs are the same.";
+  if(r2) r2.innerHTML="<b>Flag &amp; review.</b> Flag questions as you go, then review the flagged and unanswered ones before you submit.";
+  if(bk) bk.textContent=(fmt.types[0]==="terminal")
+    ? "Keyboard: F flag · Enter next"
+    : "Keyboard: A–D answer · F flag · X strike out";
   show("screen-brief");
 }
 $("brief-back").addEventListener("click",()=>renderModes(curExam.slug));
@@ -5020,6 +5067,7 @@ function renderQ(){
     b.innerHTML='<span class="key">'+String.fromCharCode(65+i)+'</span><span></span>';
     b.lastChild.textContent=t;
     b.addEventListener("click",()=>answer(i,b));
+    addStrikeBtn(b,i);
     box.appendChild(b);
   });
   /* live modes (practice + untimed custom): restore already-answered state when navigating back */
@@ -5047,6 +5095,7 @@ function renderMulti(q,box){
     b.className="opt ms"; b.type="button";
     b.innerHTML='<span class="key">'+String.fromCharCode(65+i)+'</span><span></span><span class="mcheck">✓</span>';
     b.lastChild.previousSibling.textContent=t;
+    addStrikeBtn(b,i);
     const cur=live?null:S.answers[S.idx];
     if(!live && cur && cur.indexOf(i)!==-1) b.classList.add("sel");
     b.addEventListener("click",()=>{
@@ -5277,6 +5326,87 @@ $("endbtn").addEventListener("click",()=>{
   if(confirm(msg)) finishExam(false);
 });
 
+/* ================= strike-out + keyboard (2026-10-22) =================
+   Test-day tools that stay invisible until used (Cori's design law: the
+   question screen stays minimal). Strike state lives on S.strikes as
+   per-question arrays of option indices, persists across navigation and
+   resume, and never blocks selecting the struck option — real exams
+   allow that. The on-option ✕ appears on hover/focus (faint on touch);
+   the keyboard layer is exam-screen only and never hijacks typing. */
+function strikesAt(i){
+  if(!S.strikes) S.strikes=[];
+  if(!S.strikes[i]) S.strikes[i]=[];
+  return S.strikes[i];
+}
+function toggleStrike(qi,oi){
+  const a=strikesAt(qi), k=a.indexOf(oi);
+  if(k===-1) a.push(oi); else a.splice(k,1);
+}
+function addStrikeBtn(b,i){
+  if(strikesAt(S.idx).indexOf(i)!==-1) b.classList.add("struck");
+  const sx=document.createElement("span");
+  sx.className="strikebtn"; sx.textContent="✕";
+  sx.title="Strike out this option (X)";
+  sx.setAttribute("aria-hidden","true");
+  sx.addEventListener("click",ev=>{
+    ev.stopPropagation(); ev.preventDefault();
+    toggleStrike(S.idx,i); b.classList.toggle("struck"); saveResume();
+  });
+  b.appendChild(sx);
+}
+$("opts").addEventListener("focusin",e=>{
+  const b=e.target && e.target.closest ? e.target.closest(".opt") : null;
+  if(!b || !S) return;
+  const opts=[...$("opts").querySelectorAll(".opt")];
+  S._focusOpt=opts.indexOf(b);
+});
+document.addEventListener("keydown",e=>{
+  if(!S || S.submitted) return;
+  const examScr=$("screen-exam");
+  if(!examScr || examScr.classList.contains("hidden")) return;
+  const rov=$("reviewov"); if(rov && !rov.classList.contains("hidden")) return;
+  const pw=$("paywall"); if(pw && !pw.classList.contains("hidden")) return;
+  const t=e.target;
+  if(t && (t.tagName==="INPUT"||t.tagName==="TEXTAREA"||t.tagName==="SELECT"||t.isContentEditable)) return;
+  const q=S.bank[S.idx]; if(!q) return;
+  const box=$("opts");
+  const opts=box?[...box.querySelectorAll(".opt")]:[];
+  const key=e.key;
+  if(key==="ArrowDown"||key==="ArrowUp"){
+    if(!opts.length) return;
+    e.preventDefault();
+    let cur=opts.indexOf(document.activeElement);
+    if(cur===-1) cur=(typeof S._focusOpt==="number")?S._focusOpt:(key==="ArrowDown"?-1:0);
+    const nx=key==="ArrowDown"?Math.min(opts.length-1,cur+1):Math.max(0,cur-1);
+    if(opts[nx] && !opts[nx].disabled) opts[nx].focus();
+    return;
+  }
+  if(e.repeat) return;
+  if(key==="Enter"){
+    const ae=document.activeElement;
+    if(ae && ae.tagName==="BUTTON") return; /* native activation (incl. options) */
+    e.preventDefault(); $("nextbtn").click(); return;
+  }
+  const k=(key||"").toLowerCase();
+  if(k==="f"){
+    if(!isLiveMode() && S.mode!=="cat"){ e.preventDefault(); $("flagbtn").click(); }
+    return;
+  }
+  if(k==="x"){
+    const cur=opts.indexOf(document.activeElement);
+    const fi=cur!==-1?cur:(typeof S._focusOpt==="number"?S._focusOpt:-1);
+    if(fi>=0 && opts[fi]){ e.preventDefault(); toggleStrike(S.idx,fi); opts[fi].classList.toggle("struck"); saveResume(); }
+    return;
+  }
+  let oi=-1;
+  if(/^[a-d]$/.test(k)) oi=k.charCodeAt(0)-97;
+  else if(/^[1-4]$/.test(k)) oi=parseInt(k,10)-1;
+  if(oi>=0 && q.kind!=="terminal"){
+    const b=opts[oi];
+    if(b && !b.disabled){ e.preventDefault(); b.click(); }
+  }
+});
+
 /* ================= end-of-exam review =================
    Deferred modes only (live modes grade on click, CAT is forward-only):
    every question with answered / unanswered / flagged status, tap a
@@ -5303,6 +5433,32 @@ function showReview(){
   const n=S.bank.length;
   $("revsum").innerHTML="<b>"+(n-un)+" answered</b> · "+un+" unanswered"+
     (un?" (Q"+unNums.join(", Q")+")":"")+" · "+fl+" flagged<br>Tap any number to jump back and change an answer.";
+  /* Focused list (2026-10-22): exactly the questions that need a second
+     look — flagged and/or unanswered — each row a jump back to it. */
+  const rl=$("revlist");
+  if(rl){
+    rl.innerHTML="";
+    const items=[];
+    S.bank.forEach((q,i)=>{
+      const unA=S.answers[i]==null, flA=!!S.flags[i];
+      if(unA||flA) items.push({i,un:unA,fl:flA,domain:q.domain||""});
+    });
+    if(!items.length){
+      const d=document.createElement("div");
+      d.className="revrow clear";
+      d.textContent="✓ Nothing flagged or unanswered — you're clear to submit.";
+      rl.appendChild(d);
+    } else items.forEach(it=>{
+      const r=document.createElement("button");
+      r.type="button"; r.className="revrow";
+      r.innerHTML='<span class="revq">Q'+(it.i+1)+'</span><span class="revdom"></span><span class="revtags">'+
+        (it.fl?'<span class="revtag fl">⚑ Flagged</span>':"")+
+        (it.un?'<span class="revtag un">Unanswered</span>':"")+'</span>';
+      r.querySelector(".revdom").textContent=it.domain;
+      r.addEventListener("click",()=>{ hideReview(); S.idx=it.i; S.answered=false; renderQ(); saveResume(); });
+      rl.appendChild(r);
+    });
+  }
   $("reviewov").classList.remove("hidden");
 }
 function hideReview(){ const ov=$("reviewov"); if(ov) ov.classList.add("hidden"); }
@@ -5395,7 +5551,7 @@ function finishExam(expired){
   requestAnimationFrame(()=>{ ring.style.transition="stroke-dashoffset 1.1s cubic-bezier(.2,.7,.2,1)"; ring.style.strokeDashoffset=C*(1-pct/100); });
 
   const vb=$("res-verdictbox");
-  /* Free tier guard (Cori 2026-10-18): the 5-question taste shows score only.
+  /* Free tier guard (Cori 2026-10-18): the 10-question taste shows score only.
      Domain breakdown, missed-question review, and readiness are Pro value —
      the free sample should make them want more, not feel like enough. */
   const freeTaste = (S.mode==="practice" && !isPro());
@@ -6117,7 +6273,7 @@ function saveResume(){
   if(S.mode==="cat") return; /* CAT sessions are forward-only; finish in one sitting */
   try{
     const data={mode:S.mode, slug:S.exam.slug, idx:S.idx, t0:S.t0, score:S.score,
-      misses:S.misses, answers:S.answers||null, flags:S.flags||null, timed:!!S.timed,
+      misses:S.misses, answers:S.answers||null, flags:S.flags||null, strikes:S.strikes||null, timed:!!S.timed,
       minutes:S.minutes||0,
       bank:S.bank.map(q=>({q:q.q||q.task||"",options:q.options||null,answer:(q.answer!=null?q.answer:null),
         answers:q.answers||null,sata:q.sata||null,explain:q.explain,domain:q.domain,__res:q.__res||null,
@@ -6142,7 +6298,7 @@ function resumeExam(){
   const exam=EXAMS.find(e=>e.slug===r.slug);
   curExam=exam;
   S={mode:r.mode, exam, bank:r.bank, idx:r.idx, score:r.score||0, misses:r.misses||[],
-     answers:r.answers, flags:r.flags, t0:r.t0, submitted:false,
+     answers:r.answers, flags:r.flags, strikes:r.strikes||null, t0:r.t0, submitted:false,
      timed:!!r.timed, minutes:r.minutes||0, answered:false};
   document.documentElement.style.setProperty("--qacc",exam.accent);
   $("exam-label").textContent=exam.code;
