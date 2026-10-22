@@ -155,17 +155,17 @@ body{
    then this: concrete numbers, blurred domain teaser, one clear CTA. */
 .upgradecard.pro-pitch{
   flex-direction:column; align-items:stretch; text-align:center;
-  padding:28px 24px; gap:0;
+  padding:22px 20px; gap:0;
   background:linear-gradient(180deg, var(--card) 0%, #fdf8ef 100%);
   border:2px solid #f0d9a8;
 }
-.pp-mascot{margin-bottom:8px;}
+.pp-mascot{margin-bottom:4px;}
 .pp-head{
-  font-size:22px; font-weight:800; letter-spacing:-.02em;
-  color:var(--navy); margin-bottom:8px;
+  font-size:21px; font-weight:800; letter-spacing:-.02em;
+  color:var(--navy); margin-bottom:6px;
 }
-.pp-sub{font-size:14px; color:var(--mut); line-height:1.5; margin-bottom:18px; max-width:420px; margin-left:auto; margin-right:auto;}
-.pp-progress{margin-bottom:20px;}
+.pp-sub{font-size:14px; color:var(--mut); line-height:1.5; margin-bottom:14px; max-width:420px; margin-left:auto; margin-right:auto;}
+.pp-progress{margin-bottom:16px;}
 .pp-progress-track{
   height:10px; border-radius:99px; background:#e8e0d0;
   overflow:hidden; max-width:320px; margin:0 auto 8px;
@@ -180,11 +180,20 @@ body{
 .pp-teaser{
   position:relative; border-radius:14px; overflow:hidden;
   background:var(--bg); border:1px solid var(--line);
-  padding:16px; margin-bottom:20px; text-align:left;
+  padding:14px; margin-bottom:16px; text-align:left;
   max-width:420px; margin-left:auto; margin-right:auto;
 }
-.pp-teaser-title{font-size:13px; font-weight:700; color:var(--navy); margin-bottom:12px; display:flex; align-items:center; justify-content:space-between;}
+.pp-teaser-title{font-size:13px; font-weight:700; color:var(--navy); margin-bottom:10px; display:flex; align-items:center; justify-content:space-between;}
 .pp-lock{font-size:11px; background:#fef3c7; color:#92400e; padding:3px 8px; border-radius:99px; font-weight:700;}
+/* One free insight: the single unblurred domain row (real data, real c/t). */
+.pp-insight{margin-bottom:12px; padding-bottom:12px; border-bottom:1px dashed var(--line);}
+.pp-insight-label{font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#b45309; margin-bottom:8px;}
+.pp-insight-label.strong{color:#0d9d6c;}
+.pp-insight .pp-teaser-row{margin-bottom:0;}
+.pp-insight-note{font-size:11.5px; color:var(--mut); margin-top:6px;}
+/* The locked remainder of the breakdown: blur + overlay live in their own
+   wrapper so the free insight above stays fully visible. */
+.pp-teaser-locked{position:relative; border-radius:10px; overflow:hidden; min-height:46px;}
 .pp-teaser-blur{filter:blur(6px); opacity:.7; pointer-events:none; user-select:none;}
 .pp-teaser-row{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
 .pp-teaser-row:last-child{margin-bottom:0;}
@@ -198,12 +207,12 @@ body{
   background:rgba(255,253,248,.55); text-align:center; padding:0 24px;
 }
 ul.pp-feats{
-  list-style:none; margin:0 0 22px; padding:0; text-align:left;
+  list-style:none; margin:0 0 18px; padding:0; text-align:left;
   max-width:380px; margin-left:auto; margin-right:auto;
 }
 ul.pp-feats li{
   font-size:14px; color:var(--ink); line-height:1.45;
-  padding:7px 0; display:flex; gap:10px; align-items:flex-start;
+  padding:6px 0; display:flex; gap:10px; align-items:flex-start;
 }
 .pp-check{
   flex:none; width:22px; height:22px; border-radius:99px;
@@ -211,10 +220,20 @@ ul.pp-feats li{
   display:flex; align-items:center; justify-content:center; margin-top:1px;
 }
 .pp-cta{
-  font-size:17px; padding:16px 32px; width:100%; max-width:380px;
+  font-size:17px; padding:14px 28px; width:100%; max-width:380px;
   margin:0 auto; display:block;
 }
-.pp-fine{font-size:12px; color:var(--mut); margin-top:12px;}
+.pp-fine{font-size:12px; color:var(--mut); margin-top:10px;}
+/* Checkout reassurance: matches the hybrid Payhip flow (account auto-created). */
+.pp-autoacct{font-size:12.5px; color:var(--mut); margin-top:6px;}
+/* Visible free exit — same dismiss-to-free-tier contract as the paywall ✕. */
+.pp-notnow{
+  display:block; margin:12px auto 0; padding:6px 10px;
+  background:none; border:none; cursor:pointer;
+  font-size:13.5px; font-weight:600; color:var(--mut);
+  text-decoration:underline; text-underline-offset:3px;
+}
+.pp-notnow:hover{color:var(--navy);}
 /* legacy: retired gradient banner (kept selector harmless) */
 .upgrade-banner{display:none !important;}
 /* ---------- mascot idle wiggle ---------- */
@@ -5453,38 +5472,77 @@ function finishExam(expired){
          visual teaser of the domain breakdown, one clear CTA. */
       const up=document.createElement("div");
       up.className="upgradecard pro-pitch";
-      /* Build a teaser domain breakdown from their actual answers — blurred */
-      const teaserDoms = Object.keys(doms).slice(0, 3).map(d => {
+      /* ONE free insight (2026-10-22): show ONE real domain row unblurred —
+         the domain where they lost the most points in this taste (their
+         strongest if they missed nothing) — and keep the rest of the
+         breakdown blurred behind Pro. Every number comes straight from
+         `doms`, i.e. their actual answers. Nothing is invented: the row
+         carries its real c/t so the tiny sample stays honest. */
+      const domRows = Object.keys(doms).map(d => {
         const t = doms[d].t, c = doms[d].c;
-        const p = t > 0 ? Math.round(c / t * 100) : 0;
-        return { name: d, pct: p };
-      });
-      let teaserBars = "";
-      teaserDoms.forEach(td => {
-        teaserBars += '<div class="pp-teaser-row"><span class="pp-teaser-name">' + escapeHtml(td.name) + '</span>' +
-          '<div class="pp-teaser-bar"><div style="width:' + td.pct + '%"></div></div>' +
-          '<span class="pp-teaser-pct">' + td.pct + '%</span></div>';
-      });
+        return { name: d, t: t, c: c, missed: t - c, pct: t > 0 ? Math.round(c / t * 100) : 0 };
+      }).filter(r => r.t > 0);
+      const totalMissed = domRows.reduce((s, r) => s + r.missed, 0);
+      let featured = null, featuredLabel = "", featuredStrong = false;
+      if(domRows.length && totalMissed > 0){
+        featured = domRows.slice().sort((a, b) => (b.missed - a.missed) || (a.pct - b.pct) || (b.t - a.t))[0];
+        featuredLabel = "Where you lost points";
+      } else if(domRows.length){
+        featured = domRows.slice().sort((a, b) => (b.pct - a.pct) || (b.t - a.t))[0];
+        featuredLabel = "Your strongest so far"; featuredStrong = true;
+      }
+      const teaserRow = (r, barCol) =>
+        '<div class="pp-teaser-row"><span class="pp-teaser-name">' + escapeHtml(r.name) + '</span>' +
+        '<div class="pp-teaser-bar"><div style="width:' + r.pct + '%' + (barCol ? ';background:' + barCol : '') + '"></div></div>' +
+        '<span class="pp-teaser-pct">' + r.pct + '%</span></div>';
+      let insightHtml = "";
+      if(featured){
+        const barCol = featured.pct >= 85 ? "#0d9d6c" : (featured.pct >= passMark ? "#c77408" : "#d63a3a");
+        insightHtml =
+          '<div class="pp-insight"><div class="pp-insight-label' + (featuredStrong ? ' strong' : '') + '">' + featuredLabel + '</div>' +
+          teaserRow(featured, barCol) +
+          '<div class="pp-insight-note">' + featured.c + ' of ' + featured.t + ' correct in this taste</div></div>';
+      }
+      let blurredBars = "";
+      domRows.filter(r => r !== featured).slice(0, 3).forEach(r => { blurredBars += teaserRow(r); });
+      /* Progress line pairs the taste with the exam's real pass standard,
+         taken from EXAM_FORMATS only (raw-% pass where the sim defines one;
+         NCLEX defines none — its standard is the adaptive engine's). */
+      const fmt = EXAM_FORMATS[S.exam.slug];
+      let passNote = "";
+      if(fmt && fmt.pass != null) passNote = ' · Pass standard: <b>' + fmt.pass + '%</b>';
+      else if(fmt && fmt.types && fmt.types.indexOf("cat") !== -1) passNote = ' · Adaptive passing standard';
       up.innerHTML =
-        '<div class="pp-mascot"><span class="mascot-slot floaty">' + mascotSVG("excited", 72) + '</span></div>' +
+        '<div class="pp-mascot"><span class="mascot-slot floaty">' + mascotSVG("excited", 60) + '</span></div>' +
         '<div class="pp-head">You just scratched the surface</div>' +
         '<div class="pp-sub">That was ' + CONFIG.PRACTICE_COUNT + ' questions out of ' + QCOUNT_DISPLAY_TXT + '. Here\'s what Pro unlocks for ' + curExam.code + ':</div>' +
         '<div class="pp-progress"><div class="pp-progress-track"><div class="pp-progress-fill"></div></div>' +
-        '<div class="pp-progress-label"><b>' + CONFIG.PRACTICE_COUNT + '</b> of <b>' + QCOUNT_DISPLAY_TXT + '</b> questions tried</div></div>' +
+        '<div class="pp-progress-label"><b>' + CONFIG.PRACTICE_COUNT + '</b> of <b>' + QCOUNT_DISPLAY_TXT + '</b> questions tried' + passNote + '</div></div>' +
         '<div class="pp-teaser"><div class="pp-teaser-title">Your domain breakdown <span class="pp-lock">🔒 Pro</span></div>' +
-        '<div class="pp-teaser-blur">' + teaserBars + '</div>' +
-        '<div class="pp-teaser-overlay">Unlock Pro to see exactly what to study next</div></div>' +
+        insightHtml +
+        '<div class="pp-teaser-locked"><div class="pp-teaser-blur">' + blurredBars + '</div>' +
+        '<div class="pp-teaser-overlay">Unlock Pro to see exactly what to study next</div></div></div>' +
         '<ul class="pp-feats">' +
         '<li><span class="pp-check">✓</span> 19,000 questions — 1,000 per exam, matched to the real test</li>' +
-        '<li><span class="pp-check">✓</span> True test-day simulations — timing, format, adaptive NCLEX, kubectl terminal</li>' +
-        '<li><span class="pp-check">✓</span> Know exactly what to study — domain breakdowns pinpoint weak spots</li>' +
-        '<li><span class="pp-check">✓</span> Know when you are ready — readiness prediction + custom quiz builder</li>' +
+        '<li><span class="pp-check">✓</span> More than multiple choice — hands-on terminal tasks and adaptive NCLEX exams</li>' +
+        '<li><span class="pp-check">✓</span> Know exactly what to study — domain breakdowns pinpoint your weak spots</li>' +
+        '<li><span class="pp-check">✓</span> Know when you\'re ready — readiness prediction and a custom quiz builder</li>' +
         '</ul>' +
         '<button class="btn pp-cta" id="ub-go">Unlock Pro — ' + CONFIG.PRICE + ' one-time · all 19 exams</button>' +
-        '<div class="pp-fine">One payment for all 19 exams · Yours forever · No subscription, ever</div>';
+        '<div class="pp-fine">One payment for all 19 exams · Yours forever · No subscription, ever</div>' +
+        '<div class="pp-autoacct">Your Pro account is created automatically at checkout — just check your inbox.</div>' +
+        '<button class="pp-notnow" id="ub-notnow">Not now — keep exploring the free tier</button>';
       upSlot.appendChild(up);
       const go=$("ub-go");
       if(go) go.addEventListener("click",openPaywall);
+      /* Visible free exit: same contract as the paywall ✕ — dismiss the
+         pitch, land on the free tier, never navigate anywhere. */
+      const nn=$("ub-notnow");
+      if(nn) nn.addEventListener("click",()=>{
+        up.remove();
+        const rs=$("screen-results");
+        if(rs) rs.scrollIntoView({behavior:"smooth", block:"start"});
+      });
       /* Animate the "5 of 1,000" progress bar — the visual gap sells Pro */
       requestAnimationFrame(()=>{ requestAnimationFrame(()=>{
         const fill = up.querySelector(".pp-progress-fill");
