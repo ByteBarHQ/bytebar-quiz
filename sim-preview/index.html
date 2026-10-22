@@ -1557,6 +1557,11 @@ button:active{transform:scale(.97);}
    Transform-only keyframes on the existing v3 figure; every move
    plays exactly once per screen appearance, then Pip settles. */
 .pipblock{display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; margin:6px 0 12px;}
+/* Phase B: readiness meter on exam cards + Pip greeting actions */
+.rmeter{display:block; height:6px; border-radius:99px; background:#edf1f8; overflow:hidden; margin-top:10px;}
+.rmeter-fill{display:block; height:100%; border-radius:99px; background:var(--acc,#0b8fc4); transition:width .9s cubic-bezier(.2,.7,.2,1);}
+.rmeter-txt{display:block; font-size:12px; font-weight:700; color:var(--mut); margin-top:6px;}
+.pip-actions{display:flex; gap:10px; justify-content:center; margin:0 0 14px; flex-wrap:wrap;}
 .pipfig{display:inline-flex; line-height:0;}
 .pipfig svg{display:block; height:auto;}
 .pipline{font-size:15.5px; font-weight:700; color:var(--ink); margin:0; max-width:430px; text-wrap:balance;}
@@ -1766,6 +1771,8 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
   <div class="wrap">
     <div id="resume-slot"></div>
     <div id="streak-slot"></div>
+    <div class="pipblock hidden" id="pip-greet"></div>
+    <div class="pip-actions hidden" id="pip-greet-actions"></div>
     <div class="hero hero-new">
       <div class="hero-stage">
         <div class="hero-orbs" aria-hidden="true"><span class="orb o1"></span><span class="orb o2"></span><span class="orb o3"></span></div>
@@ -2037,10 +2044,39 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
         <ul id="sim-feats"><li>Exam-realistic questions · timer · auto-submit</li><li>Domain-level score report &amp; readiness prediction</li><li>Custom quiz builder — your domains, your rules</li><li>Performance analytics &amp; study plan</li></ul>
         <div class="price">$9.99 <small>one-time · all 19 exams</small></div>
       </button>
+      <button class="modecard hidden" id="mode-deck">
+        <span class="mchip" style="--mc:#e8f1fd;">🗂</span>
+        <h3>Your Misses</h3>
+        <p>Questions that beat you, saved for a rematch. Answer each one right twice to clear it from the deck.</p>
+        <ul><li id="deck-count-line">Nothing saved right now</li><li>Explanation after every answer</li><li>Progress saves as you go</li></ul>
+        <div class="price" id="deck-price">Saved by your account</div>
+      </button>
     </div>
     <div class="trustchips">
       <div class="tchip">🔒 Secure checkout</div>
       <div class="tchip">✓ One-time payment, no subscription</div>
+    </div>
+  </div>
+  <div class="foot"><div class="wm">B Y T E B A R</div><span>← bytebarhq.com</span></div>
+</div>
+
+<!-- ================= MISSES DECK (Phase B) ================= -->
+<div id="screen-deck" class="hidden">
+  <div class="topbar"><div class="inner">
+    <div><div class="brandmark">B Y T E B A R</div></div>
+    <div class="brandsub">Exam Simulator</div>
+    <div class="spacer"></div>
+    <div class="probadge free">Misses deck</div>
+  </div></div>
+  <div class="wrap">
+    <button class="backlink" id="deck-back">← All exams</button>
+    <div class="hero" style="margin-bottom:22px;">
+      <h1 id="deck-title" style="font-size:30px;">Your misses</h1>
+      <p id="deck-sub"></p>
+    </div>
+    <div class="pipblock hidden" id="deck-pip"></div>
+    <div class="panel" style="max-width:640px;margin:0 auto;">
+      <div id="deck-body"></div>
     </div>
   </div>
   <div class="foot"><div class="wm">B Y T E B A R</div><span>← bytebarhq.com</span></div>
@@ -2218,6 +2254,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <h1 style="font-size:32px;">Your performance <span class="cy">analytics</span></h1>
       <p>Trends, weak spots, and a study plan — generated from every attempt you've logged.</p>
     </div>
+    <div class="pipblock hidden" id="dash-pip"></div>
     <div class="dashgrid" id="dash-stats"></div>
     <div id="dash-challenges"></div>
     <div class="panel">
@@ -4232,7 +4269,7 @@ const $ = id => document.getElementById(id);
 const REDUCED = () => window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 function show(id){
   ["screen-home","screen-modes","screen-brief","screen-exam","screen-results",
-   "screen-dashboard","screen-profile","screen-builder"].forEach(s=>{
+   "screen-dashboard","screen-profile","screen-builder","screen-deck"].forEach(s=>{
     const el=$(s), on=(s===id);
     el.classList.toggle("hidden", !on);
     if(on && !REDUCED()){ el.classList.remove("screen-enter"); void el.offsetWidth; el.classList.add("screen-enter"); }
@@ -4713,6 +4750,7 @@ function renderHome(){
   refreshBadges();
   refreshAccount();
   const pro = isPro();
+  const homeRec=userRec();
   const g=$("examgrid"); g.innerHTML="";
   let idx=0;
   CATEGORIES.forEach(([catSlug,catLabel])=>{
@@ -4728,11 +4766,24 @@ function renderHome(){
         : '<span class="freetag">✦ TRY FREE</span>';
       const term = e.terminal ? '<span class="termbadge">⌨ TERMINAL</span>' : '';
       const cbadge = e.badge ? '<span class="catbadge">⚡ '+e.badge+'</span>' : '';
+      /* Phase B readiness meter: signed-in users with evidence on this
+         exam get one quiet meter; below the evidence threshold the card
+         shows the not-enough-data line instead of a fake number. */
+      let rmeter="";
+      if(homeRec){
+        const det=readinessDetail(homeRec, e.slug);
+        if(det&&det.evidence>0){
+          rmeter = det.pct!=null
+            ? '<span class="rmeter"><span class="rmeter-fill" style="width:'+det.pct+'%"></span></span><span class="rmeter-txt">Readiness '+det.pct+'%</span>'
+            : '<span class="rmeter-txt">Take a practice run to start your readiness</span>';
+        }
+      }
       d.innerHTML =
         tag+
         '<span class="erow"><span class="eicon">'+(ICONS[e.slug]||"")+'</span><span class="ecode">'+e.code+'</span>'+term+cbadge+'</span>'+
         '<span class="ename">'+e.name+'</span>'+
         '<span class="etag">'+e.tagline+'</span>'+
+        rmeter+
         '<span class="meta"><span class="qcount">'+QCOUNT_DISPLAY+' Qs</span> '+(pro?"Timed simulation · Score report":"10-question taste · free")+'</span>';
       d.addEventListener("click",()=>examCardClick(e.slug));
       g.appendChild(d);
@@ -4741,6 +4792,7 @@ function renderHome(){
   });
   renderResumeBanner();
   renderStreakBanner();
+  renderPipHome();
   show("screen-home");
 }
 
@@ -4826,6 +4878,7 @@ function renderModes(slug){
     fl.innerHTML=items.map(t=>"<li>"+t+"</li>").join("");
   }
   if(sp && fmt.types.indexOf("cat")===-1) sp.textContent="The "+QCOUNT_DISPLAY_TXT+"-question bank under real "+curExam.code+" conditions. This is the closest thing to test day.";
+  updateDeckCard(slug);
   refreshBadges();
   show("screen-modes");
 }
@@ -5257,7 +5310,7 @@ function renderExamChrome(){
     paintTrack(); return;
   }
   $("palsub").textContent = !isLiveMode() ? "Tap a number to jump" :
-    (S.mode==="custom" ? "Custom quiz · untimed" : "Practice mode");
+    (S.mode==="custom" ? "Custom quiz · untimed" : (S.mode==="deck" ? "Misses deck" : "Practice mode"));
   const g=$("palgrid"); g.innerHTML="";
   for(let i=0;i<n;i++){
     const b=document.createElement("button");
@@ -5366,6 +5419,7 @@ function renderQ(){
   }
   $("prevbtn").disabled=(S.idx===0||S.mode==="cat");
   $("nextbtn").textContent = S.mode==="cat" ? "Next →" : (S.idx===n-1 ? (!isLiveMode()?"Review →":"See results →") : "Next →");
+  if(S.mode==="deck"&&S.idx===n-1) $("nextbtn").textContent="Finish deck →";
   paintPalette();
 }
 /* ---------- multi-select (PBQ) ---------- */
@@ -5450,6 +5504,7 @@ function answerMS(q){
   q.__res=wasRight?"right":(partial?"partial":"wrong");
   q.__resScore=frac; q.__resPicked=picked;
   S.score+=frac;
+  deckOnAnswer(q, wasRight);
   showExplanationMS(q, wasRight, partial);
   opts.forEach(o=>o.disabled=true);
   const chk=$("ms-check"); if(chk) chk.disabled=true;
@@ -5547,6 +5602,7 @@ function termReveal(){
   termDone(q,false); saveResume();
 }
 function termDone(q, wasRight){
+  deckOnAnswer(q, wasRight);
   const inp=$("terminput"); if(inp) inp.disabled=true;
   const sb=$("termsubmit"); if(sb) sb.disabled=true;
   const rv=$("termreveal"); if(rv) rv.disabled=true;
@@ -5590,6 +5646,7 @@ function answer(i,btn){
     }
     if(!wasRight){ btn.classList.add("wrong"); S.misses.push({q, picked:i}); q.__res="wrong"; }
     else { S.score++; q.__res="right"; }
+    deckOnAnswer(q, wasRight);
     showExplanation(q, wasRight);
     [...opts].forEach(o=>o.disabled=true);
     buddyOnAnswer(wasRight);
@@ -5629,11 +5686,13 @@ $("flagbtn").addEventListener("click",()=>{
 $("prevbtn").addEventListener("click",()=>{ if(S&&S.mode==="cat") return; if(S.idx>0){S.idx--; S.answered=false; renderQ(); saveResume();} });
 $("nextbtn").addEventListener("click",()=>{
   if(S&&S.mode==="cat"){ catNext(); return; }
+  if(S&&S.mode==="deck"&&S.idx>=S.bank.length-1){ deckComplete(); return; }
   if(S.idx<S.bank.length-1){ S.idx++; S.answered=false; renderQ(); saveResume(); }
   else if(!isLiveMode()){ showReview(); }
   else finishExam(false);
 });
 $("endbtn").addEventListener("click",()=>{
+  if(S&&S.mode==="deck"){ deckComplete(); return; }
   if(isLiveMode()){ finishExam(false); return; }
   const un=S.answers.filter(a=>a===null).length;
   const fl=S.flags.filter(Boolean).length;
@@ -6119,8 +6178,24 @@ function finishExam(expired){
   if(nudge) nudge.innerHTML="";
   if(currentUser()){
     const r0=userRec(), xpBefore=r0?r0.xp:0, lvlBefore=levelFor(xpBefore).name;
+    const detBefore=r0?readinessDetail(r0, S.exam.slug):null;
     const rec=recordAttempt({slug:S.exam.slug, mode:S.mode, pct, score, n, domains:doms,
       timeLeftSec, sataTotal:sataT, sataCorrect:sataC, elapsedSec:secs});
+    /* Phase B: feed the misses deck from this run's own misses list, and
+       track the 80% readiness crossing (fires once per crossing — the Pip
+       milestone block itself renders on home/dashboard, never stacked on
+       this results screen's own Pip block). */
+    deckAddMisses(S.exam.slug, misses);
+    { const r2=userRec();
+      if(r2){
+        const detA=readinessDetail(r2, S.exam.slug);
+        r2.readySeen=r2.readySeen||{}; r2.readyPending=r2.readyPending||{};
+        if(detA.pct!=null&&detA.pct>=80){
+          if(!(detBefore&&detBefore.pct!=null&&detBefore.pct>=80)&&!r2.readySeen[S.exam.slug]) r2.readyPending[S.exam.slug]=true;
+          r2.readySeen[S.exam.slug]=true;
+        } else if(detA.pct!=null){ r2.readySeen[S.exam.slug]=false; }
+        saveUserRec(r2);
+      } }
     const r1=userRec(), lvlAfter=r1?levelFor(r1.xp).name:lvlBefore;
     renderReadinessPanel(S.exam.slug);
     const gained=rec?rec.gained:0, xpLine=$("res-xpline");
@@ -6215,6 +6290,11 @@ function migrateRec(r){
   if(r.challengeWeek==null) r.challengeWeek="";
   if(!r.challenges) r.challenges={sims80:0,questions:0,days:0};
   if(!Array.isArray(r.challengesDone)) r.challengesDone=[];
+  /* Phase B (2026-10-22): misses deck + readiness milestone state. */
+  if(!r.missDeck) r.missDeck={};
+  if(!r.deckHad) r.deckHad={};
+  if(!r.readySeen) r.readySeen={};
+  if(!r.readyPending) r.readyPending={};
 }
 function validUsername(u){ return /^[a-zA-Z0-9_.-]{3,20}$/.test(u||""); }
 
@@ -6538,14 +6618,11 @@ function awardBadge(r,id){
   return true;
 }
 /* Readiness computed from the live record (not storage) so the current
-   attempt counts toward the Test-Day Ready badge. */
+   attempt counts toward the Test-Day Ready badge. Delegates to the Phase B
+   detail computation (single source of truth — see readinessDetail). */
 function readinessOf(r, slug){
-  const atts=r.attempts.filter(a=>a.slug===slug);
-  if(!atts.length) return 0;
-  const rev=atts.slice(-3).reverse(), w=[0.5,0.3,0.2];
-  let acc=0, ws=0;
-  rev.forEach((a,i)=>{ acc+=a.pct*(w[i]||0.1); ws+=(w[i]||0.1); });
-  return Math.min(99, Math.round(acc/ws));
+  const det=readinessDetail(r, slug);
+  return det.pct||0;
 }
 function checkBadges(r, o){
   /* o: {slug, mode, pct, prevBest, timeLeftSec, sataTotal, sataCorrect, domains}
@@ -6636,6 +6713,7 @@ function resumeKey(){ const u=currentUser(); return u?("bb_resume_"+u):"bb_resum
 function saveResume(){
   if(!S||S.submitted) return;
   if(S.mode==="cat") return; /* CAT sessions are forward-only; finish in one sitting */
+  if(S.mode==="deck") return; /* deck progress saves per-answer in the deck store, never as a resume */
   try{
     const data={mode:S.mode, slug:S.exam.slug, idx:S.idx, t0:S.t0, score:S.score,
       misses:S.misses, answers:S.answers||null, flags:S.flags||null, strikes:S.strikes||null, timed:!!S.timed,
@@ -6684,29 +6762,34 @@ function readiness(slug){
   const r=userRec(); if(!r) return null;
   const atts=r.attempts.filter(a=>a.slug===slug);
   if(!atts.length) return null;
-  const rev=atts.slice(-3).reverse(), w=[0.5,0.3,0.2];
-  let acc=0, ws=0;
-  rev.forEach((a,i)=>{ acc+=a.pct*(w[i]||0.1); ws+=(w[i]||0.1); });
-  let score=Math.round(acc/ws);
-  const latest=atts[atts.length-1];
-  let weak=null;
-  Object.keys(latest.domains||{}).forEach(d=>{
-    const s=latest.domains[d], p=Math.round(s.c/s.t*100);
-    if(!weak||p<weak.p) weak={d,p};
-  });
+  const det=readinessDetail(r, slug);
   const pm=passPct(slug);
-  if(weak&&weak.p<pm) score=Math.max(0,score-8); // domain under the pass mark drags readiness
-  score=Math.min(99,score);
+  if(det.pct==null){
+    return {nodata:true, n:atts.length, evidence:det.evidence,
+      conf: "Not enough data yet — "+det.evidence+" question"+(det.evidence===1?"":"s")+" logged for this exam. Your readiness number appears after 20+ questions spread across its domains."};
+  }
+  const score=det.pct;
   const verdict = score>=85 ? "Likely to pass" : score>=pm ? "Borderline" : "Not yet";
   const color = score>=85 ? "var(--green)" : score>=pm ? "var(--amber)" : "var(--red)";
   return {score, verdict, color, n:atts.length,
-    conf: "Based on "+atts.length+" logged attempt"+(atts.length>1?"s":"")+" for "+slug.toUpperCase()+". Aim for 85%+ with no domain under "+pm+"%."};
+    conf: "Based on "+atts.length+" logged attempt"+(atts.length>1?"s":"")+" · "+det.covered+" of "+det.domains+" domains covered"+
+      (det.weakest?(" · weakest: "+det.weakest.d+" at "+det.weakest.p+"%"):"")+
+      ". Aim for 85%+ with no domain under "+pm+"%."};
 }
 function renderReadinessPanel(slug){
   const box=$("res-readiness"); if(!box) return;
   const rd=readiness(slug);
   if(!rd || !isPro()){ box.classList.add("hidden"); return; }
   box.classList.remove("hidden");
+  if(rd.nodata){
+    $("res-rrpct").textContent="–";
+    $("res-rverdict").textContent="Not enough data yet";
+    $("res-rverdict").style.color="var(--mut)";
+    $("res-rconf").textContent=rd.conf;
+    const nb=$("res-rbar"); if(nb) nb.style.width="0%";
+    const nr=$("res-rringfg"); if(nr){ nr.style.strokeDashoffset=194.8; }
+    return;
+  }
   const bar=$("res-rbar");
   bar.style.width="0%"; bar.style.background=rd.color;
   const C=194.8, ring=$("res-rringfg");
@@ -6723,6 +6806,229 @@ function renderReadinessPanel(slug){
 }
 
 /* ============================================================
+   PHASE B — READINESS DETAIL, PIP GREETING/MILESTONE, MISSES DECK
+   (2026-10-22, Cori approved lines from the Pip voice guide only.)
+
+   Readiness formula (defensible by construction):
+   - Inputs: the account record's stored attempts for the exam. Each
+     attempt carries per-domain {t, c} (fractional c allowed since A2).
+   - Per-domain mastery = recency-weighted accuracy over the last 12
+     stored attempts (newest attempt weighs 1, each older one 0.85x):
+     mastery_d = SUM(w * c) / SUM(w * t). Recent form counts most.
+   - Base = mean of mastery over ALL of the exam's domains (the build's
+     domain list). A domain never attempted counts 0 — so the number
+     rewards coverage exactly as much as it rewards accuracy.
+   - Volume: evidence E = total questions logged for the exam. Below
+     E = 20 there is NO number (not-enough-data state) — a percentage
+     invented from five questions would be a fake. At/above threshold,
+     a confidence factor (0.6 + 0.4 * min(1, E/100)) scales the base:
+     full weight only once 100 questions back it.
+   - readiness = round(100 * base * confidence), capped 0..99.
+   ============================================================ */
+function readinessDetail(r, slug){
+  const empty={pct:null, evidence:0, covered:0, domains:0, weakest:null, mastery:{}};
+  if(!r) return empty;
+  const exam=EXAMS.find(e=>e.slug===slug);
+  const domSet=exam?(exam.domains||[]):[];
+  const atts=(r.attempts||[]).filter(a=>a.slug===slug);
+  if(!atts.length) return Object.assign({}, empty, {domains:domSet.length});
+  let evidence=0;
+  atts.forEach(a=>{ Object.keys(a.domains||{}).forEach(d=>{ evidence+= (+((a.domains[d]||{}).t)||0); }); });
+  const wAgg={};
+  atts.slice(-12).reverse().forEach((a,i)=>{
+    const w=Math.pow(0.85,i);
+    Object.keys(a.domains||{}).forEach(d=>{
+      const s=a.domains[d]; if(!s||!s.t) return;
+      const g=wAgg[d]=wAgg[d]||{wc:0,wt:0};
+      g.wc+=w*(+s.c||0); g.wt+=w*(+s.t||0);
+    });
+  });
+  const doms=domSet.length?domSet:Object.keys(wAgg);
+  const mastery={}; let sum=0, weakest=null, covered=0;
+  doms.forEach(d=>{
+    const g=wAgg[d];
+    const m=(g&&g.wt)?(g.wc/g.wt):0;
+    mastery[d]=m;
+    if(g){ covered++; sum+=m; if(!weakest||m<weakest.m) weakest={d:d, m:m, p:Math.round(m*100)}; }
+  });
+  if(evidence<20||!doms.length) return {pct:null, evidence:evidence, covered:covered, domains:doms.length, weakest:weakest, mastery:mastery};
+  const base=sum/doms.length;
+  const conf=0.6+0.4*Math.min(1, evidence/100);
+  const pct=Math.max(0, Math.min(99, Math.round(100*base*conf)));
+  return {pct:pct, evidence:evidence, covered:covered, domains:doms.length, weakest:weakest, mastery:mastery};
+}
+
+/* Pip on home/dashboard: milestone first (fires once per crossing into
+   >=80, queued by finishExam), else the return greeting built ONLY from
+   the voice guide's approved template (real readiness % + exam + weakest
+   domain). The path forward rides as a plain UI button under the block —
+   never as improvised Pip copy. */
+function renderPipHome(){
+  const blocks=[$("pip-greet"), $("dash-pip")];
+  const actEl=$("pip-greet-actions");
+  const clearAll=()=>{ blocks.forEach(el=>{ if(el){ el.classList.add("hidden"); el.innerHTML=""; } });
+    if(actEl){ actEl.classList.add("hidden"); actEl.innerHTML=""; } };
+  const r=userRec(); if(!r){ clearAll(); return; }
+  r.readyPending=r.readyPending||{};
+  const pendSlug=Object.keys(r.readyPending).find(s=>r.readyPending[s]);
+  if(pendSlug){
+    delete r.readyPending[pendSlug]; saveUserRec(r);
+    blocks.forEach(el=>{ if(el) renderPipBlock(el,"cheering","80%. That's exam-ready territory.","pip-hop",64); });
+    if(actEl){ actEl.classList.add("hidden"); actEl.innerHTML=""; }
+    return;
+  }
+  const counts={}, lastD={};
+  (r.attempts||[]).forEach(a=>{ counts[a.slug]=(counts[a.slug]||0)+1; lastD[a.slug]=a.d||0; });
+  let bestSlug=null, bestN=-1, bestLast=-1;
+  Object.keys(counts).forEach(s=>{
+    if(counts[s]>bestN || (counts[s]===bestN && (lastD[s]||0)>bestLast)){ bestSlug=s; bestN=counts[s]; bestLast=lastD[s]||0; }
+  });
+  if(!bestSlug){ clearAll(); return; }
+  const det=readinessDetail(r, bestSlug);
+  const exam=EXAMS.find(e=>e.slug===bestSlug);
+  if(!det||det.pct==null||!det.weakest||!exam){ clearAll(); return; }
+  const line="Back again. You're at "+det.pct+"% on "+exam.name+" — "+det.weakest.d+" is the last gap.";
+  blocks.forEach(el=>{ if(el) renderPipBlock(el,"determined",line,"",64); });
+  if(actEl){
+    actEl.innerHTML=""; actEl.classList.remove("hidden");
+    const n=deckCount(bestSlug);
+    const b=document.createElement("button"); b.type="button"; b.className="btn ghost";
+    b.textContent=n?("Review your misses ("+n+") →"):("Practice "+exam.code+" →");
+    b.addEventListener("click",()=>{ if(n) renderDeck(bestSlug); else renderModes(bestSlug); });
+    actEl.appendChild(b);
+  }
+}
+
+/* ---------------- Misses deck ----------------
+   One store, unified with the run engine: finishExam's own misses list
+   feeds deckAddMisses for signed-in users; the same bank items (looked
+   up by a stable stem/task hash) are re-prepped for deck sessions.
+   A question leaves the deck after TWO correct deck answers (cumulative,
+   not necessarily consecutive — a partial SATA never counts). Clears
+   persist per answer, so leaving mid-session loses nothing. */
+function qKey(slug, q){
+  if(!q) return "";
+  return q.kind==="terminal" ? cyrb53(slug+"|T|"+(q.task||""), 11) : cyrb53(slug+"|Q|"+(q.q||""), 11);
+}
+function deckKeys(r, slug){ return Object.keys(((r&&r.missDeck)||{})[slug]||{}); }
+function deckCount(slug){ const r=userRec(); return r?deckKeys(r, slug).length:0; }
+function deckAddMisses(slug, misses){
+  const r=userRec(); if(!r||!misses||!misses.length) return 0;
+  r.missDeck=r.missDeck||{}; r.deckHad=r.deckHad||{};
+  const deck=r.missDeck[slug]=r.missDeck[slug]||{};
+  let added=0;
+  misses.forEach(m=>{
+    if(!m||!m.q) return;
+    const key=qKey(slug, m.q); if(!key) return;
+    if(!deck[key]){ deck[key]={c:0, t:Date.now()}; added++; }
+    else deck[key].t=Date.now();
+  });
+  if(Object.keys(deck).length) r.deckHad[slug]=true;
+  saveUserRec(r);
+  return added;
+}
+function deckMoveToEnd(r, slug, key){
+  const deck=(r.missDeck||{})[slug]; if(!deck||!deck[key]) return;
+  const v=deck[key]; delete deck[key]; deck[key]=v;
+}
+function deckOnAnswer(q, correct){
+  if(!S||S.mode!=="deck") return;
+  const r=userRec(); if(!r) return;
+  const slug=S.exam.slug, key=qKey(slug, q);
+  const deck=(r.missDeck||{})[slug]; if(!deck||!deck[key]) return;
+  if(S.deckStats) S.deckStats.seen++;
+  if(correct){
+    deck[key].c=(deck[key].c||0)+1;
+    if(deck[key].c>=2){ delete deck[key]; if(S.deckStats) S.deckStats.beaten++; }
+    else deckMoveToEnd(r, slug, key);
+  } else {
+    deck[key].t=Date.now();
+    deckMoveToEnd(r, slug, key);
+  }
+  saveUserRec(r);
+}
+function updateDeckCard(slug){
+  const card=$("mode-deck"); if(!card) return;
+  const r=userRec();
+  if(!r){ card.classList.add("hidden"); return; }
+  card.classList.remove("hidden");
+  const n=deckKeys(r, slug).length;
+  const line=$("deck-count-line");
+  if(line) line.textContent=n?(n+" saved question"+(n===1?"":"s")+" waiting"):"Nothing saved right now";
+  const price=$("deck-price");
+  if(price) price.textContent=(r.deckHad&&r.deckHad[slug]&&!n)?"Deck cleared 🎉":"Saved by your account";
+}
+function renderDeck(slug, stats){
+  const exam=EXAMS.find(e=>e.slug===slug); if(!exam) return;
+  curExam=exam;
+  const r=userRec(); if(!r){ openAuth(); return; }
+  $("deck-title").textContent=exam.name+" — your misses";
+  $("deck-sub").textContent=exam.code+" · beat each saved question twice to clear it";
+  const keys=deckKeys(r, slug);
+  const pip=$("deck-pip"), body=$("deck-body");
+  pip.classList.add("hidden"); pip.innerHTML="";
+  let html="";
+  if(stats&&stats.seen) html+='<p style="margin-top:0;">Session done — <b>'+stats.beaten+'</b> beaten this time, <b>'+keys.length+'</b> still saved.</p>';
+  if(!keys.length){
+    if(r.deckHad&&r.deckHad[slug]){
+      renderPipBlock(pip,"proud","Deck cleared. Every one of those used to beat you.","pip-hop",72);
+    } else {
+      renderPipBlock(pip,"happy","Nothing saved here. Go miss a few — I'll keep them safe.","pip-hop",72);
+    }
+    html+='<p>Nothing in this deck right now. Misses from any '+exam.code+' run land here automatically.</p>';
+  } else {
+    const inProg=keys.filter(k=>((r.missDeck[slug][k]||{}).c||0)>0).length;
+    html+='<p style="margin-top:0;"><b>'+keys.length+'</b> question'+(keys.length===1?"":"s")+' saved'+(inProg?(" · "+inProg+" one win from cleared"):"")+'.</p>'+
+      '<p>Sessions run up to 20 questions at a time, with the explanation after every answer. Progress saves as you go — leave whenever you like.</p>'+
+      '<button class="btn" id="deck-start" type="button">Start deck session</button>';
+  }
+  body.innerHTML=html;
+  const sb=$("deck-start"); if(sb) sb.addEventListener("click",()=>startDeck(slug));
+  show("screen-deck");
+}
+async function startDeck(slug){
+  const exam=EXAMS.find(e=>e.slug===slug); if(!exam) return;
+  const r=userRec(); if(!r){ openAuth(); return; }
+  const fmt=examFormat(slug);
+  const isTerm=fmt.types.indexOf("terminal")!==-1;
+  if(!isTerm){
+    try{ await ensureBank(slug); }catch(e){ if(window.BB&&BB.toast) BB.toast("Could not load questions — check your connection and try again."); return; }
+  }
+  const keys=deckKeys(r, slug);
+  const rawBank=BANKS[slug]||[];
+  const pbq=(typeof PBQ_QUESTIONS!=="undefined"&&PBQ_QUESTIONS[slug])||[];
+  const prepped=[];
+  for(const key of keys){
+    if(prepped.length>=20) break;
+    if(isTerm){
+      const raw=(TERMINAL_TASKS[slug]||[]).find(t=>qKey(slug,{kind:"terminal",task:t.task})===key);
+      if(raw) prepped.push(prepTerminal(raw));
+      continue;
+    }
+    let raw=rawBank.find(item=>qKey(slug,item)===key), fromPbq=false;
+    if(!raw){ raw=pbq.find(item=>qKey(slug,item)===key); fromPbq=!!raw; }
+    if(!raw) continue;
+    prepped.push(fromPbq?prepMS(raw):prepAny(raw));
+  }
+  if(!prepped.length){ r.missDeck[slug]={}; saveUserRec(r); renderDeck(slug); return; }
+  S={mode:"deck", exam:exam, bank:prepped, idx:0, score:0, misses:[],
+     answers:new Array(prepped.length).fill(null), flags:new Array(prepped.length).fill(false),
+     strikes:{}, answered:false, t0:Date.now(), deckStats:{seen:0, beaten:0}};
+  document.documentElement.style.setProperty("--qacc", exam.accent);
+  $("exam-label").textContent=exam.code; $("exam-sublabel").textContent="Misses deck · untimed review";
+  $("timer").style.display="none"; $("endbtn").textContent="End deck";
+  show("screen-exam"); renderExamChrome(); renderQ(); buddyInit();
+}
+function deckComplete(){
+  if(!S||S.mode!=="deck") return;
+  const slug=S.exam.slug, st=S.deckStats||{seen:0, beaten:0};
+  S=null;
+  renderDeck(slug, st.seen?st:null);
+}
+$("deck-back").addEventListener("click", renderHome);
+$("mode-deck").addEventListener("click", ()=>{ if(curExam) renderDeck(curExam.slug); });
+
+/* ============================================================
    DASHBOARD (Pro)
    ============================================================ */
 function renderDashboard(){
@@ -6730,6 +7036,7 @@ function renderDashboard(){
   if(!r){ openAuth(); return; }
   if(!isPro()){ openPaywall(); return; }
   refreshAccount();
+  renderPipHome();
   const atts=r.attempts, n=atts.length;
   const avg=n?Math.round(atts.slice(-10).reduce((a,x)=>a+x.pct,0)/Math.min(10,n)):0;
   const streak=dayStreak(r);
@@ -6840,6 +7147,7 @@ function renderDashboard(){
   rd.innerHTML = slugs.length ? slugs.map(s=>{
     const x=readiness(s), e=EXAMS.find(v=>v.slug===s);
     if(!x) return "";
+    if(x.nodata) return '<div class="rrow"><span class="rcode">'+e.code+'</span><div class="rbar"><div style="width:0%"></div></div><span class="rpct">—</span></div>';
     return '<div class="rrow"><span class="rcode">'+e.code+'</span><div class="rbar"><div style="width:'+x.score+'%;background:'+x.color+'"></div></div><span class="rpct" style="color:'+x.color+'">'+x.score+'%</span></div>';
   }).join("") : '<p class="psub">No exams attempted yet.</p>';
 
@@ -7028,7 +7336,7 @@ async function startCustom(){
   clearResume(); saveResume(); buddyInit();
 }
 /* custom mode helpers: timed custom behaves like sim, untimed like practice */
-function isLiveMode(){ return S && (S.mode==="practice" || (S.mode==="custom"&&!S.timed)); }
+function isLiveMode(){ return S && (S.mode==="practice" || S.mode==="deck" || (S.mode==="custom"&&!S.timed)); }
 
 /* ============================================================
    HOME REFRESH — scroll reveals, proof-bar counters, hero CTA
