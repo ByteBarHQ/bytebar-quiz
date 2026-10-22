@@ -336,6 +336,9 @@ ul.pp-feats li{
 .qcard{background:var(--card); border:1px solid var(--line); border-radius:20px; padding:30px 30px 26px; box-shadow:var(--shadow);}
 .qhead{display:flex; align-items:center; gap:10px; margin-bottom:16px;}
 .qnum{font-size:12.5px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--mut);}
+/* Domain name lives on its own small line under the question header
+   (fix 2026-10-22) — inside .qnum it ballooned the header ~5 lines on NCLEX. */
+.qdomain{font-size:12px; font-weight:600; color:var(--mut); margin:-8px 0 12px; overflow-wrap:break-word;}
 .flagbtn{margin-left:auto; background:var(--bg); border:1px solid var(--line); border-radius:9px; font-size:13px; font-weight:700; color:var(--mut); padding:7px 13px; cursor:pointer; font-family:inherit;}
 .flagbtn.on{background:var(--amber-soft); border-color:#f3d9a8; color:var(--gold);}
 .qtext{font-size:19px; line-height:1.55; font-weight:600; margin:0 0 20px; letter-spacing:-.005em;}
@@ -397,9 +400,15 @@ ul.pp-feats li{
 .resmeta .v{font-weight:750; font-variant-numeric:tabular-nums;}
 .domains{margin-top:8px; text-align:left;}
 .domrow{margin:0 0 16px;}
-.domrow .dl{display:flex; justify-content:space-between; font-size:14px; margin-bottom:7px; gap:10px;}
+.domrow .dl{display:flex; align-items:center; font-size:14px; margin-bottom:7px;}
 .domrow .dn{font-weight:700;}
 .domrow .dp{font-weight:800; font-variant-numeric:tabular-nums;}
+/* Domain rows (fix 2026-10-22): the name owns a full-width line (wraps,
+   never squeezed by the stats cluster); bar + stats ride the line below —
+   same shape as the paywall card's featured row. */
+.domrow .dstats{display:flex; align-items:center; gap:10px;}
+.domrow .dstats .dbar{flex:1; min-width:60px;}
+.domrow .dstat{flex:none; white-space:nowrap;}
 .dbar{height:11px; background:#edf1f8; border-radius:99px; overflow:hidden;}
 .dbar > div{height:100%; border-radius:99px; transition:width .8s cubic-bezier(.2,.7,.2,1);}
 .domtag{font-size:11.5px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; margin-left:8px;}
@@ -1138,6 +1147,14 @@ button:active{transform:scale(.97);}
   font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; font-size:13.5px; padding:6px 2px;}
 #terminput::placeholder{color:#475569;}
 #terminput:disabled{opacity:.45;}
+/* Narrow screens (fix 2026-10-22): stack the prompt above the input — the
+   fixed "candidate@cluster:~$" prompt alone left ~98px of input at 360px
+   and clipped the placeholder mid-sentence. Stacked, the input gets the
+   full terminal width (~262px at 360px). */
+@media(max-width:480px){
+  .termline{flex-wrap:wrap;}
+  .termline .tprompt{flex:1 1 100%;}
+}
 #termhint .thint{margin-top:10px; font-size:13.5px; background:var(--amber-soft); border:1px solid #f3d9a8;
   color:#7a4a06; border-radius:10px; padding:10px 14px; line-height:1.5;}
 .termrow{display:flex; gap:10px; margin-top:12px; flex-wrap:wrap;}
@@ -1886,7 +1903,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <table class="compare">
         <tr><th></th><th>ByteBar Pro</th><th>Free quizzes</th></tr>
         <tr class="hl"><td>Full access — all 19 exams, one price</td><td class="y">✓</td><td class="n">5-question taste each</td></tr>
-        <tr class="hl"><td>Full 100-question timed simulations</td><td class="y">✓</td><td class="n">–</td></tr>
+        <tr class="hl"><td>Full timed simulations at real exam length</td><td class="y">✓</td><td class="n">–</td></tr>
         <tr><td>Hands-on terminal simulations (CKA/CKAD)</td><td class="y">✓</td><td class="n">–</td></tr>
         <tr><td>Explanation on every answer</td><td class="y">✓</td><td class="n">–</td></tr>
         <tr><td>Domain-level score analytics</td><td class="y">✓</td><td class="n">–</td></tr>
@@ -1960,7 +1977,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <div class="tchip">✓ One-time payment, no subscription</div>
     </div>
   </div>
-  <div class="foot"><div class="wm">B Y T E B A R</div><a href="https://bytebarhq.com" style="color:inherit; text-decoration:underline; text-underline-offset:3px">← bytebarhq.com</a></div>
+  <div class="foot"><div class="wm">B Y T E B A R</div><span>← bytebarhq.com</span></div>
 </div>
 
 <!-- ================= BRIEFING ================= -->
@@ -1978,7 +1995,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <p style="color:var(--mut); margin:0 0 14px; font-size:13.5px;" id="brief-note"></p>
       <div class="rule"><div class="ic">◷</div><div><b>Real exam timing.</b> The timer matches the vendor's actual exam and cannot be paused.</div></div>
       <div class="rule"><div class="ic">▦</div><div><b>Navigate freely.</b> Use the question palette to jump around, flag questions for review, and change answers before you finish.</div></div>
-      <div class="rule"><div class="ic">✓</div><div><b>Passing score: 70%.</b> You'll get a domain-by-domain breakdown showing exactly what to study next.</div></div>
+      <div class="rule"><div class="ic">✓</div><div><b id="brief-passmark">Passing score: 70%.</b> You'll get a domain-by-domain breakdown showing exactly what to study next.</div></div>
       <div class="warn"><span class="mascot-slot" data-mascot="nervous" data-size="46" style="float:left;margin:0 12px 4px 0;"></span><b>No pausing.</b> When the timer hits zero your exam auto-submits. Treat this like the real thing — that's the point.<div style="clear:both;"></div></div>
       <div class="btnrow">
         <button class="btn block" id="brief-start">Begin simulation</button>
@@ -2003,6 +2020,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
         <span class="qnum" id="qnum">Question 1</span>
         <button class="flagbtn" id="flagbtn">⚑ Flag for review</button>
       </div>
+      <div class="qdomain hidden" id="qdomain"></div>
       <div id="coachline" class="coachline"><span class="mascot" id="coachmascot"></span><span id="coachtext">Let's go — you've got this.</span></div>
       <p class="qtext" id="qtext"></p>
       <div id="opts"></div>
@@ -2072,7 +2090,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
           <div class="row"><span class="k">Correct</span><span class="v" id="res-correct">–</span></div>
           <div class="row"><span class="k">Best streak</span><span class="v" id="res-streak">–</span></div>
           <div class="row"><span class="k">Time used</span><span class="v" id="res-time">–</span></div>
-          <div class="row"><span class="k">Passing score</span><span class="v">70%</span></div>
+          <div class="row"><span class="k">Passing score</span><span class="v" id="res-passmark">70%</span></div>
           <div class="row"><span class="k">Result</span><span class="v" id="res-verdict-word">–</span></div>
         </div>
       </div>
@@ -2110,7 +2128,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     </div>
     <div id="res-upgrade"></div>
   </div></div>
-  <div class="foot"><div class="wm">B Y T E B A R</div><a href="https://bytebarhq.com" style="color:inherit; text-decoration:underline; text-underline-offset:3px">← bytebarhq.com</a></div>
+  <div class="foot"><div class="wm">B Y T E B A R</div><span>← bytebarhq.com</span></div>
 </div>
 
 <!-- ================= DASHBOARD (Pro) ================= -->
@@ -2151,7 +2169,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <div id="dash-ready"></div>
     </div>
   </div>
-  <div class="foot"><div class="wm">B Y T E B A R</div><a href="https://bytebarhq.com" style="color:inherit; text-decoration:underline; text-underline-offset:3px">← bytebarhq.com</a></div>
+  <div class="foot"><div class="wm">B Y T E B A R</div><span>← bytebarhq.com</span></div>
 </div>
 
 <!-- ================= PROFILE ================= -->
@@ -2188,7 +2206,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <div class="secttl">Your stats</div>
     <div class="dashgrid" id="profile-stats"></div>
   </div>
-  <div class="foot"><div class="wm">B Y T E B A R</div><a href="https://bytebarhq.com" style="color:inherit; text-decoration:underline; text-underline-offset:3px">← bytebarhq.com</a></div>
+  <div class="foot"><div class="wm">B Y T E B A R</div><span>← bytebarhq.com</span></div>
 </div>
 
 <!-- ================= QUIZ BUILDER (Pro) ================= -->
@@ -2234,7 +2252,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <div class="fineprint" id="builder-msg" style="min-height:20px;"></div>
     </div>
   </div>
-  <div class="foot"><div class="wm">B Y T E B A R</div><a href="https://bytebarhq.com" style="color:inherit; text-decoration:underline; text-underline-offset:3px">← bytebarhq.com</a></div>
+  <div class="foot"><div class="wm">B Y T E B A R</div><span>← bytebarhq.com</span></div>
 </div>
 
 <!-- ================= AUTH ================= -->
@@ -2389,7 +2407,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <div class="sbody">
       <ul class="feats">
         <li><span><b>19,000 exam-realistic questions</b> — 1,000 per exam across 19 certifications, matched to the real test's style and difficulty</span></li>
-        <li><span><b>True test-day simulations</b> — real timing, real format, real pressure. Adaptive NCLEX plus hands-on kubectl terminal for CKA/CKAD</span></li>
+        <li><span><b>True test-day simulations</b> — real timing, real format, real pressure. Hands-on terminal tasks and adaptive NCLEX exams</span></li>
         <li><span><b>Know exactly what to study</b> — domain-level score breakdowns after every attempt pinpoint your weak spots</span></li>
         <li><span><b>Learn from every question</b> — detailed explanations for right and wrong answers, so you understand the concept not just the answer</span></li>
         <li><span><b>Drill your weaknesses</b> — custom quiz builder targets the domains dragging your score down</span></li>
@@ -4783,6 +4801,16 @@ let timerId=null, deadline=0;
 function renderBrief(slug){
   curExam=EXAMS.find(e=>e.slug===slug);
   const fmt=examFormat(slug);
+  /* Passing rule shows THIS exam's real mark (fix 2026-10-22, same class as
+     the results res-passmark fix) — the hardcoded 70% was wrong for every
+     65–80 exam. Set here, before either branch shows the screen, so no
+     briefing path can ever display the static default. NCLEX publishes
+     no % at all: the CAT engine decides. */
+  const bp=$("brief-passmark");
+  if(bp){
+    const bf=EXAM_FORMATS[slug];
+    bp.textContent=(bf&&bf.pass!=null)?("Passing score: "+passPct(slug)+"%."):"Passing standard: adaptive (CAT).";
+  }
   if(fmt.types.indexOf("cat")!==-1){
     $("brief-title").textContent=curExam.code+" — adaptive simulation";
     $("brief-sub").textContent=curExam.name+" · 85–150 questions · up to 5 hours · "+formatLabel(fmt);
@@ -4966,7 +4994,11 @@ function paintPalette(){
 function renderQ(){
   const q=S.bank[S.idx], n=S.bank.length;
   const isTerm=q.kind==="terminal", isMS=q.kind==="ms";
-  $("qnum").textContent=(isTerm?"Task ":"Question ")+(S.idx+1)+" of "+n+(q.domain?" · "+q.domain:"");
+  $("qnum").textContent=(isTerm?"Task ":"Question ")+(S.idx+1)+" of "+n;
+  /* Domain rides its own small line under the header (fix 2026-10-22) —
+     appended to .qnum it wrapped ~5 lines on NCLEX and ballooned the header. */
+  const qd=$("qdomain");
+  if(qd){ qd.textContent=q.domain||""; qd.classList.toggle("hidden",!q.domain); }
   $("qtext").textContent=isTerm?q.task:q.q;
   const box=$("opts"); box.innerHTML=""; box.style.display=isTerm?"none":"";
   const tw=$("termwrap"); if(tw) tw.classList.toggle("hidden",!isTerm);
@@ -5283,6 +5315,9 @@ $("reviewov").addEventListener("click",e=>{ if(e.target.id==="reviewov") hideRev
 function finishExam(expired){
   clearInterval(timerId);
   clearResume();
+  /* Never stack CAT verdict banners across retakes (fix 2026-10-22): the
+     banner below is insert-only, so clear any previous one first. */
+  document.querySelectorAll(".catverdict").forEach(el=>el.remove());
   if(S) S.submitted=true; /* finished exams are never "live" — guards goHome + saveResume */
   const tm=$("timermascot"); if(tm) tm.classList.add("hidden");
   const n=S.bank.length;
@@ -5343,6 +5378,14 @@ function finishExam(expired){
   const rStreak=$("res-streak");
   if(rStreak) rStreak.textContent=(S.bestStreak>1)?S.bestStreak+" in a row 🔥":"—";
   $("res-time").textContent=used;
+  /* Passing-score row shows THIS exam's real mark (fix 2026-10-22) — the
+     hardcoded 70% contradicted the verdict for every 65–80 exam. CAT exams
+     (NCLEX) publish no % at all: the adaptive engine decides. */
+  const rPass=$("res-passmark");
+  if(rPass){
+    const fmt=EXAM_FORMATS[S.exam.slug];
+    rPass.textContent=(fmt&&fmt.pass!=null)?passMark+"%":"Adaptive standard";
+  }
   $("res-verdict-word").textContent=pass?"PASS":"Not yet";
   $("res-verdict-word").style.color=pass?"var(--green)":"var(--red)";
   const pf=$("res-passfail"); pf.textContent=pass?"✓ Pass":"✗ Not yet"; pf.className="passfail "+(pass?"pass":"fail");
@@ -5405,8 +5448,8 @@ function finishExam(expired){
     const solid=p>=85?"#0d9d6c":(p>=passMark?"#c77408":"#d63a3a");
     const tag=p>=85?'<span class="domtag s">Strength</span>':(p>=passMark?'<span class="domtag w">Shaky</span>':'<span class="domtag r">Study this</span>');
     const row=document.createElement("div"); row.className="domrow";
-    row.innerHTML='<div class="dl"><span class="dlgroup"><span class="wic" style="background:'+solid+'">'+TARGET_SVG+'</span><span class="dn"></span></span><span><span class="dp" style="color:'+col+'">'+p+'%</span> <span style="color:var(--mut);font-size:12.5px;">'+c+'/'+t+'</span>'+tag+'</span></div>'+
-      '<div class="dbar"><div style="width:0%;background:'+col+'"></div></div>';
+    row.innerHTML='<div class="dl"><span class="wic" style="background:'+solid+'">'+TARGET_SVG+'</span><span class="dn"></span></div>'+
+      '<div class="dstats"><div class="dbar"><div style="width:0%;background:'+col+'"></div></div><span class="dstat"><span class="dp" style="color:'+col+'">'+p+'%</span> <span style="color:var(--mut);font-size:12.5px;">'+c+'/'+t+'</span>'+tag+'</span></span></div>';
     row.querySelector(".dn").textContent=d;
     dw.appendChild(row);
     requestAnimationFrame(()=>{ row.querySelector(".dbar>div").style.width=p+"%"; });
