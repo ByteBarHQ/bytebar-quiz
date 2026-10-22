@@ -165,23 +165,17 @@ body{
   color:var(--navy); margin-bottom:6px;
 }
 .pp-sub{font-size:14px; color:var(--mut); line-height:1.5; margin-bottom:14px; max-width:420px; margin-left:auto; margin-right:auto;}
-.pp-progress{margin-bottom:16px;}
-.pp-progress-track{
-  height:10px; border-radius:99px; background:#e8e0d0;
-  overflow:hidden; max-width:320px; margin:0 auto 8px;
-}
-.pp-progress-fill{
-  height:100%; width:0.5%; border-radius:99px;
-  background:linear-gradient(90deg, var(--cyan), #0d9d6c);
-  transition:width 1.2s cubic-bezier(.2,.7,.2,1);
-}
+.pp-progress{margin-bottom:10px;}
 .pp-progress-label{font-size:13px; color:var(--mut);}
 .pp-progress-label b{color:var(--navy); font-size:15px;}
 .pp-teaser{
   position:relative; border-radius:14px; overflow:hidden;
   background:var(--bg); border:1px solid var(--line);
   padding:14px; margin-bottom:16px; text-align:left;
-  max-width:420px; margin-left:auto; margin-right:auto;
+  /* width:100% is load-bearing: as a flex item of the column card, an auto
+     width resolves to max-content (the nowrap rows' unwrapped names, capped
+     only by max-width) and bleeds past the card's right padding on phones. */
+  width:100%; max-width:420px; margin-left:auto; margin-right:auto;
 }
 .pp-teaser-title{font-size:13px; font-weight:700; color:var(--navy); margin-bottom:10px; display:flex; align-items:center; justify-content:space-between;}
 .pp-lock{font-size:11px; background:#fef3c7; color:#92400e; padding:3px 8px; border-radius:99px; font-weight:700;}
@@ -189,11 +183,16 @@ body{
 .pp-insight{margin-bottom:12px; padding-bottom:12px; border-bottom:1px dashed var(--line);}
 .pp-insight-label{font-size:11px; font-weight:800; letter-spacing:.06em; text-transform:uppercase; color:#b45309; margin-bottom:8px;}
 .pp-insight-label.strong{color:#0d9d6c;}
-.pp-insight .pp-teaser-row{margin-bottom:0;}
+/* Featured row: the name owns a full-width line (wraps, never ellipsizes),
+   then the bar on its own line with the % at its right end. */
+.pp-insight-name{font-size:13px; font-weight:700; color:var(--ink); line-height:1.35; margin-bottom:8px; overflow-wrap:break-word;}
+.pp-insight-meter{display:flex; align-items:center; gap:10px;}
+.pp-insight-meter .pp-teaser-bar{flex:1;}
 .pp-insight-note{font-size:11.5px; color:var(--mut); margin-top:6px;}
-/* The locked remainder of the breakdown: blur + overlay live in their own
-   wrapper so the free insight above stays fully visible. */
-.pp-teaser-locked{position:relative; border-radius:10px; overflow:hidden; min-height:46px;}
+/* The locked remainder of the breakdown: blur + unlock pill live in their
+   own wrapper so the free insight above stays fully visible. Height follows
+   the blurred rows — no min-height, so few-domain tastes stay compact. */
+.pp-teaser-locked{border-radius:10px; overflow:hidden;}
 .pp-teaser-blur{filter:blur(6px); opacity:.7; pointer-events:none; user-select:none;}
 .pp-teaser-row{display:flex; align-items:center; gap:10px; margin-bottom:10px;}
 .pp-teaser-row:last-child{margin-bottom:0;}
@@ -201,10 +200,9 @@ body{
 .pp-teaser-bar{flex:2; height:8px; border-radius:99px; background:#e2e8f0; overflow:hidden;}
 .pp-teaser-bar div{height:100%; border-radius:99px; background:var(--cyan);}
 .pp-teaser-pct{font-size:12px; font-weight:700; color:var(--mut); min-width:36px; text-align:right;}
-.pp-teaser-overlay{
-  position:absolute; inset:0; display:flex; align-items:center; justify-content:center;
+.pp-teaser-pill{
+  margin-top:8px; padding:2px 12px; text-align:center;
   font-size:13.5px; font-weight:700; color:var(--navy);
-  background:rgba(255,253,248,.55); text-align:center; padding:0 24px;
 }
 ul.pp-feats{
   list-style:none; margin:0 0 18px; padding:0; text-align:left;
@@ -5495,12 +5493,19 @@ function finishExam(expired){
         '<div class="pp-teaser-row"><span class="pp-teaser-name">' + escapeHtml(r.name) + '</span>' +
         '<div class="pp-teaser-bar"><div style="width:' + r.pct + '%' + (barCol ? ';background:' + barCol : '') + '"></div></div>' +
         '<span class="pp-teaser-pct">' + r.pct + '%</span></div>';
+      /* Featured row layout: the name gets its own full-width line (the
+         one-line teaserRow ellipsized it against the bar + %), then the
+         bar on the next line with the % at its right end. */
+      const featuredRow = (r, barCol) =>
+        '<div class="pp-insight-name">' + escapeHtml(r.name) + '</div>' +
+        '<div class="pp-insight-meter"><div class="pp-teaser-bar"><div style="width:' + r.pct + '%' + (barCol ? ';background:' + barCol : '') + '"></div></div>' +
+        '<span class="pp-teaser-pct">' + r.pct + '%</span></div>';
       let insightHtml = "";
       if(featured){
         const barCol = featured.pct >= 85 ? "#0d9d6c" : (featured.pct >= passMark ? "#c77408" : "#d63a3a");
         insightHtml =
           '<div class="pp-insight"><div class="pp-insight-label' + (featuredStrong ? ' strong' : '') + '">' + featuredLabel + '</div>' +
-          teaserRow(featured, barCol) +
+          featuredRow(featured, barCol) +
           '<div class="pp-insight-note">' + featured.c + ' of ' + featured.t + ' correct in this taste</div></div>';
       }
       let blurredBars = "";
@@ -5516,12 +5521,11 @@ function finishExam(expired){
         '<div class="pp-mascot"><span class="mascot-slot floaty">' + mascotSVG("excited", 60) + '</span></div>' +
         '<div class="pp-head">You just scratched the surface</div>' +
         '<div class="pp-sub">That was ' + CONFIG.PRACTICE_COUNT + ' questions out of ' + QCOUNT_DISPLAY_TXT + '. Here\'s what Pro unlocks for ' + curExam.code + ':</div>' +
-        '<div class="pp-progress"><div class="pp-progress-track"><div class="pp-progress-fill"></div></div>' +
-        '<div class="pp-progress-label"><b>' + CONFIG.PRACTICE_COUNT + '</b> of <b>' + QCOUNT_DISPLAY_TXT + '</b> questions tried' + passNote + '</div></div>' +
+        '<div class="pp-progress"><div class="pp-progress-label"><b>' + CONFIG.PRACTICE_COUNT + '</b> of <b>' + QCOUNT_DISPLAY_TXT + '</b> questions tried' + passNote + '</div></div>' +
         '<div class="pp-teaser"><div class="pp-teaser-title">Your domain breakdown <span class="pp-lock">🔒 Pro</span></div>' +
         insightHtml +
         '<div class="pp-teaser-locked"><div class="pp-teaser-blur">' + blurredBars + '</div>' +
-        '<div class="pp-teaser-overlay">Unlock Pro to see exactly what to study next</div></div></div>' +
+        '<div class="pp-teaser-pill">Unlock Pro to see exactly what to study next</div></div></div>' +
         '<ul class="pp-feats">' +
         '<li><span class="pp-check">✓</span> 19,000 questions — 1,000 per exam, matched to the real test</li>' +
         '<li><span class="pp-check">✓</span> More than multiple choice — hands-on terminal tasks and adaptive NCLEX exams</li>' +
@@ -5543,11 +5547,6 @@ function finishExam(expired){
         const rs=$("screen-results");
         if(rs) rs.scrollIntoView({behavior:"smooth", block:"start"});
       });
-      /* Animate the "5 of 1,000" progress bar — the visual gap sells Pro */
-      requestAnimationFrame(()=>{ requestAnimationFrame(()=>{
-        const fill = up.querySelector(".pp-progress-fill");
-        if(fill) fill.style.width = "0.5%";
-      }); });
     }
   }
 
