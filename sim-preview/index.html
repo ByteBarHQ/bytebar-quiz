@@ -525,6 +525,13 @@ ul.pp-feats li{
   .hero h1{font-size:28px;}
   .hero p{font-size:15px;}
   .trust{font-size:12px; padding:7px 13px;}
+  /* hero pills: cluster 2+1 — two pills per row, third wraps centered below;
+     text wraps to two lines inside each pill, icon tile stays beside the text.
+     Air fix: smaller font + wider inline padding + balanced breaks (br.tbr is
+     display:none on desktop, a real line break at phone width) so no line
+     spans wall-to-wall against the capsule sides. */
+  .trustrow .trust{flex:0 1 calc(50% - 5px); max-width:calc(50% - 5px); font-size:10.5px; padding:7px 13px;}
+  .trustrow .trust br.tbr{display:inline;}
   /* exam screen */
   .examtop .inner{padding:10px 14px; gap:10px; flex-wrap:wrap;}
   .timer{font-size:17px; padding:6px 12px;}
@@ -1029,11 +1036,15 @@ button:active{transform:scale(.97);}
 .speech span{font-size:12.5px; color:var(--mut); line-height:1.45;}
 /* trust chips with icons */
 .trust{display:inline-flex; align-items:center; gap:8px;}
+br.tbr{display:none;}
 .tico{width:30px; height:30px; border-radius:9px; background:var(--cyan-soft); color:var(--cyan);
   display:inline-flex; align-items:center; justify-content:center; flex:none;}
 .tico svg{width:16px; height:16px;}
 /* hero CTA */
-.hero-cta{margin:20px 0 4px;}
+/* hero CTA: button gets its own line, dead-center; the authbadge drops
+   to its own centered line below it (it used to share the button's line,
+   so the pair centered as a group and the button sat left of center) */
+.hero-cta{display:block; width:fit-content; margin:20px auto 4px;}
 .hero-new .authbadge{margin-top:14px;}
 /* section titles get an accent bar on home */
 #screen-home .secttl{display:flex; align-items:center; gap:10px;}
@@ -1760,6 +1771,7 @@ html,body{overscroll-behavior-x:none;}
 .cvs{color:var(--mut,#6b7280);font-size:12.5px}
 @keyframes qnudge{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
 .qnudge{animation:qnudge .3s ease}
+
 </style>
 </head>
 <body>
@@ -1819,7 +1831,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <p>Full-length, timed exam simulations built from real exam objectives — with instant explanations and domain-level score reports that show exactly where you stand.</p>
       <div class="trustrow">
         <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span><span><b>One-time payment</b> — no subscription</span></div>
-        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span><span><b>Your whole career</b> in one place</span></div>
+        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span><span><b>Your whole career</b> <br class="tbr">in one place</span></div>
         <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c-1.8-2.2-3.4-3.3-5-3.3a4.05 4.05 0 1 0 0 6.6c1.6 0 3.2-1.1 5-3.3Zm0 0c1.8 2.2 3.4 3.3 5 3.3a4.05 4.05 0 1 0 0-6.6c-1.6 0-3.2 1.1-5 3.3Z"/></svg></span><span><b>Yours forever</b> — new exams included</span></div>
       </div>
       <button class="btn hero-cta" id="hero-cta">Choose your exam ↓</button>
