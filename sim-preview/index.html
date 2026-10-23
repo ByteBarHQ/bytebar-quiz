@@ -681,8 +681,7 @@ ul.pp-feats li{
 .badge .bi{font-size:38px; margin-bottom:8px; display:block; filter:none;}
 .badge .bn{display:block; font-size:14px; font-weight:800; color:var(--navy); line-height:1.3;}
 .badge .bd{display:block; font-size:12px; color:var(--mut); margin-top:4px; line-height:1.45;}
-.badge.locked{opacity:.55; background:#f4f6fb;}
-.badge.locked .bi{filter:grayscale(1);}
+.badge.locked{background:var(--card);}
 .badge.unlocked{border-color:#f0c060; background:linear-gradient(180deg,#fffdf4,#fff);}
 .badge.unlocked:hover{transform:translateY(-2px);}
 
@@ -716,6 +715,39 @@ ul.pp-feats li{
 .badge .bpro{position:absolute; bottom:8px; left:50%; transform:translateX(-50%);
   font-size:9.5px; font-weight:800; letter-spacing:.08em; color:#7c2d12;
   background:linear-gradient(180deg,#ffd97a,#f0ad3c); border-radius:6px; padding:2px 8px;}
+
+/* ---------- badge coins (challenge-coin system, 2026-10-22) ---------- */
+.coin{filter:drop-shadow(0 3px 5px rgba(122,90,48,.28)); display:block; margin:0 auto;}
+.coin-locked{filter:none;}
+.coin-flip{display:inline-block; animation:coinflip .7s cubic-bezier(.2,.7,.2,1); transform-origin:50% 50%;}
+@keyframes coinflip{0%{transform:rotateY(0) scale(.6); opacity:0} 60%{transform:rotateY(540deg) scale(1.06); opacity:1} 100%{transform:rotateY(720deg) scale(1)}}
+@media (prefers-reduced-motion: reduce){ .coin-flip{animation:none} }
+.unlockcard .ubi.coinmode{animation:none; margin-bottom:4px;}
+.badge .bcoin{display:block; margin-bottom:9px; line-height:0;}
+.badge .bcoin .coin{margin:0 auto;}
+.badge .tierlab{display:inline-block; margin-top:7px; font-size:9.5px; font-weight:900; letter-spacing:.14em;
+  padding:3px 8px; border-radius:99px; background:#eceff3; color:#68707c; border:1px solid #c7cedb;}
+.badge .tierlab.t-gold{background:linear-gradient(180deg,#ffe9a8,#f7c948); color:#7c4a03; border-color:#d9a83f;}
+.badge .tierlab.t-bronze{background:#f7e3cd; color:#8a5222; border-color:#d9a06b;}
+.badge .prog{display:block; margin:10px 6px 0;}
+.pbar{display:block; height:7px; background:#eadfc2; border-radius:99px; overflow:hidden;}
+.pbar>span{display:block; height:100%; background:linear-gradient(90deg,#f0b429,#f7c948); border-radius:99px;}
+.plabel{display:block; font-size:11px; color:var(--mut); margin-top:4px; font-weight:600;}
+/* next-coin slot (top of the achievements screen) */
+.nextcoin{display:flex; gap:14px; align-items:center; background:linear-gradient(135deg,#fffdf4,#fdf6e3);
+  border:2px solid #f0d9a0; border-radius:18px; padding:14px 16px; box-shadow:var(--shadow); margin-bottom:6px;}
+.nextcoin .nc-mid{flex:1; min-width:0;}
+.nextcoin .micro{font-size:10.5px; font-weight:900; letter-spacing:.14em; color:var(--gold); text-transform:uppercase;}
+.nextcoin .piprow{margin-top:5px;}
+.nextcoin .pbar{margin-top:9px;}
+.nextcoin .plabel{margin-top:5px; font-size:11.5px;}
+.piprow{display:flex; gap:9px; align-items:flex-start;}
+.piprow .pipfig{flex:none; line-height:0;}
+.piprow .pipline{font-size:14.5px; font-weight:700; color:var(--navy); line-height:1.35; margin:0;}
+.unlockcard .piprow{background:var(--bg); border:1px solid var(--line); border-radius:14px; padding:10px 12px; margin-top:12px; text-align:left;}
+.bovflavor{display:block; font-size:14.5px; font-weight:700; color:var(--navy); margin-bottom:5px;}
+#bov-prog{margin-top:10px;}
+#bov-prog .plabel{text-align:center;}
 
 /* weekly challenges */
 .challgrid{display:grid; gap:12px;}
@@ -1786,9 +1818,9 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <h1>Practice like it's <span class="cy">test day.</span></h1>
       <p>Full-length, timed exam simulations built from real exam objectives — with instant explanations and domain-level score reports that show exactly where you stand.</p>
       <div class="trustrow">
-        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></span><span><b>20,000</b> exam-style questions</span></div>
-        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="7"/><polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"/></svg></span><span><b>20</b> certifications</span></div>
-        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></span><span><b>90-min</b> timed simulations</span></div>
+        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span><span><b>One-time payment</b> — no subscription</span></div>
+        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span><span><b>Your whole career</b> in one place</span></div>
+        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c-1.8-2.2-3.4-3.3-5-3.3a4.05 4.05 0 1 0 0 6.6c1.6 0 3.2-1.1 5-3.3Zm0 0c1.8 2.2 3.4 3.3 5 3.3a4.05 4.05 0 1 0 0-6.6c-1.6 0-3.2 1.1-5 3.3Z"/></svg></span><span><b>Yours forever</b> — new exams included</span></div>
       </div>
       <button class="btn hero-cta" id="hero-cta">Choose your exam ↓</button>
       <div class="authbadge">✓ Questions mapped to official exam objectives</div>
@@ -2319,6 +2351,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <button class="btn ghost" id="profile-signout" style="padding:11px 20px;font-size:14px;">Sign out</button>
     </div>
     <div id="profile-problock" class="hidden" style="margin-bottom:18px;"></div>
+    <div id="next-coin-slot"></div>
     <div class="secttl">Achievements <span id="badge-count" style="color:var(--cyan);"></span></div>
     <div id="badge-grid"></div>
     <div class="secttl">Your stats</div>
@@ -2505,6 +2538,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <span class="ubi" id="bov-icon">🏆</span>
     <h2 id="bov-name">—</h2>
     <p id="bov-desc">—</p>
+    <div id="bov-prog"></div>
     <div class="xp" id="bov-xp" style="display:none;">—</div>
     <div class="btnrow" style="justify-content:center;margin-top:18px;">
       <button class="btn gold hidden" id="bov-cta" style="padding:12px 26px;font-size:15px;">Go Pro to unlock</button>
@@ -6286,6 +6320,7 @@ function newUserRec(username, passHash){
     activeDays:[], best:{}, attempts:[], domainAgg:{}, qAnswered:0,
     examsDone:{}, unlockQueue:[], pro:false, proSince:null, proKey:null,
     bestStreak:0, streakFreeze:0, teasedBadges:[], teaseQueue:[],
+    badgeCounts:{sims:0,sims90:0,perfectPractice:0,domainAces:0},
     challengeQueue:[], records:{}, challengeWeek:"", 
     challenges:{sims80:0,questions:0,days:0}, challengesDone:[] };
 }
@@ -6300,6 +6335,19 @@ function migrateRec(r){
   if(r.challengeWeek==null) r.challengeWeek="";
   if(!r.challenges) r.challenges={sims80:0,questions:0,days:0};
   if(!Array.isArray(r.challengesDone)) r.challengesDone=[];
+  /* Badge tiers (2026-10-22): lifetime feat counters. Backfilled once
+     from the stored attempt history (last 60) — the best floor the
+     record honestly supports; they only grow from there. */
+  if(!r.badgeCounts){
+    r.badgeCounts={sims:0,sims90:0,perfectPractice:0,domainAces:0};
+    (Array.isArray(r.attempts)?r.attempts:[]).forEach(a=>{
+      if(!a) return;
+      if(a.mode==="sim"){ r.badgeCounts.sims++; if(a.pct>=90) r.badgeCounts.sims90++; }
+      if(a.mode==="practice"&&a.pct===100) r.badgeCounts.perfectPractice++;
+      const doms=a.domains||{};
+      if(Object.keys(doms).some(d=>{ const s=doms[d]; return s&&s.t>=3&&s.c===s.t; })) r.badgeCounts.domainAces++;
+    });
+  }
   /* Phase B (2026-10-22): misses deck + readiness milestone state. */
   if(!r.missDeck) r.missDeck={};
   if(!r.deckHad) r.deckHad={};
@@ -6547,7 +6595,9 @@ function pumpChallengeQueue(){
   const id=r.challengeQueue.shift(); saveUserRec(r);
   const ch=CHALLENGES.find(x=>x.id===id); if(!ch){ pumpChallengeQueue(); return; }
   $("unlock-mascot").innerHTML=mascotSVG("celebrate",64);
-  $("unlock-icon").textContent=ch.icon;
+  const cic=$("unlock-icon");
+  cic.classList.remove("coinmode");
+  cic.textContent=ch.icon;
   $("unlock-name").textContent="Weekly challenge complete!";
   $("unlock-desc").textContent=ch.name+" — "+ch.desc;
   $("unlock-xp").textContent="+200 XP";
@@ -6561,7 +6611,9 @@ function pumpTeaseQueue(){
   const b=BADGES.find(x=>x.id===id); if(!b){ pumpTeaseQueue(); return; }
   const proCount=BADGES.filter(x=>x.pro).length;
   $("tease-mascot").innerHTML=mascotSVG("encourage",64);
-  $("tease-icon").textContent=b.icon;
+  const tic=$("tease-icon");
+  tic.classList.add("coinmode");
+  tic.innerHTML=coinSVG(id,{size:88,state:"locked",label:b.name});
   $("tease-name").textContent=b.name;
   $("tease-desc").textContent="You would've earned this achievement! Go Pro to unlock it — plus "+proCount+" more Pro achievements, streak freezes, and weekly challenges.";
   $("teaseov").classList.remove("hidden");
@@ -6571,7 +6623,22 @@ function recordAttempt(o){
   const r=userRec(); if(!r) return null;
   const prevBest=r.best[o.slug]||0;
   const att={d:Date.now(), slug:o.slug, mode:o.mode, pct:o.pct, domains:o.domains};
+  /* Badge data fixes (2026-10-22): persist the finish-time clock and
+     the per-attempt SATA tally. Clutch progress (minutes left on a
+     pass) and SATA Slayer progress were unmeasurable before — both
+     values were computed at finish, then dropped. Only stored when
+     the caller actually measured them; older attempts simply lack
+     the fields and every reader treats that as "no progress". */
+  if(typeof o.timeLeftSec==="number") att.timeLeftSec=o.timeLeftSec;
+  if(typeof o.sataTotal==="number") att.sataTotal=o.sataTotal;
+  if(typeof o.sataCorrect==="number") att.sataCorrect=o.sataCorrect;
   r.attempts.push(att); if(r.attempts.length>60) r.attempts=r.attempts.slice(-60);
+  /* Tier counters for repeatable badges (Bronze -> Silver -> Gold).
+     Lifetime counters, so attempt trimming can never rewind a tier. */
+  if(!r.badgeCounts) r.badgeCounts={sims:0,sims90:0,perfectPractice:0,domainAces:0};
+  if(o.mode==="sim"){ r.badgeCounts.sims++; if(o.pct>=90) r.badgeCounts.sims90++; }
+  if(o.mode==="practice"&&o.pct===100) r.badgeCounts.perfectPractice++;
+  if(Object.keys(o.domains||{}).some(d=>{ const s=o.domains[d]; return s&&s.t>=3&&s.c===s.t; })) r.badgeCounts.domainAces++;
   if(!r.best[o.slug] || o.pct>r.best[o.slug]) r.best[o.slug]=o.pct;
   r.qAnswered+=o.n;
   r.examsDone[o.slug]=true;
@@ -6611,44 +6678,307 @@ function recordAttempt(o){
 }
 
 /* ============================================================
+   BADGE COINS — challenge-coin art system (approved 2026-10-22)
+   ------------------------------------------------------------
+   One inline-SVG coin per badge: thick rope-edge rim in the
+   badge's metal, beaded inner ring, domed navy enamel with an
+   engraved guilloche swirl, one BOLD FILLED glyph. Locked = the
+   same coin as an un-struck blank: pale metal, engraved outline
+   of the same glyph. No padlock, no emoji. Repeat feats deepen
+   the metal bronze -> silver -> gold (see BADGE_TIERS). Glyph
+   paths use paint tokens resolved per state in coinSVG():
+   @@M@@ metal, @@T@@ text metal, @@D@@ dark detail, @@W@@ light.
+   ============================================================ */
+const COIN_GLYPHS = {
+  "rocket":      '<path fill="@@M@@" d="M12 2.2c3 2.6 4.8 6.4 4.8 10.3 0 1-.1 2-.4 2.9l3 1.9-4.6-.4c-.8 1.1-1.7 2-2.8 2.7-1.1-.7-2-1.6-2.8-2.7l-4.6.4 3-1.9c-.3-.9-.4-1.9-.4-2.9C7.2 8.6 9 4.8 12 2.2Z"/><circle cx="12" cy="9.3" r="1.9" fill="@@D@@" opacity=".4"/><path fill="@@M@@" d="M9.8 19.4c.5 1.3 1.2 2.3 2.2 3 .9-.7 1.7-1.7 2.2-3-.7-.3-1.4-.8-2.2-1.4-.8.6-1.5 1.1-2.2 1.4Z"/>',
+  "sprout":      '<path fill="@@M@@" d="M12 14C12 10.4 9.4 8.4 5.4 8.4c0 4 2.6 5.6 6.6 5.6Z"/><path fill="@@M@@" d="M12 11.4c0-3.4 2.4-5.2 6-5.2 0 3.4-2.4 5.2-6 5.2Z"/><rect x="11" y="13.4" width="2" height="7" rx="1" fill="@@M@@"/><rect x="4.5" y="20.6" width="15" height="1.8" rx=".9" fill="@@M@@"/>',
+  "star":        '<path fill="@@M@@" d="M12 2.9l2.7 5.5 6 .9-4.3 4.2 1 6-5.4-2.8-5.4 2.8 1-6L3.3 9.3l6-.9Z"/>',
+  "compass":     '<path fill="@@M@@" fill-rule="evenodd" d="M12 3.4a8.6 8.6 0 1 0 0 17.2 8.6 8.6 0 0 0 0-17.2Zm0 3.3a5.3 5.3 0 1 1 0 10.6 5.3 5.3 0 0 1 0-10.6Z"/><path fill="@@M@@" d="M15.9 8.1 13.5 13.5 8.1 15.9 10.5 10.5Z"/><circle cx="12" cy="12" r="1.1" fill="@@D@@"/>',
+  "crosshair":   '<path fill="@@M@@" fill-rule="evenodd" d="M12 5.2a6.8 6.8 0 1 0 0 13.6 6.8 6.8 0 0 0 0-13.6Zm0 2.5a4.3 4.3 0 1 1 0 8.6 4.3 4.3 0 0 1 0-8.6Z"/><rect x="11" y="1.6" width="2" height="4.6" fill="@@M@@"/><rect x="11" y="17.8" width="2" height="4.6" fill="@@M@@"/><rect x="1.6" y="11" width="4.6" height="2" fill="@@M@@"/><rect x="17.8" y="11" width="4.6" height="2" fill="@@M@@"/><circle cx="12" cy="12" r="1.4" fill="@@M@@"/>',
+  "flag":        '<rect x="5" y="2.2" width="2.1" height="19.6" rx="1" fill="@@M@@"/><path fill="@@M@@" d="M7.1 3.3h10.3l-2.8 3.9 2.8 3.9H7.1Z"/>',
+  "stopwatch":   '<rect x="9.5" y="2" width="5" height="2.4" rx="1.1" fill="@@M@@"/><rect x="11" y="4.2" width="2" height="2.1" fill="@@M@@"/><path fill="@@M@@" d="M17.3 6.1l2-2 1.6 1.6-2 2Z"/><path fill="@@M@@" fill-rule="evenodd" d="M12 6.3a6.9 6.9 0 1 0 0 13.8 6.9 6.9 0 0 0 0-13.8Zm0 2.5a4.4 4.4 0 1 1 0 8.8 4.4 4.4 0 0 1 0-8.8Z"/><path fill="@@M@@" d="M11.1 9.7h1.8v3l2.4 1.6-1 1.5-3.2-2.2Z"/><circle cx="12" cy="13.2" r="1" fill="@@M@@"/>',
+  "diamond":     '<path fill="@@M@@" d="M6.8 3.8h10.4L21 9.2 12 20.6 3 9.2Z"/><path stroke="@@D@@" stroke-width=".9" opacity=".3" fill="none" d="M3.2 9.2h17.6M8.4 9.2 12 20.2M15.6 9.2 12 20.2M8.4 9.2h7.2M8.4 9.2 6.8 3.8M15.6 9.2l1.6-5.4"/>',
+  "century":     '<text x="12" y="16.2" text-anchor="middle" font-size="9.8" font-weight="900" letter-spacing="-.5" fill="@@T@@">100</text>',
+  "flame":       '<path fill="@@M@@" d="M12 2.8s5.7 5.3 5.7 10.2a5.7 5.7 0 1 1-11.4 0c0-2.1 1-4 2.3-5.5.3 1 .9 2 1.9 2.5C10.2 7.3 11 4.8 12 2.8Z"/><path fill="@@D@@" opacity=".35" d="M12 11.4c1.5 1.6 2.6 3.1 2.6 4.9a2.6 2.6 0 1 1-5.2 0c0-1.8 1.1-3.3 2.6-4.9Z"/>',
+  "wave":        '<path fill="@@M@@" d="M2 8.2c3-2.9 6-2.9 9 0s6 2.9 9 0v3.1c-3 2.9-6 2.9-9 0s-6-2.9-9 0Z"/><path fill="@@M@@" d="M2 14.7c3-2.9 6-2.9 9 0s6 2.9 9 0v3.1c-3 2.9-6 2.9-9 0s-6-2.9-9 0Z"/>',
+  "mountain":    '<path fill="@@M@@" d="M2.8 19.6 9.4 7.6l3.9 5.5 2.3-2.9 5.6 9.4Z"/><path fill="@@W@@" d="M9.4 7.6 11 10.2l-1.6 1.3-1.5-1.2-1.2 1L9.4 7.6Z"/>',
+  "crown":       '<path fill="@@M@@" d="M3.6 17.8 2.6 7.6l5.4 3.6L12 5.4l4 5.8 5.4-3.6-1 10.2Z"/><circle cx="6.8" cy="10.4" r="1.05" fill="@@D@@"/><circle cx="12" cy="8.4" r="1.05" fill="@@D@@"/><circle cx="17.2" cy="10.4" r="1.05" fill="@@D@@"/><rect x="4" y="19.3" width="16" height="1.9" rx=".95" fill="@@M@@"/>',
+  "infinity":    '<path d="M12 12c-1.8-2.2-3.4-3.3-5-3.3a4.05 4.05 0 1 0 0 6.6c1.6 0 3.2-1.1 5-3.3Zm0 0c1.8 2.2 3.4 3.3 5 3.3a4.05 4.05 0 1 0 0-6.6c-1.6 0-3.2 1.1-5 3.3Z" fill="none" stroke="@@M@@" stroke-width="3.1" stroke-linecap="round"/>',
+  "trophy":      '<path fill="@@M@@" d="M6.8 3.6h10.4v5.2a5.2 5.2 0 0 1-10.4 0Z"/><path d="M6.8 5.6H4.7a3 3 0 0 0 3 3.5" fill="none" stroke="@@M@@" stroke-width="1.9"/><path d="M17.2 5.6h2.1a3 3 0 0 1-3 3.5" fill="none" stroke="@@M@@" stroke-width="1.9"/><rect x="11" y="13.7" width="2" height="3.1" fill="@@M@@"/><path fill="@@M@@" d="M8.2 20.6c.5-2.2 1.9-3.4 3.8-3.4s3.3 1.2 3.8 3.4Z"/>',
+  "cloud":       '<path fill="@@M@@" d="M7 18.5h9.7a4.3 4.3 0 0 0 .7-8.5A6 6 0 0 0 5.7 11 3.8 3.8 0 0 0 7 18.5Z"/>',
+  "terminal":    '<rect x="2.8" y="4.2" width="18.4" height="15.6" rx="2.6" fill="@@M@@"/><path fill="@@D@@" d="M6.3 9.2l3.7 3-3.7 3 1.2 1.7 5.3-4.7-5.3-4.7Z"/><rect x="12.4" y="15.2" width="5.2" height="1.9" fill="@@D@@"/>',
+  "pulse":       '<path fill="@@M@@" d="M2 13.2v-2.4h3.4L7 8.6l2.6 4.8L11.8 5.2l2.6 11.6 2-6h5.6v2.4h-4.4l-2.8 6.4-2.7-11.2-1.7 7.2-2.6-4.8-1.2 2.4Z"/>',
+  "shield-star": '<path fill="@@M@@" d="M12 2.8l7.2 2.7v5.7c0 4.7-3.1 7.8-7.2 9.5C7.9 19 4.8 15.9 4.8 11.2V5.5Z"/><path fill="@@D@@" d="M12 7.9l1.3 2.7 3 .4-2.2 2.1.5 3-2.6-1.4-2.6 1.4.5-3-2.2-2.1 3-.4Z"/>',
+  "gauge":       '<path fill="@@M@@" d="M3.4 17.4A8.6 8.6 0 1 1 20.6 17.4H18A6.1 6.1 0 1 0 6 17.4Z"/><path fill="@@M@@" d="M12.8 15.9 16.5 9.6l-1.8-.7-2.8 6.2Z"/><circle cx="12" cy="15.6" r="1.5" fill="@@M@@"/><rect x="4.6" y="19.7" width="14.8" height="1.8" rx=".9" fill="@@M@@"/>',
+  "sword":       '<path fill="@@M@@" d="M15.4 8.1 20.3 3.2c.4 3-.6 5.7-2.9 7.5l-2-2.6Z"/><path fill="@@M@@" d="M6.1 17.9 14.6 9.4l1.4 1.4-8.5 8.5Z"/><path fill="@@M@@" d="M6.2 13.7l3.5 3.5-1.5 1.5-3.5-3.5Z"/><circle cx="5.2" cy="19.6" r="1.2" fill="@@M@@"/>',
+  "moon":        '<path fill="@@M@@" d="M19.5 15.5A8.5 8.5 0 1 1 8.5 4.5a7 7 0 0 0 11 11Z"/><path fill="@@M@@" d="M17.3 2.3l.6 1.9 1.9.6-1.9.6-.6 1.9-.6-1.9-1.9-.6 1.9-.6Z"/>',
+  "sunrise":     '<path fill="@@M@@" d="M6.4 17.6a5.6 5.6 0 0 1 11.2 0Z"/><path stroke="@@M@@" stroke-width="2" stroke-linecap="round" fill="none" d="M12 6.6V3.9M5.3 9.4 3.8 7.9M18.7 9.4l1.5-1.5"/><rect x="3" y="18.7" width="18" height="1.8" rx=".9" fill="@@M@@"/><rect x="6.2" y="21.1" width="11.6" height="1.6" rx=".8" fill="@@M@@"/>',
+  "comeback":    '<path d="M20.2 12a8.2 8.2 0 1 1-2.4-5.8" fill="none" stroke="@@M@@" stroke-width="3" stroke-linecap="round"/><path fill="@@M@@" d="M18.6 2v5.1h-5.1Z"/>',
+  "bolt":        '<path d="M13 2.5 5 13.5h5L9.5 21.5 19 10h-5.2Z" fill="@@M@@"/>'
+};
+const COIN_BY_BADGE = {
+  "first-steps":"rocket", "warming-up":"sprout", "flawless":"star",
+  "explorer":"compass", "sharp-shooter":"crosshair", "marathon":"flag",
+  "clutch":"stopwatch", "perfectionist":"diamond", "century":"century",
+  "on-fire":"flame", "unstoppable":"wave", "mountain":"mountain",
+  "legendary":"crown", "immortal":"infinity", "completionist":"trophy",
+  "cloud-nine":"cloud", "terminal-tamer":"terminal", "code-blue":"pulse",
+  "domain-master":"shield-star", "test-ready":"gauge", "sata-slayer":"sword",
+  "night-owl":"moon", "early-bird":"sunrise", "comeback":"comeback"
+};
+const COIN_METALS = {
+  gold:   { hi:"#ffe9a8", mid:"#f0b429", lo:"#a86f0e", edge:"#8a5a08" },
+  silver: { hi:"#ffffff", mid:"#c7cedb", lo:"#87909f", edge:"#6e7787" },
+  bronze: { hi:"#f4c491", mid:"#c97f3d", lo:"#8a5222", edge:"#6f3f18" }
+};
+let __coinUid = 0;
+function coinSVG(badgeId, opts) {
+  opts = opts || {};
+  const size   = opts.size || 84;
+  const locked = opts.state === "locked";
+  const tier   = opts.tier || "gold";
+  const metal  = COIN_METALS[tier] || COIN_METALS.gold;
+  const u      = "c" + (++__coinUid) + (opts.uid ? "-" + opts.uid : "");
+  const label  = opts.label || badgeId;
+  let glyph = COIN_GLYPHS[COIN_BY_BADGE[badgeId] || "star"];
+  /* Guilloche: three engraved swirl rings under the enamel gloss. */
+  const swirl = [30, 35.5, 41].map(r =>
+    '<circle cx="60" cy="60" r="' + r + '" fill="none" stroke="#ffffff" ' +
+    'stroke-width="2.6" stroke-dasharray="7 5" opacity="0.05"/>').join("");
+  if (locked) {
+    /* Un-struck blank: filled shapes become engraved outlines. */
+    glyph = glyph.split('fill="@@M@@"').join('fill="none" stroke="#a79b7d" stroke-width="1.25"')
+                 .split('@@T@@').join('#a79b7d')
+                 .split('@@D@@').join('#a79b7d')
+                 .split('@@W@@').join('rgba(0,0,0,0)')
+                 .split('@@M@@').join('#a79b7d');
+    return '' +
+    '<svg class="coin coin-locked" width="' + size + '" height="' + size + '" viewBox="0 0 120 120" role="img" aria-label="' + label + ' (locked)">' +
+      '<title>' + label + ' — locked</title>' +
+      '<circle cx="60" cy="60" r="57" fill="#ece5d0" stroke="#c9bfa4" stroke-width="2"/>' +
+      '<circle cx="60" cy="60" r="52.5" fill="none" stroke="#c9bfa4" stroke-width="4.6" stroke-dasharray="3.4 2.3"/>' +
+      '<circle cx="60" cy="60" r="47" fill="none" stroke="#c9bfa4" stroke-width="2.4" stroke-dasharray="0.1 5.9" stroke-linecap="round"/>' +
+      '<circle cx="60" cy="60" r="43.5" fill="#f0ead8" stroke="#cfc5a9" stroke-width="1.4"/>' +
+      '<g transform="translate(38,38) scale(1.833)" stroke-linecap="round" stroke-linejoin="round">' + glyph + '</g>' +
+    '</svg>';
+  }
+  const gUrl = 'url(#' + u + '-glyph)';
+  glyph = glyph.split('@@M@@').join(gUrl)
+               .split('@@T@@').join(gUrl)
+               .split('@@D@@').join('#0a204a')
+               .split('@@W@@').join('rgba(255,255,255,.6)');
+  return '' +
+  '<svg class="coin coin-earned" width="' + size + '" height="' + size + '" viewBox="0 0 120 120" role="img" aria-label="' + label + '">' +
+    '<title>' + label + '</title>' +
+    '<defs>' +
+      '<linearGradient id="' + u + '-rim" x1="0" y1="0" x2="1" y2="1">' +
+        '<stop offset="0" stop-color="' + metal.hi + '"/><stop offset=".48" stop-color="' + metal.mid + '"/><stop offset="1" stop-color="' + metal.lo + '"/>' +
+      '</linearGradient>' +
+      '<radialGradient id="' + u + '-face" cx=".38" cy=".3" r=".95">' +
+        '<stop offset="0" stop-color="#274b8f"/><stop offset=".55" stop-color="#122c5e"/><stop offset="1" stop-color="#081a3d"/>' +
+      '</radialGradient>' +
+      '<linearGradient id="' + u + '-glyph" x1="0" y1="0" x2="0" y2="1">' +
+        '<stop offset="0" stop-color="' + metal.hi + '"/><stop offset="1" stop-color="' + metal.mid + '"/>' +
+      '</linearGradient>' +
+    '</defs>' +
+    '<circle cx="60" cy="60" r="57" fill="url(#' + u + '-rim)"/>' +
+    '<circle cx="60" cy="60" r="57" fill="none" stroke="' + metal.edge + '" stroke-width="1.6"/>' +
+    /* rope edge */
+    '<circle cx="60" cy="60" r="52.5" fill="none" stroke="' + metal.lo + '" stroke-width="5" stroke-dasharray="3.4 2.3" opacity=".85"/>' +
+    '<circle cx="60" cy="60" r="52.5" fill="none" stroke="' + metal.hi + '" stroke-width="1.1" stroke-dasharray="3.4 2.3" stroke-dashoffset="1.7" opacity=".7"/>' +
+    /* beaded inner ring */
+    '<circle cx="60" cy="60" r="47" fill="none" stroke="' + metal.mid + '" stroke-width="2.6" stroke-dasharray="0.1 5.9" stroke-linecap="round"/>' +
+    /* domed navy enamel + guilloche + gloss */
+    '<circle cx="60" cy="60" r="43.5" fill="url(#' + u + '-face)"/>' + swirl +
+    '<ellipse cx="46" cy="34" rx="24" ry="13" fill="#ffffff" opacity=".10"/>' +
+    '<circle cx="60" cy="60" r="43.5" fill="none" stroke="#04102a" stroke-width="1.4" opacity=".55"/>' +
+    /* glyph */
+    '<g transform="translate(38,38) scale(1.833)" stroke-linecap="round" stroke-linejoin="round">' + glyph + '</g>' +
+  '</svg>';
+}
+
+/* ============================================================
    BADGES
    ============================================================ */
 /* Badge catalog: 24 achievements across 6 categories.
    pro:false = free-tier taste (earnable without Pro). pro:true = Pro-only;
    free users who trigger one get a teaser instead of the award. */
+/* name/flavor/pip copy is Cori-approved verbatim (badge copy list,
+   2026-10-22). desc stays the exact unlock condition — it lives on
+   the badge detail view. icon is retained only for the weekly-
+   challenge overlay family; badge surfaces render coins, not emoji. */
 const BADGES=[
   /* ---- Starter: the free taste ---- */
-  {id:"first-steps", icon:"🚀", name:"First Steps", desc:"Complete your first quiz", cat:"starter", pro:false},
-  {id:"warming-up",  icon:"🌱", name:"Warming Up",  desc:"Study 3 days in a row", cat:"starter", pro:false},
-  {id:"flawless",    icon:"🌟", name:"Flawless",    desc:"Score 100% on a practice quiz", cat:"starter", pro:false},
-  {id:"explorer",    icon:"🧭", name:"Explorer",    desc:"Try 3 different exams", cat:"starter", pro:false},
+  {id:"first-steps", icon:"🚀", name:"Booted Up", desc:"Complete your first quiz", flavor:"First quiz down. The machine is awake.", pip:"First one done. The case has its first coin.", cat:"starter", pro:false},
+  {id:"warming-up",  icon:"🌱", name:"Hat Trick",  desc:"Study 3 days in a row", flavor:"Three days straight. This is a habit now.", pip:"Three days, three shows. Hat Trick earned.", cat:"starter", pro:false},
+  {id:"flawless",    icon:"🌟", name:"Clean Sheet", desc:"Score 100% on a practice quiz", flavor:"Ten for ten. Not a scratch on it.", pip:"A perfect run. Clean Sheet, no notes.", cat:"starter", pro:false},
+  {id:"explorer",    icon:"🧭", name:"The Sampler", desc:"Try 3 different exams", flavor:"Three exams tasted. Curiosity counts.", pip:"Three exams in. You know your way around now.", cat:"starter", pro:false},
   /* ---- Scores ---- */
-  {id:"sharp-shooter", icon:"🎯", name:"Sharpshooter", desc:"Score 90%+ on a timed simulation", cat:"score", pro:true},
-  {id:"marathon",    icon:"🏃", name:"Marathoner",   desc:"Complete a full timed simulation", cat:"score", pro:true},
-  {id:"clutch",      icon:"⏱️", name:"Clutch",       desc:"Finish a simulation with 10+ minutes to spare — and pass", cat:"score", pro:true},
-  {id:"perfectionist",icon:"💎", name:"Perfectionist",desc:"Score 100% on a full simulation", cat:"score", pro:true},
-  {id:"century",     icon:"💯", name:"Century",      desc:"Answer 100 questions", cat:"score", pro:true},
+  {id:"sharp-shooter", icon:"🎯", name:"Sharpshooter", desc:"Score 90%+ on a timed simulation", flavor:"90% under the clock. Cold.", pip:"90% against the clock. That's Sharpshooter work.", cat:"score", pro:true},
+  {id:"marathon",    icon:"🏃", name:"Marathoner",   desc:"Complete a full timed simulation", flavor:"All 90 questions. No shortcuts.", pip:"Full distance, real clock. Marathoner earned.", cat:"score", pro:true},
+  {id:"clutch",      icon:"⏱️", name:"Clutch",       desc:"Finish a simulation with 10+ minutes to spare — and pass", flavor:"Passed with time still on the clock.", pip:"Passed with minutes to spare. Clutch.", cat:"score", pro:true},
+  {id:"perfectionist",icon:"💎", name:"Untouchable", desc:"Score 100% on a full simulation", flavor:"A perfect full simulation. Frame it.", pip:"100% on a full sim. Untouchable is right.", cat:"score", pro:true},
+  {id:"century",     icon:"💯", name:"Century",      desc:"Answer 100 questions", flavor:"One hundred questions in. Keep going.", pip:"One hundred questions answered. Century coin's yours.", cat:"score", pro:true},
   /* ---- Streaks: each one banks a streak freeze ---- */
-  {id:"on-fire",     icon:"🔥", name:"On Fire",      desc:"Study 7 days in a row", cat:"streak", pro:true},
-  {id:"unstoppable", icon:"🌊", name:"Unstoppable",  desc:"Study 14 days in a row", cat:"streak", pro:true},
-  {id:"mountain",    icon:"🏔️", name:"Mountain",     desc:"Study 30 days in a row", cat:"streak", pro:true},
-  {id:"legendary",   icon:"👑", name:"Legendary",    desc:"Study 60 days in a row", cat:"streak", pro:true},
-  {id:"immortal",    icon:"♾️", name:"Immortal",     desc:"Study 100 days in a row", cat:"streak", pro:true},
+  {id:"on-fire",     icon:"🔥", name:"On Fire",      desc:"Study 7 days in a row", flavor:"Seven days in a row. Momentum looks good on you.", pip:"Seven days straight. On Fire — and a freeze banked.", cat:"streak", pro:true},
+  {id:"unstoppable", icon:"🌊", name:"Unstoppable",  desc:"Study 14 days in a row", flavor:"Two weeks straight. The habit runs itself now.", pip:"Fourteen days. The streak is doing the talking.", cat:"streak", pro:true},
+  {id:"mountain",    icon:"🏔️", name:"Mountain",     desc:"Study 30 days in a row", flavor:"Thirty days in a row. Base camp was a while ago.", pip:"Thirty days in a row. Mountain climbed.", cat:"streak", pro:true},
+  {id:"legendary",   icon:"👑", name:"Legendary",    desc:"Study 60 days in a row", flavor:"Sixty days in a row. People will ask how.", pip:"Sixty days. Legendary isn't overselling it.", cat:"streak", pro:true},
+  {id:"immortal",    icon:"♾️", name:"Immortal",     desc:"Study 100 days in a row", flavor:"One hundred days in a row. At this point, it's structural.", pip:"One hundred days straight. Immortal, officially.", cat:"streak", pro:true},
   /* ---- Explorer ---- */
-  {id:"completionist", icon:"🏆", name:"Completionist", desc:"Complete all 20 exams", cat:"explorer", pro:true},
-  {id:"cloud-nine",  icon:"☁️", name:"Head in the Clouds", desc:"Complete all 5 Cloud exams", cat:"explorer", pro:true},
-  {id:"terminal-tamer",icon:"⌨️", name:"Terminal Tamer", desc:"Complete a CKA or CKAD terminal simulation", cat:"explorer", pro:true},
-  {id:"code-blue",   icon:"🩺", name:"Code Blue Ready", desc:"Complete an NCLEX adaptive simulation", cat:"explorer", pro:true},
+  {id:"completionist", icon:"🏆", name:"Completionist", desc:"Complete all 20 exams", flavor:"Exam after exam, all of them, done.", pip:"Exam after exam, done. Completionist earned.", cat:"explorer", pro:true},
+  {id:"cloud-nine",  icon:"☁️", name:"Head in the Clouds", desc:"Complete all 5 Cloud exams", flavor:"All five cloud exams, finished. Nice view up here.", pip:"All five cloud exams, done. Head in the Clouds.", cat:"explorer", pro:true},
+  {id:"terminal-tamer",icon:"⌨️", name:"Terminal Tamer", desc:"Complete a CKA or CKAD terminal simulation", flavor:"The command line stopped arguing back.", pip:"A terminal sim, finished. The keyboard obeys you now.", cat:"explorer", pro:true},
+  {id:"code-blue",   icon:"🩺", name:"Code Blue Ready", desc:"Complete an NCLEX adaptive simulation", flavor:"The adaptive engine threw everything. You stayed calm.", pip:"An adaptive NCLEX sim, complete. Code Blue Ready.", cat:"explorer", pro:true},
   /* ---- Mastery ---- */
-  {id:"domain-master",icon:"🎖️", name:"Domain Master", desc:"Score 100% in a domain (3+ questions)", cat:"mastery", pro:true},
-  {id:"test-ready",  icon:"📈", name:"Test-Day Ready", desc:"Reach 90%+ readiness on any exam", cat:"mastery", pro:true},
-  {id:"sata-slayer", icon:"✅", name:"SATA Slayer",   desc:"Ace every SATA question in an NCLEX attempt", cat:"mastery", pro:true},
+  {id:"domain-master",icon:"🎖️", name:"Domain Master", desc:"Score 100% in a domain (3+ questions)", flavor:"A whole blueprint domain, aced outright.", pip:"A whole domain, perfect. Domain Master earned.", cat:"mastery", pro:true},
+  {id:"test-ready",  icon:"📈", name:"Test-Day Ready", desc:"Reach 90%+ readiness on any exam", flavor:"Readiness at 90%. The exam should be nervous.", pip:"90% readiness. Test-Day Ready says it all.", cat:"mastery", pro:true},
+  {id:"sata-slayer", icon:"✅", name:"SATA Slayer",   desc:"Ace every SATA question in an NCLEX attempt", flavor:"Every select-all, nailed. The traps are disarmed.", pip:"Every select-all, correct. SATA Slayer earned.", cat:"mastery", pro:true},
   /* ---- Grit ---- */
-  {id:"night-owl",   icon:"🦉", name:"Night Owl",    desc:"Finish an exam after 10 PM", cat:"grit", pro:true},
-  {id:"early-bird",  icon:"🌅", name:"Early Bird",   desc:"Finish an exam before 7 AM", cat:"grit", pro:true},
-  {id:"comeback",    icon:"💪", name:"Comeback Kid", desc:"Beat your previous best on an exam by 20+ points", cat:"grit", pro:true},
+  {id:"night-owl",   icon:"🦉", name:"Night Owl",    desc:"Finish an exam after 10 PM", flavor:"Finished while the house slept.", pip:"Finished after 10 PM. Night Owl hours.", cat:"grit", pro:true},
+  {id:"early-bird",  icon:"🌅", name:"Early Bird",   desc:"Finish an exam before 7 AM", flavor:"Done before the coffee kicked in.", pip:"Done before 7 AM. Early Bird, indeed.", cat:"grit", pro:true},
+  {id:"comeback",    icon:"💪", name:"Comeback Kid", desc:"Beat your previous best on an exam by 20+ points", flavor:"Your old best score sends its regards.", pip:"Twenty points past your best. Comeback Kid.", cat:"grit", pro:true},
 ];
-const BADGE_CATS=[["starter","🌱 Starter"],["score","🎯 Scores"],["streak","🔥 Streaks"],["explorer","🧭 Explorer"],["mastery","📈 Mastery"],["grit","💪 Grit"]];
+const BADGE_CATS=[["starter","Starter"],["score","Scores"],["streak","Streaks"],["explorer","Explorer"],["mastery","Mastery"],["grit","Grit"]];
+/* Metal tiers for repeatable feats (approved 2026-10-22): base unlock
+   is Bronze, repeats deepen to Silver, then Gold. Rim + glyph take
+   the metal; the navy enamel never changes. One-feat badges are not
+   in this table and always render in the standard gold finish. */
+const BADGE_TIERS={
+  "century":      {src:r=>r.qAnswered||0,                    steps:[100,500,1000], unit:"questions answered"},
+  "marathon":     {src:r=>(r.badgeCounts||{}).sims||0,       steps:[1,10,25],      unit:"full simulations"},
+  "sharp-shooter":{src:r=>(r.badgeCounts||{}).sims90||0,     steps:[1,5,15],       unit:"simulations at 90%+"},
+  "flawless":     {src:r=>(r.badgeCounts||{}).perfectPractice||0, steps:[1,5,15],  unit:"perfect practice quizzes"},
+  "domain-master":{src:r=>(r.badgeCounts||{}).domainAces||0, steps:[1,5,10],       unit:"domains aced"}
+};
+function badgeTier(r,b){
+  const t=BADGE_TIERS[b.id]; if(!t) return "gold";
+  const c=t.src(r);
+  if(c>=t.steps[2]) return "gold";
+  if(c>=t.steps[1]) return "silver";
+  return "bronze";
+}
+/* Honest progress for a locked badge, from stored data only.
+   Returns {ratio:0..1, label, gap} or null when no honest progress
+   exists (single feats, when-feats, not-yet-started counters). */
+function badgeProgress(r,b){
+  const atts=r.attempts||[];
+  const streak=dayStreak(r);
+  const sims=atts.filter(a=>a.mode==="sim");
+  const bestSim=sims.length?Math.max.apply(null,sims.map(a=>a.pct)):null;
+  switch(b.id){
+    case "warming-up": {
+      if(streak<=0||streak>=3) return null;
+      const c=Math.min(streak,3);
+      return {ratio:c/3, label:"Day "+c+" of 3", gap:(3-c)+" more days in a row"};
+    }
+    case "flawless": {
+      const pr=atts.filter(a=>a.mode==="practice");
+      if(!pr.length) return null;
+      const best=Math.max.apply(null,pr.map(a=>a.pct));
+      if(best>=100) return null;
+      return {ratio:best/100, label:"Best practice score "+best+"%", gap:(100-best)+" points to go"};
+    }
+    case "explorer": {
+      const c=Math.min(Object.keys(r.examsDone||{}).length,3);
+      if(!c||c>=3) return null;
+      return {ratio:c/3, label:c+" of 3 exams", gap:(3-c)+" exams to go"};
+    }
+    case "sharp-shooter": {
+      if(bestSim==null||bestSim>=90) return null;
+      return {ratio:bestSim/90, label:"Best sim "+bestSim+"%", gap:(90-bestSim)+" points to go"};
+    }
+    case "clutch": {
+      const ps=sims.filter(a=>a.timeLeftSec!=null&&a.pct>=passPct(a.slug));
+      if(!ps.length) return null;
+      const best=Math.max.apply(null,ps.map(a=>a.timeLeftSec));
+      if(best>=600) return null;
+      return {ratio:best/600, label:"Best pass: "+Math.floor(best/60)+" min to spare",
+        gap:Math.ceil((600-best)/60)+" more minutes to spare"};
+    }
+    case "perfectionist": {
+      if(bestSim==null||bestSim>=100) return null;
+      return {ratio:bestSim/100, label:"Best sim "+bestSim+"%", gap:(100-bestSim)+" points to go"};
+    }
+    case "century": {
+      if(!r.qAnswered||r.qAnswered>=100) return null;
+      const c=Math.min(r.qAnswered,100);
+      return {ratio:c/100, label:c+" of 100 questions", gap:(100-c)+" questions to go"};
+    }
+    case "on-fire": case "unstoppable": case "mountain": case "legendary": case "immortal": {
+      const target={"on-fire":7,"unstoppable":14,"mountain":30,"legendary":60,"immortal":100}[b.id];
+      if(streak<=0||streak>=target) return null;
+      const c=Math.min(streak,target);
+      return {ratio:c/target, label:"Day "+c+" of "+target, gap:(target-c)+" more days in a row"};
+    }
+    case "completionist": {
+      const c=Object.keys(r.examsDone||{}).length;
+      if(!c||c>=EXAMS.length) return null;
+      return {ratio:c/EXAMS.length, label:c+" of "+EXAMS.length+" exams", gap:(EXAMS.length-c)+" exams to go"};
+    }
+    case "cloud-nine": {
+      const cs=EXAMS.filter(e=>e.cat==="cloud").map(e=>e.slug);
+      const c=cs.filter(s=>(r.examsDone||{})[s]).length;
+      if(!c||!cs.length||c>=cs.length) return null;
+      return {ratio:c/cs.length, label:c+" of "+cs.length+" cloud exams", gap:(cs.length-c)+" exams to go"};
+    }
+    case "domain-master": {
+      let bd=null;
+      atts.forEach(a=>{ Object.keys(a.domains||{}).forEach(d=>{
+        const s=a.domains[d];
+        if(s&&s.t>=3&&(!bd||s.c/s.t>bd.c/bd.t)) bd=s;
+      }); });
+      if(!bd||bd.c>=bd.t) return null;
+      return {ratio:bd.c/bd.t, label:"Best domain run: "+bd.c+" of "+bd.t+" correct",
+        gap:(bd.t-bd.c)+" questions short in your best domain"};
+    }
+    case "test-ready": {
+      const slugs=Array.from(new Set(atts.map(a=>a.slug)));
+      let best=null;
+      slugs.forEach(s=>{ const det=readinessDetail(r,s);
+        if(det&&det.pct!=null&&(best==null||det.pct>best)) best=det.pct; });
+      if(best==null||best>=90) return null;
+      return {ratio:best/90, label:"Readiness "+best+"% · goal 90%", gap:(90-best)+"% of readiness to go"};
+    }
+    case "sata-slayer": {
+      const sa=atts.filter(a=>a.sataTotal>0);
+      if(!sa.length) return null;
+      const t=sa.slice().sort((x,y)=>(y.sataCorrect/y.sataTotal)-(x.sataCorrect/x.sataTotal))[0];
+      if(t.sataCorrect>=t.sataTotal) return null;
+      return {ratio:t.sataCorrect/t.sataTotal, label:"Best: "+t.sataCorrect+" of "+t.sataTotal+" SATA correct",
+        gap:(t.sataTotal-t.sataCorrect)+" SATA from a perfect run"};
+    }
+    case "comeback": {
+      const bySlug={}; let jump=0;
+      atts.forEach(a=>{ const pb=bySlug[a.slug];
+        if(pb!=null&&pb>0) jump=Math.max(jump,a.pct-pb);
+        if(pb==null||a.pct>pb) bySlug[a.slug]=a.pct; });
+      if(jump<=0||jump>=20) return null;
+      return {ratio:jump/20, label:"Biggest jump +"+jump+" · goal +20", gap:(20-jump)+" points to go"};
+    }
+  }
+  return null;
+}
+/* Next-badge slot: always the closest earnable badge, from real
+   progress. Templates are the approved set from the copy list. */
+function nextBadge(r){
+  const has=id=>r.badges.includes(id);
+  if(BADGES.every(b=>has(b.id)))
+    return {all:true, line:"Every coin's in the case. Now the real exam."};
+  const brandNew=!(r.attempts&&r.attempts.length)&&!r.qAnswered;
+  if(brandNew&&!has("first-steps")){
+    const b=BADGES.find(x=>x.id==="first-steps");
+    return {b, prog:null, line:"Your first coin is one quiz away: " + b.name + "."};
+  }
+  let cands=BADGES.filter(b=>!has(b.id)&&(!b.pro||r.pro));
+  if(!cands.length) cands=BADGES.filter(b=>!has(b.id));
+  let best=null;
+  cands.forEach(b=>{ const p=badgeProgress(r,b);
+    if(p&&(!best||p.ratio>best.prog.ratio)) best={b,prog:p}; });
+  if(best) return {b:best.b, prog:best.prog, line:"Next up: " + best.b.name + " \u2014 " + best.prog.gap + "."};
+  const b=cands[0];
+  return {b, prog:null, line:"Next up: "+b.name+" — "+b.desc.charAt(0).toLowerCase()+b.desc.slice(1)+"."};
+}
 function awardBadge(r,id){
   if(r.badges.includes(id)) return false;
   const b=BADGES.find(x=>x.id===id);
@@ -6689,14 +7019,14 @@ function checkBadges(r, o){
     give("marathon");
     if(o.pct>=90) give("sharp-shooter");
     if(o.pct===100) give("perfectionist");
-    if(o.pct>=70&&(o.timeLeftSec||0)>=600) give("clutch");
+    if(o.pct>=passPct(o.slug)&&(o.timeLeftSec||0)>=600) give("clutch");
   }
   if(r.qAnswered>=100) give("century");
   /* ---- Streaks ---- */
   [[7,"on-fire"],[14,"unstoppable"],[30,"mountain"],[60,"legendary"],[100,"immortal"]]
     .forEach(([n,id])=>{ if(streak>=n) give(id); });
   /* ---- Explorer ---- */
-  if(Object.keys(r.examsDone).length>=16) give("completionist");
+  if(Object.keys(r.examsDone).length>=EXAMS.length) give("completionist");
   const cloudSlugs=EXAMS.filter(e=>e.cat==="cloud").map(e=>e.slug);
   if(cloudSlugs.length&&cloudSlugs.every(s=>r.examsDone[s])) give("cloud-nine");
   const ex=EXAMS.find(e=>e.slug===o.slug);
@@ -6721,10 +7051,16 @@ function pumpUnlockQueue(){
   if(r.unlockQueue&&r.unlockQueue.length){
     const id=r.unlockQueue.shift(); saveUserRec(r);
     const b=BADGES.find(x=>x.id===id); if(!b){ pumpUnlockQueue(); return; }
-    $("unlock-mascot").innerHTML=mascotSVG("celebrate",64);
-    $("unlock-icon").textContent=b.icon;
+    /* The unlock moment: the coin flips to full metal, Pip says the
+       badge's one approved line. No mascot, no emoji — the coin is
+       the hero (approved mock, 2026-10-22). */
+    $("unlock-mascot").innerHTML="";
+    const uic=$("unlock-icon");
+    uic.classList.add("coinmode");
+    uic.innerHTML='<span class="coin-flip">'+coinSVG(id,{size:120,tier:badgeTier(r,b),label:b.name})+'</span>';
     $("unlock-name").textContent=b.name;
-    $("unlock-desc").textContent=b.desc;
+    $("unlock-desc").innerHTML='<span class="piprow"><span class="pipfig">'+mascotSVG("celebrate",32)+'</span><span class="pipline"></span></span>';
+    $("unlock-desc").querySelector(".pipline").textContent=b.pip;
     $("unlock-xp").textContent="+"+(b.pro?100:50)+" XP";
     $("unlockov").classList.remove("hidden");
     burstConfetti(70);
@@ -7268,6 +7604,23 @@ function renderProfile(){
   requestAnimationFrame(()=>{ pr.style.transition="stroke-dashoffset 1.2s cubic-bezier(.2,.7,.2,1)"; pr.style.strokeDashoffset=C*(1-prog/100); });
   $("profile-xptext").textContent=r.xp.toLocaleString()+" XP"+(lv.nextName?" · "+(lv.next-lv.cur-(r.xp-lv.cur)).toLocaleString()+" XP to "+lv.nextName:" · max level");
   $("badge-count").textContent="· "+r.badges.length+" of "+BADGES.length+" unlocked";
+  /* Next-coin slot: the closest earnable badge, from real progress. */
+  const ncs=$("next-coin-slot");
+  if(ncs){
+    const nb=nextBadge(r);
+    if(nb.all){
+      ncs.innerHTML='<div class="nextcoin">'+coinSVG("century",{size:64,tier:"gold",label:"Every coin earned"})+
+        '<div class="nc-mid"><div class="micro">Next coin</div>'+
+        '<div class="piprow"><span class="pipfig">'+mascotSVG("celebrate",30)+'</span><p class="pipline">'+nb.line+'</p></div></div></div>';
+    } else {
+      ncs.innerHTML='<div class="nextcoin">'+coinSVG(nb.b.id,{size:64,state:"locked",label:nb.b.name})+
+        '<div class="nc-mid"><div class="micro">Next coin</div>'+
+        '<div class="piprow"><span class="pipfig">'+mascotSVG("encourage",30)+'</span><p class="pipline"></p></div>'+
+        (nb.prog?'<span class="pbar"><span style="width:'+Math.round(nb.prog.ratio*100)+'%"></span></span><span class="plabel">'+nb.prog.label+'</span>':"")+
+        '</div></div>';
+      ncs.querySelector(".pipline").textContent=nb.line;
+    }
+  }
   $("badge-grid").innerHTML=BADGE_CATS.map(([cat,label])=>{
     const items=BADGES.filter(b=>b.cat===cat);
     if(!items.length) return "";
@@ -7275,10 +7628,13 @@ function renderProfile(){
       items.map(b=>{
         const un=r.badges.includes(b.id);
         const proLock=!un&&b.pro&&!r.pro;
+        const tier=un?badgeTier(r,b):null;
+        const prog=!un?badgeProgress(r,b):null;
         return '<button class="badge '+(un?"unlocked":"locked")+(proLock?" prolock":"")+'" data-bid="'+b.id+'">'+
-          '<span class="bi">'+b.icon+'</span>'+
-          (proLock?'<span class="block">🔒</span>':"")+
-          '<span class="bn">'+b.name+'</span><span class="bd">'+b.desc+'</span>'+
+          '<span class="bcoin">'+coinSVG(b.id,{size:76,state:un?"earned":"locked",tier:tier||"gold",label:b.name})+'</span>'+
+          '<span class="bn">'+b.name+'</span><span class="bd">'+b.flavor+'</span>'+
+          (tier&&BADGE_TIERS[b.id]?'<span class="tierlab t-'+tier+'">'+tier.toUpperCase()+'</span>':"")+
+          (prog?'<span class="prog"><span class="pbar"><span style="width:'+Math.round(prog.ratio*100)+'%"></span></span><span class="plabel">'+prog.label+'</span></span>':"")+
           (proLock?'<span class="bpro">PRO</span>':"")+'</button>';
       }).join("")+'</div></div>';
   }).join("");
@@ -7299,9 +7655,28 @@ function showBadgeDetail(id){
   const r=userRec(); const b=BADGES.find(x=>x.id===id); if(!b) return;
   const un=r&&r.badges.includes(id);
   const proLock=!un&&b.pro&&!(r&&r.pro);
-  $("bov-icon").textContent=b.icon;
+  const tier=un?badgeTier(r,b):null;
+  const bic=$("bov-icon");
+  bic.classList.add("coinmode");
+  bic.innerHTML=coinSVG(id,{size:104,state:un?"earned":"locked",tier:tier||"gold",label:b.name});
   $("bov-name").textContent=b.name;
-  $("bov-desc").textContent=b.desc;
+  $("bov-desc").innerHTML='<span class="bovflavor"></span><span class="bovcond"></span>';
+  $("bov-desc").querySelector(".bovflavor").textContent=b.flavor;
+  $("bov-desc").querySelector(".bovcond").textContent=b.desc;
+  /* Progress / tier state: the honest numbers live here, one tap in. */
+  const bp=$("bov-prog");
+  if(bp){
+    if(un&&BADGE_TIERS[b.id]){
+      const t=BADGE_TIERS[b.id], c=t.src(r);
+      const nxt=tier==="bronze"?t.steps[1]:(tier==="silver"?t.steps[2]:null);
+      bp.innerHTML='<span class="tierlab t-'+tier+'">'+tier.toUpperCase()+'</span>'+
+        '<span class="plabel">'+c.toLocaleString()+" "+t.unit+(nxt?" · next: "+(tier==="bronze"?"Silver":"Gold")+" at "+nxt.toLocaleString():" · top metal")+'</span>';
+    } else if(un){ bp.innerHTML=""; }
+    else {
+      const prog=r?badgeProgress(r,b):null;
+      bp.innerHTML=prog?'<span class="pbar"><span style="width:'+Math.round(prog.ratio*100)+'%"></span></span><span class="plabel">'+prog.label+'</span>':"";
+    }
+  }
   $("bov-xp").textContent=un?"Unlocked ✓":"+"+(b.pro?100:50)+" XP";
   $("bov-xp").style.display="";
   const cta=$("bov-cta");
