@@ -2538,7 +2538,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <button class="btn block" id="pw-buy">Get Pro — $9.99 · All 20 exams</button>
       <div class="fineprint">Secure checkout · Instant access · Yours forever<br>No subscription, no renewals.</div>
       <div class="keyrow">
-        <input id="pw-key" type="text" placeholder="BB19-XXXXXX-XXXXXX" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" style="font-family:ui-monospace,Menlo,monospace; letter-spacing:.04em;">
+        <input id="pw-key" type="text" placeholder="Enter your license key" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" style="font-family:ui-monospace,Menlo,monospace; letter-spacing:.04em;">
         <button class="btn ghost" id="pw-activate" style="padding:12px 18px; font-size:14px;">Activate</button>
       </div>
       <div class="fineprint" style="margin-top:8px; text-align:left;">Have a key? Enter it to unlock Pro — or restore it on a new device.<br>Lost your key? It's in your Payhip purchase email.</div>
@@ -4938,7 +4938,7 @@ $("pw-activate").addEventListener("click",()=>{
   const msg=$("pw-msg");
   /* Production validation: checksum-verified pre-generated keys (see keygen.py). */
   if(!k || k==="BB19"){ msg.textContent="Enter your license key \u2014 you'll find it in your Payhip purchase email."; msg.style.color="var(--amber)"; return; }
-  if(!/^BB19-[A-Z0-9]{6}-[A-Z0-9]{6}$/.test(k)){ msg.textContent="Keys look like BB19-XXXXXX-XXXXXX \u2014 check for typos and try again."; msg.style.color="var(--red)"; return; }
+  if(!/^BB19-[A-Z0-9]{6}-[A-Z0-9]{6}$/.test(k)){ msg.textContent="That key looks incomplete \u2014 check for typos and try again."; msg.style.color="var(--red)"; return; }
   if(verifyKey(k)){
     activatePro(k);
   } else { msg.textContent="That key didn't check out. Double-check it, or find it in your Payhip purchase email."; msg.style.color="var(--red)"; }
