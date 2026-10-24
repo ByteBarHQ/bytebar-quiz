@@ -1837,7 +1837,17 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <button class="btn hero-cta" id="hero-cta">Choose your exam ↓</button>
       <div class="authbadge">✓ Questions mapped to official exam objectives</div>
     </div>
-    <div class="secttl">Choose your exam</div>
+    <style>
+.tier1-strip{background:var(--card); border:1px solid var(--line); border-top:4px solid #f0ad3c; border-radius:var(--r); box-shadow:var(--shadow); padding:18px 22px; margin:26px 0 6px;}
+.tier1-strip-in{display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;}
+.tier1-strip-tx{font-size:16.5px; font-weight:700; color:var(--ink); line-height:1.45;}
+.tier1-strip-tx b{font-weight:850;}
+.tier1-strip-sub{display:block; font-size:13.5px; font-weight:600; color:var(--mut); margin-top:2px;}
+.tier1-strip .goprobtn{font-size:14px; padding:10px 22px;}
+@media(max-width:560px){.tier1-strip{padding:16px 18px} .tier1-strip-tx{font-size:15px}}
+</style>
+<div class="tier1-strip"><div class="tier1-strip-in"><div class="tier1-strip-tx"><b>$9.99 one-time</b> &middot; all 28 exams &middot; yours forever<span class="tier1-strip-sub">10 free questions on every exam — no account needed</span></div><button class="goprobtn" onclick="openPaywall()">Go Pro — $9.99</button></div></div>
+<div class="secttl">Choose your exam</div>
     <div class="examgrid" id="examgrid">
     <div class="catchdr">☁️ Cloud</div>
     <button class="examcard" style="--acc:#38bdf8;--i:0" onclick="examCardClick('az900')">
