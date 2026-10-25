@@ -2648,7 +2648,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
         <div class="tchip">🔒 Secure checkout</div>
         <div class="tchip">✓ One-time payment, no subscription</div>
       </div>
-      <div class="priceline"><span class="was">$99</span><span class="p">$9.99</span><span class="per">one-time · all 28 exams</span></div>
+      <div class="priceline"><span class="was">$99 per exam elsewhere</span><span class="p">$9.99</span><span class="per">one-time · all 28 exams</span></div>
       <button class="btn block" id="pw-buy">Get Pro — $9.99 · All 28 exams</button>
       <div class="fineprint">Secure checkout · Instant access · Yours forever<br>No subscription, no renewals.</div>
       <div class="keyrow">
@@ -2768,7 +2768,7 @@ window.BB = (function(){
     if(note){
       if(returnTo === "paywall"){
         note.innerHTML = '<div class="authpro-note">' + mascotSVG("happy", 44) +
-          '<div><b>One quick step before checkout</b><span>Sign in with email — your Pro status, progress, and badges then work on any device.</span></div></div>';
+          '<div><b>Almost there</b><span>Sign in with your checkout email — your Pro account was created automatically at checkout, and signing in ties your license key and Pro status to your account on any device.</span></div></div>';
         note.classList.remove("hidden");
       } else { note.classList.add("hidden"); note.innerHTML = ""; }
     }
@@ -3246,15 +3246,54 @@ function buildSimBank(slug){
   }
   return pool;
 }
+/* Taste topic de-duplication (funnel fix, Cori 2026-10-25): the taste draw
+   was a naive shuffle + slice, so one 10-question set could serve the same
+   narrow topic twice — the 2026-10-25 buyer-path walk drew TWO port-445
+   questions in a single Security+ taste. Each item gets a topic signature:
+   significant numbers (ports, versions — value >= 20, or any dotted
+   number) and ALL-CAPS acronyms (protocols, services, tools) taken from
+   its stem plus its correct answer. The draw skips an item whose
+   signature collides with one already picked; generic tokens are
+   stoplisted. If the pool can't fill the taste under the rule, the draw
+   tops up from the skipped items, so a taste is always PRACTICE_COUNT
+   long and small pools behave exactly as before. */
+const TASTE_TOPIC_STOP=new Set(["tcp","udp","ip","it","os","id","ii","iii","iv","pc","usb","not","best","most","least","first","all","one","two","the","and","for","are","was","has","can","may","per","via"]);
+function tasteTopicSig(q){
+  const sig=new Set();
+  let ansTxt="";
+  if(q && q.options){
+    if(typeof q.answer==="string"){ const i="ABCD".indexOf(q.answer); if(i>=0) ansTxt=q.options[i]||""; }
+    if(Array.isArray(q.answers)){ ansTxt=q.answers.map(a=>q.options["ABCD".indexOf(a)]||"").join(" "); }
+  }
+  const text=((q&&(q.q||q.task))||"")+" "+ansTxt;
+  (text.match(/\b\d+(?:\.\d+)?\b/g)||[]).forEach(n=>{ if(parseFloat(n)>=20||n.indexOf(".")!==-1) sig.add("n:"+n); });
+  (text.match(/\b[A-Z][A-Z0-9]{1,}\b/g)||[]).forEach(a=>{ const k=a.toLowerCase(); if(!TASTE_TOPIC_STOP.has(k)) sig.add("a:"+k); });
+  return sig;
+}
+function pickTasteQuestions(pool, n){
+  const shuffled=shuffle(pool.slice());
+  const picked=[], used=new Set();
+  for(const q of shuffled){
+    if(picked.length>=n) break;
+    const sig=tasteTopicSig(q); let clash=false;
+    sig.forEach(k=>{ if(used.has(k)) clash=true; });
+    if(clash) continue;
+    picked.push(q); sig.forEach(k=>used.add(k));
+  }
+  if(picked.length<n){
+    for(const q of shuffled){ if(picked.length>=n) break; if(picked.indexOf(q)===-1) picked.push(q); }
+  }
+  return picked;
+}
 function buildPracticeBank(slug){
   const fmt=examFormat(slug);
   if(fmt.types.indexOf("terminal")!==-1){
-    return shuffle((TERMINAL_TASKS[slug]||[]).slice()).slice(0,CONFIG.PRACTICE_COUNT).map(prepTerminal);
+    return pickTasteQuestions((TERMINAL_TASKS[slug]||[]).slice(),CONFIG.PRACTICE_COUNT).map(prepTerminal);
   }
   const cs=caseSplit(BANKS[slug]);
   let pool=cs.singles.slice();
   if(fmt.types.indexOf("sata")!==-1) pool=pool.filter(q=>q.qtype!=="sata"); /* free taste: MCQ only */
-  let bank=shuffle(pool).slice(0,CONFIG.PRACTICE_COUNT).map(prepAny);
+  let bank=pickTasteQuestions(pool,CONFIG.PRACTICE_COUNT).map(prepAny);
   /* NCLEX-RN practice carries one intact case study (Phase A3): the study
      block replaces half the taste, so the run stays at PRACTICE_COUNT and
      the study's SATA items ride inside the study, not the singles pool. */
@@ -5028,13 +5067,17 @@ $("pw-close").addEventListener("click",closePaywall);
 $("pw-close2").addEventListener("click",closePaywall);
 $("paywall").addEventListener("click",e=>{ if(e.target.id==="paywall") closePaywall(); });
 $("pw-buy").addEventListener("click",()=>{
-  /* Pro lives on the account — guests create one first (positive framing). */
-  /* Pro lives on the account — guests create one first (positive framing).
-     Hide the paywall directly instead of closePaywall(): for ?buy=1
-     arrivals closePaywall() fires the _cameFromBuy redirect and ejects
-     the guest to bytebarhq.com before the auth modal can ever open. */
-  if(!currentUser()){ $("paywall").classList.add("hidden"); openAuth("paywall"); return; }
-  window.open(CONFIG.PAYMENT_URL,"_blank");
+  /* Buy path goes STRAIGHT to Payhip — no account gate first (funnel fix,
+     Cori 2026-10-25). The old flow bounced guests into a sign-in sheet
+     step before Payhip; the 2026-10-25 buyer-path walk found that
+     dead-ended anonymous visitors at the pay moment. The Pro account
+     is created automatically at checkout under
+     the checkout email, and the license key in the purchase email also
+     unlocks Pro — so nobody needs an account before buying. Sign-in
+     stays exactly as it was for returning users (account button) and
+     for tying a key to an account (key door above). Same tab, so the
+     visitor never loses their place. */
+  window.location.href = CONFIG.PAYMENT_URL;
 });
 /* Key entry: auto-uppercase + dash formatting as they type (mobile-friendly).
    Keys look like BB19-XXXXXX-XXXXXX. */
@@ -5088,8 +5131,8 @@ function celebrateProWelcome(r){
   const prowNote=$("prow-note");
   if(prowNote){
     if(!r){
-      prowNote.innerHTML='<div class="prow-secure">🔒 <b>Secure your Pro status</b><span>Create a free account so Pro follows you to any device.</span></div>'+
-        '<button class="btn ghost" id="prow-securebtn" style="margin-top:10px;">Create free account</button>';
+      prowNote.innerHTML='<div class="prow-secure">🔒 <b>Secure your Pro status</b><span>Sign in with your checkout email — your account was created automatically at checkout, so Pro follows you to any device.</span></div>'+
+        '<button class="btn ghost" id="prow-securebtn" style="margin-top:10px;">Sign in</button>';
       prowNote.classList.remove("hidden");
       const sb=$("prow-securebtn");
       if(sb) sb.addEventListener("click",()=>{ $("prowelcomeov").classList.add("hidden"); openAuth(); });
@@ -6217,12 +6260,13 @@ function finishExam(expired){
          visual teaser of the domain breakdown, one clear CTA. */
       const up=document.createElement("div");
       up.className="upgradecard pro-pitch";
-      /* ONE free insight (2026-10-22): show ONE real domain row unblurred —
-         the domain where they lost the most points in this taste (their
-         strongest if they missed nothing) — and keep the rest of the
-         breakdown blurred behind Pro. Every number comes straight from
-         `doms`, i.e. their actual answers. Nothing is invented: the row
-         carries its real c/t so the tiny sample stays honest. */
+      /* Teaser insight: name ONE real domain — the domain where they lost
+         the most points in this taste (their strongest if they missed
+         nothing) — as the labeled hook, and list the other domains by
+         name. The rows are picked from `doms`, i.e. their actual answers,
+         but NO percentages or counts render for free users (funnel fix,
+         Cori 2026-10-25 — see teaserRow below); the full breakdown with
+         real numbers is Pro value, shown on the Pro results page. */
       const domRows = Object.keys(doms).map(d => {
         const t = doms[d].t, c = doms[d].c;
         return { name: d, t: t, c: c, missed: t - c, pct: t > 0 ? Math.round(c / t * 100) : 0 };
@@ -6236,24 +6280,31 @@ function finishExam(expired){
         featured = domRows.slice().sort((a, b) => (b.pct - a.pct) || (b.t - a.t))[0];
         featuredLabel = "Your strongest so far"; featuredStrong = true;
       }
-      const teaserRow = (r, barCol) =>
+      /* FUNNEL FIX (Cori 2026-10-25): the teaser used to render the real
+         percentages into the DOM and rely on CSS blur to hide them — the
+         2026-10-25 buyer-path walk read them straight off the page,
+         contradicting the "🔒 Pro" label. Now the numbers never reach
+         the DOM for free users: domain names show, the bar renders as a
+         neutral locked bar, and the % slot shows the lock. (This also
+         retires the 2026-10-22 "one free insight" unblurred row — the
+         label saying WHERE points were lost stays; the numbers are Pro.) */
+      const teaserRow = (r) =>
         '<div class="pp-teaser-row"><span class="pp-teaser-name">' + escapeHtml(r.name) + '</span>' +
-        '<div class="pp-teaser-bar"><div style="width:' + r.pct + '%' + (barCol ? ';background:' + barCol : '') + '"></div></div>' +
-        '<span class="pp-teaser-pct">' + r.pct + '%</span></div>';
+        '<div class="pp-teaser-bar"><div style="width:100%;background:#ccd3e4"></div></div>' +
+        '<span class="pp-teaser-pct">🔒</span></div>';
       /* Featured row layout: the name gets its own full-width line (the
-         one-line teaserRow ellipsized it against the bar + %), then the
-         bar on the next line with the % at its right end. */
-      const featuredRow = (r, barCol) =>
+         one-line teaserRow ellipsized it against the bar + lock), then the
+         locked bar on the next line with the lock at its right end. */
+      const featuredRow = (r) =>
         '<div class="pp-insight-name">' + escapeHtml(r.name) + '</div>' +
-        '<div class="pp-insight-meter"><div class="pp-teaser-bar"><div style="width:' + r.pct + '%' + (barCol ? ';background:' + barCol : '') + '"></div></div>' +
-        '<span class="pp-teaser-pct">' + r.pct + '%</span></div>';
+        '<div class="pp-insight-meter"><div class="pp-teaser-bar"><div style="width:100%;background:#ccd3e4"></div></div>' +
+        '<span class="pp-teaser-pct">🔒</span></div>';
       let insightHtml = "";
       if(featured){
-        const barCol = featured.pct >= 85 ? "#0d9d6c" : (featured.pct >= passMark ? "#c77408" : "#d63a3a");
         insightHtml =
           '<div class="pp-insight"><div class="pp-insight-label' + (featuredStrong ? ' strong' : '') + '">' + featuredLabel + '</div>' +
-          featuredRow(featured, barCol) +
-          '<div class="pp-insight-note">' + fmtPts(featured.c) + ' of ' + featured.t + ' correct in this taste</div></div>';
+          featuredRow(featured) +
+          '<div class="pp-insight-note">Pro unlocks the exact score for every domain</div></div>';
       }
       let blurredBars = "";
       domRows.filter(r => r !== featured).slice(0, 3).forEach(r => { blurredBars += teaserRow(r); });
@@ -6281,7 +6332,7 @@ function finishExam(expired){
         '</ul>' +
         '<button class="btn pp-cta" id="ub-go">Unlock Pro — ' + CONFIG.PRICE + ' one-time · all 28 exams</button>' +
         '<div class="pp-fine">One payment for all 28 exams · Yours forever · No subscription, ever</div>' +
-        '<div class="pp-autoacct">Your Pro account is created automatically at checkout — just check your inbox.</div>' +
+        '<div class="pp-autoacct">Your Pro account is created automatically at checkout under your checkout email — and the license key in your purchase email unlocks Pro anytime.</div>' +
         '<button class="pp-notnow" id="ub-notnow">Not now — keep exploring the free tier</button>';
       upSlot.appendChild(up);
       const go=$("ub-go");
@@ -6481,12 +6532,15 @@ function openAuth(returnTo){
   $("auth-user").value=""; $("auth-pass").value="";
   /* Purchase flow defaults to signup — they're creating their Pro home. */
   setAuthMode(returnTo==="paywall" ? "signup" : "signin");
-  /* Friendly context when we're asking for an account before purchase. */
+  /* Context when the auth sheet opens around the Pro flow. NOTE (funnel
+     fix, Cori 2026-10-25): checkout never requires an account first —
+     the account is created automatically at checkout under the checkout
+     email. This note must never imply sign-in comes before buying. */
   const note=$("auth-context");
   if(note){
     if(returnTo==="paywall"){
       note.innerHTML='<div class="authpro-note">'+mascotSVG("happy",44)+
-        '<div><b>One quick step before checkout</b><span>Create your free account — your Pro status, progress, and badges all live here, on any device.</span></div></div>';
+        '<div><b>Your Pro account starts at checkout</b><span>Checkout creates it automatically under your checkout email — no account needed before you buy. This sign-in is for an account you already have.</span></div></div>';
       note.classList.remove("hidden");
     } else { note.classList.add("hidden"); note.innerHTML=""; }
   }
