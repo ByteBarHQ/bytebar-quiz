@@ -6439,7 +6439,23 @@ function userRec(){
   if(r) migrateRec(r);
   return r;
 }
-function saveUserRec(r){ const a=getAccounts(); a[r.username]=r; saveAccounts(a); if(window.BB) BB.onSave(); }
+function saveUserRec(r){
+  const a=getAccounts();
+  /* Key fix (2026-10-30): Supabase sessions store the record under the
+     session key "sb:<uid>" (BB.establishSession), while r.username is the
+     account email. Writing by username orphaned every save for signed-in
+     users — reads (userRec) use the session key, so progress never
+     accumulated, Analytics read the stale sign-in snapshot (0/0/0), and
+     BB.pushNow kept pushing that snapshot, so attempts never reached the
+     server either. When the current session's stored record is this same
+     account (its username matches), save under the session key instead.
+     Legacy local accounts are unaffected: their session key IS the
+     username, so the first branch never triggers for them. */
+  let key=r.username;
+  const sess=currentUser();
+  if(sess && sess!==key && a[sess] && a[sess].username===r.username) key=sess;
+  a[key]=r; saveAccounts(a); if(window.BB) BB.onSave();
+}
 function newUserRec(username, passHash){
   return { username, passHash, created:Date.now(), xp:0, badges:[],
     activeDays:[], best:{}, attempts:[], domainAgg:{}, qAnswered:0,
