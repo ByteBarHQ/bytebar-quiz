@@ -1602,6 +1602,10 @@ br.tbr{display:none;}
    Transform-only keyframes on the existing v3 figure; every move
    plays exactly once per screen appearance, then Pip settles. */
 .pipblock{display:flex; flex-direction:column; align-items:center; gap:8px; text-align:center; margin:6px 0 12px;}
+/* Watch the chapter (2026-11-02): one quiet pill under the Pip block — ByteBar restraint, no new accent. */
+.watchchap{text-align:center; margin:2px 0 14px;}
+.watchchap a{display:inline-block; padding:11px 24px; border-radius:999px; background:var(--navy); color:#fff; font-weight:800; font-size:15px; text-decoration:none; box-shadow:0 4px 14px rgba(11,32,64,.18);}
+.watchchap a:hover{filter:brightness(1.15);}
 /* Phase B: readiness meter on exam cards + Pip greeting actions */
 .rmeter{display:block; height:6px; border-radius:99px; background:#edf1f8; overflow:hidden; margin-top:10px;}
 .rmeter-fill{display:block; height:100%; border-radius:99px; background:var(--acc,#0b8fc4); transition:width .9s cubic-bezier(.2,.7,.2,1);}
@@ -2317,6 +2321,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <div><span class="passfail" id="res-passfail">–</span></div>
       <div class="verdictbox" id="res-verdictbox"></div>
       <div class="pipblock hidden" id="res-pip"></div>
+      <div class="watchchap hidden" id="res-watch"></div>
       <div class="readiness hidden" id="res-readiness">
         <h4>📊 Exam readiness</h4>
         <div class="rsub" id="res-rsub">Based on your logged attempts for this exam.</div>
@@ -6002,6 +6007,115 @@ $("rev-back").addEventListener("click",()=>{ hideReview(); });
 $("rev-submit").addEventListener("click",()=>{ hideReview(); finishExam(false); });
 $("reviewov").addEventListener("click",e=>{ if(e.target.id==="reviewov") hideReview(); });
 
+/* ================= Watch the chapter =================
+   Results-screen send-back (2026-11-02): the weakest domain from THIS
+   attempt's real breakdown — same rule as the Pip block in finishExam
+   (lowest % correct, ties broken by most missed) — links to that
+   domain's chapter in the exam's masterclass book on YouTube. Keys are
+   the banks' exact domain strings; values are [videoId, chapter name]
+   taken from the LIVE playlist order and each book's published chapter
+   map on 2026-11-02 (record: watch_chapter_mapping_2026-11-02.json in
+   the simulator-launch goal). Exams and domains with no live chapter
+   are absent — the link renders only when a real chapter exists, never
+   a placeholder or a dead link. */
+const CHAPTER_LINKS = {
+  "aif_c01": {
+    "Domain 1: Fundamentals of AI and ML": ["iQRDojBWiJk", "AIF-C01 Domain 1: AI & ML Fundamentals, Explained"],
+    "Domain 2: Fundamentals of Generative AI": ["FzBXp2Nhhp4", "AIF-C01 Domain 2: Generative AI, Explained"],
+    "Domain 3: Applications of Foundation Models": ["gqIPz4ssib0", "Applications of Foundation Models: Bedrock, Prompts, and RAG"],
+    "Domain 4: Guidelines for Responsible AI": ["tSmzxcT2sAw", "Guidelines for Responsible AI: Fair, Transparent, Accountable"],
+    "Domain 5: Security, Compliance, and Governance for AI Solutions": ["UoYD7uGcvHE", "Security, Compliance, and Governance for AI Solutions"]
+  },
+  "aplus_220_1101": {
+    "Hardware": ["U_ptLQtZJ7E", "A+ Hardware Questions That Fail Everyone"],
+    "Hardware/Network Troubleshooting": ["cBQiNeirl2o", "A+ Troubleshooting: The 6 Steps CompTIA Grades"],
+    "Networking": ["XZx6aMaPSDU", "Your Home Network Is a Mess. Fix It."]
+  },
+  "aplus_220_1102": {
+    "Operating Systems": ["4PUQDqS0qRw", "Stop Botching Windows Installs"],
+    "Operational Procedures": ["6muMUhV0QFs", "Don't Fry It: Safety & Change Management for A+"],
+    "Security": ["Hw5EYHeiErE", "Malware Removal: The A+ Order of Operations"]
+  },
+  "az104": {
+    "Domain 1: Manage identities and governance in Azure": ["5f6S3ODBgYo", "Active Directory Finally Explained: One Login, Every Door"],
+    "Domain 2: Implement and manage storage": ["7iR0VJZy5nk", "Azure Storage Accounts: Pick the Wrong Tier, Pay"],
+    "Domain 3: Deploy and manage Azure compute resources": ["leql25rsBEI", "Azure VMs: Sizes, Disks & the AZ-104 Traps"],
+    "Domain 4: Implement and manage virtual networking": ["5zNKTK1CcrA", "Your Azure VNet Is Misconfigured"]
+  },
+  "ccna_200_301": {
+    "Domain 1: Network Fundamentals": ["UHtoPVd6e54", "Network Fundamentals: Every Piece, One Map"],
+    "Domain 2: Network Access": ["5uvKDZ_mocU", "Network Access Decoded: VLANs to EtherChannel"],
+    "Domain 3: IP Connectivity": ["Cd2wxEp6bgE", "OSPF: Why Your Routes Pick the Wrong Path"],
+    "Domain 4: IP Services": ["u7aKcLkHodg", "IP Services: The Network's Invisible Staff"],
+    "Domain 5: Security Fundamentals": ["1I5V6eLzDNg", "Security Fundamentals: Lock the Network Down"],
+    "Domain 6: Automation and Programmability": ["cUQN4LQb2-Y", "The CLI Is Not the Future: Automation & APIs"]
+  },
+  "cissp": {
+    "Domain 1: Security and Risk Management": ["hMFTi7OTiTg", "CISSP Domain 1: Think Like a Manager, Not a Tech"],
+    "Domain 2: Asset Security": ["WiE--zR_hDo", "CISSP Domain 2: Data Has a Lifecycle. Learn It."],
+    "Domain 3: Security Architecture and Engineering": ["8zjwFx561m0", "CISSP Domain 3: Architecture Models That Matter"],
+    "Domain 4: Communication and Network Security": ["oqmK9xaQELU", "CISSP Domain 4: The Wire Is the Battlefield"],
+    "Domain 5: Identity and Access Management (IAM)": ["7dG6FPPniG0", "CISSP Domain 5: Your Password Is Not a Perimeter"]
+  },
+  "cka": {
+    "Domain 1: Cluster Architecture, Installation & Configuration": ["gHMaUi9yhO8", "CKA: Kill the API Server (What Actually Breaks?)"],
+    "Domain 2: Workloads & Scheduling": ["zsBH1DUN7mE", "Workloads & Scheduling: The Complete Map"],
+    "Domain 4: Storage": ["O33aC2h7K9g", "CKA: Kubernetes Deletes Your Data (PVs, PVCs)"]
+  },
+  "clf_c02": {
+    "Domain 1: Cloud Concepts": ["Q6FtrNJTItg", "AWS Cloud Concepts: What CLF-C02 Actually Asks"],
+    "Domain 2: Security and Compliance": ["WYw0hI96U4A", "Shared Responsibility: Who Secures What in AWS"],
+    "Domain 4: Billing, Pricing, and Support": ["dwKyib_Qtj0", "AWS Billing, Pricing and Support Plans From Zero to Exam-Ready"]
+  },
+  "cysa_cs0_004": {
+    "Domain 1: Security Operations": ["w-iVBDjLyn0", "Threat Detection: Read Logs Like an Analyst"],
+    "Domain 2: Vulnerability Management": ["27aedV42ukc", "Vulnerability Management: The Lifecycle, End to End"],
+    "Domain 3: Incident Response and Management": ["IirGoqyLEIU", "The Incident Response Cycle, Analyst Style"]
+  },
+  "linuxplus_xk0_006": {
+    "Domain 1: System Management": ["C1ux6x6T8NU", "Linux Command Line: Survival Skills XK0-006 Tests"],
+    "Domain 2: Services and User Management": ["Dui8AowE4QI", "System Management: The Linux Admin's Whole Map"],
+    "Domain 3: Security": ["D2keVo_pdqI", "XK0-006: Who Gets In? PAM, sudo and AAA Explained"],
+    "Domain 4: Automation, Orchestration, and Scripting": ["F2Vw5q67xwU", "Automation: Make Linux Do the Boring Work"],
+    "Domain 5: Troubleshooting": ["Lxc9FFvtowE", "Your Linux Service Keeps Dying"]
+  },
+  "netplus_n10_009": {
+    "Network Implementations": ["yNuJlCcylzc", "Network Implementation: Routing to Wireless, Mapped"],
+    "Network Operations": ["9vAK0FPEBvE", "Network Operations: Run It Like You Own It"],
+    "Network Security": ["y7ISbptUv9Q", "Network Security Decoded: Firewalls, VPNs, Trust"],
+    "Network Troubleshooting": ["erPX5I5m98E", "Troubleshooting: The Method N10-009 Grades You On"],
+    "Networking Fundamentals": ["unD4yDbEUzU", "Every Network Starts Here: Concepts Decoded"]
+  },
+  "pentest_pt0_003": {
+    "Domain 1: Engagement Management": ["6FaNIuSbXno", "How a Pentest Actually Works, Step by Step"],
+    "Domain 2: Reconnaissance and Enumeration": ["ncYdNgISeXQ", "Recon & OSINT: Find It Before You Touch It"],
+    "Domain 3: Vulnerability Discovery and Analysis": ["2bWEeD0ZYk8", "Scan It Before You Exploit It: Vuln Discovery"],
+    "Domain 4: Attacks and Exploits": ["x_pppqJ7yco", "Attacks & Exploits: The Full Arsenal, Mapped"]
+  },
+  "saa_c03": {
+    "Domain 1: Design Resilient Architectures": ["x5g6SxYLuto", "High Availability: Design AWS That Survives Failure"],
+    "Domain 2: Design High-Performing Architectures": ["FaW8n0bubEU", "S3 Storage Classes: Pay Less, Know the Tradeoffs"],
+    "Domain 3: Design Secure Architectures": ["v7jhl5mtwew", "IAM Least Privilege: The Deny That Saved the Bucket"],
+    "Domain 4: Design Cost-Optimized Architectures": ["_QDxeQPJ9W8", "Stop Paying Full Price for EC2"]
+  },
+  "secplus_sy0_701": {
+    "Architecture/Security Design": ["RfQYehoUwZE", "Security+ SY0-701: Security Architecture \u2014 Zero Trust and Segmentation"],
+    "Governance/Risk/Compliance": ["BJVlYjKWMuk", "Governance Decoded: Risk, Audits & Accountability"],
+    "Implementation": ["MUWdJ5BNuq4", "Firewalls, IDS & VPNs: The Security+ Trio"],
+    "Operations/Incident Response": ["A9LBpYFZjME", "Security Operations: The SOC's Whole Map"],
+    "Threats/Vulnerabilities/Mitigations": ["8ZcNlvyHY2E", "Threats & Attack Vectors: Know Your Enemy"]
+  }
+};
+function weakestDomainOf(doms){
+  let wd=null, wPct=Infinity, wMiss=-1;
+  Object.keys(doms).forEach(d=>{
+    const t=doms[d].t, c=doms[d].c; if(!t) return;
+    const p=c/t, m=t-c;
+    if(p<wPct||(p===wPct&&m>wMiss)){ wd=d; wPct=p; wMiss=m; }
+  });
+  return wd?{d:wd, miss:wMiss}:null;
+}
+
 /* ================= results ================= */
 function finishExam(expired){
   clearInterval(timerId);
@@ -6151,6 +6265,25 @@ function finishExam(expired){
         if(p<wPct||(p===wPct&&m>wMiss)){ wd=d; wPct=p; wMiss=m; }
       });
       if(wd) renderPipBlock(pipRes,"sympathetic","Not yet. "+wd+" cost you "+wMiss+" question"+(wMiss===1?"":"s")+" — your misses are saved, and we'll fix them.","pip-settle",76);
+    }
+  }
+
+  /* Watch the chapter: this attempt's weakest domain (same math as Pip),
+     linked only when a live book chapter exists for it. Renders for the
+     free taste too — Pip already names the domain there. */
+  const watchEl=$("res-watch");
+  if(watchEl){
+    watchEl.innerHTML=""; watchEl.classList.add("hidden");
+    const wdx=weakestDomainOf(doms);
+    const byDom=(S.exam&&CHAPTER_LINKS[S.exam.slug])||null;
+    const ch=(wdx&&byDom)?byDom[wdx.d]:null;
+    if(wdx&&wdx.miss>0&&ch){
+      const wa=document.createElement("a");
+      wa.href="https://www.youtube.com/watch?v="+ch[0];
+      wa.target="_blank"; wa.rel="noopener";
+      wa.textContent="Watch the chapter — "+ch[1];
+      watchEl.appendChild(wa);
+      watchEl.classList.remove("hidden");
     }
   }
 
