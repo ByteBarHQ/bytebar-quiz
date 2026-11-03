@@ -1833,13 +1833,9 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       </div>
       <h1>Practice like it's <span class="cy">test day.</span></h1>
       <p>Full-length, timed exam simulations built from real exam objectives — with instant explanations and domain-level score reports that show exactly where you stand.</p>
-      <div class="trustrow">
-        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg></span><span><b>One-time payment</b> — no subscription</span></div>
-        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg></span><span><b>Your whole career</b> <br class="tbr">in one place</span></div>
-        <div class="trust"><span class="tico"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 12c-1.8-2.2-3.4-3.3-5-3.3a4.05 4.05 0 1 0 0 6.6c1.6 0 3.2-1.1 5-3.3Zm0 0c1.8 2.2 3.4 3.3 5 3.3a4.05 4.05 0 1 0 0-6.6c-1.6 0-3.2 1.1-5 3.3Z"/></svg></span><span><b>Yours forever</b> — new exams included</span></div>
-      </div>
+      <div class="proofline"><span><b>No subscription</b></span><i>·</i><span><b>Your whole career</b> in one place</span><i>·</i><span>Mapped to <b>official exam objectives</b></span></div>
       <button class="btn hero-cta" id="hero-cta">Choose your exam ↓</button>
-      <div class="authbadge">✓ Questions mapped to official exam objectives</div>
+      
     </div>
     <style>
 .tier1-strip{background:var(--card); border:1px solid var(--line); border-top:4px solid #f0ad3c; border-radius:var(--r); box-shadow:var(--shadow); padding:18px 22px; margin:26px 0 6px;}
@@ -8225,5 +8221,21 @@ refreshAccount();
   } else { route(); }
 })();
 </script>
+
+<style>
+/* ===== RESTYLE 2026-11-03 — landing match: one visual story (navy + cyan, spec-sheet proof). Reversible: delete this block + restore the trust chips. ===== */
+.hero-orbs .orb{opacity:.30}
+.orb.o1{background:#7fd4f7}
+.orb.o2{background:#bae6fd}
+.orb.o3{background:#7ee7f7}
+.hero h1 .cy{background:none;-webkit-background-clip:unset;background-clip:unset;-webkit-text-fill-color:var(--cyan);color:var(--cyan)}
+.secttl.fun{color:var(--navy);background:none;-webkit-background-clip:unset;background-clip:unset;-webkit-text-fill-color:currentColor}
+.speech{border-color:var(--line);background:var(--card)}
+.proofline{display:flex;gap:8px;justify-content:center;align-items:baseline;flex-wrap:wrap;font-size:13.5px;color:var(--mut);margin:2px 0 20px}
+.proofline b{color:var(--navy);font-weight:700}
+.proofline i{font-style:normal;color:var(--cyan);font-weight:700}
+.examcard{background:var(--card)}
+.examcard:hover{background:var(--card)}
+</style>
 </body>
 </html>
