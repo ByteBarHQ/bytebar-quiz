@@ -65,6 +65,18 @@ body{
   -webkit-tap-highlight-color:transparent}
 .goprobtn:active{transform:translateY(2px); box-shadow:none}
 @media(max-width:520px){.goprobtn{font-size:11.5px; padding:6px 12px;}}
+/* Library door: topbar nav link + owner library card on home (2026-11-14) */
+.liblink{font-size:12.5px; font-weight:800; letter-spacing:.02em; color:#dce7fb; text-decoration:none;
+  padding:7px 12px; border-radius:999px; border:1px solid rgba(255,255,255,.22); background:rgba(255,255,255,.08);
+  white-space:nowrap; transition:background .15s ease;}
+.liblink:hover{background:rgba(255,255,255,.17); color:#fff;}
+@media(max-width:520px){.liblink{font-size:11.5px; padding:6px 10px;}}
+.libcard{background:var(--card); border:1px solid var(--line); border-left:4px solid var(--cyan); border-radius:var(--r); box-shadow:var(--shadow);
+  padding:16px 20px; margin:14px 0 6px; display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;}
+.libcard-tx{font-size:15.5px; font-weight:700; color:var(--ink); line-height:1.45;}
+.libcard-tx span{display:block; font-size:13.5px; font-weight:600; color:var(--mut); margin-top:2px;}
+.libcard-btn{white-space:nowrap; text-decoration:none;}
+@media(max-width:560px){.libcard{padding:14px 16px} .libcard-tx{font-size:14.5px}}
 
 /* ---------- layout ---------- */
 .wrap{max-width:1180px; margin:0 auto; padding:34px 22px 70px;}
@@ -1848,12 +1860,14 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <div class="spacer"></div>
     <span class="lvlpill hidden" id="home-lvlpill"></span>
     <span id="home-acctslot"><button class="acctbtn" id="home-acctbtn" onclick="openAuth()">Sign in</button></span>
-    <button class="goprobtn" id="home-gopro" onclick="openPaywall()" title="Unlock all 28 exams — $9.99 one-time">Go Pro</button>
+    <a class="liblink" href="https://bytebarhq.com/library" title="ByteBar video library — watch the books chapter by chapter">📚 Library</a>
+    <button class="goprobtn" id="home-gopro" onclick="openPaywall()" title="ByteBar Complete — simulator + video library · $9.99 one-time">Get Complete</button>
     <div class="probadge free" id="home-probadge">Free tier</div>
   </div></div>
   <div class="wrap">
     <div id="resume-slot"></div>
     <div id="streak-slot"></div>
+    <div id="library-slot"></div>
     <div class="pipblock hidden" id="pip-greet"></div>
     <div class="pip-actions hidden" id="pip-greet-actions"></div>
     <div class="hero hero-new">
@@ -1879,7 +1893,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
 .tier1-strip .goprobtn{font-size:14px; padding:10px 22px;}
 @media(max-width:560px){.tier1-strip{padding:16px 18px} .tier1-strip-tx{font-size:15px}}
 </style>
-<div class="tier1-strip"><div class="tier1-strip-in"><div class="tier1-strip-tx"><b>$9.99 one-time</b> &middot; all 28 exams &middot; yours forever<span class="tier1-strip-sub">10 free questions on every exam — no account needed</span></div><button class="goprobtn" onclick="openPaywall()">Go Pro — $9.99</button></div></div>
+<div class="tier1-strip"><div class="tier1-strip-in"><div class="tier1-strip-tx"><b>$9.99 one-time</b> &middot; all 28 exams + the video library &middot; yours forever<span class="tier1-strip-sub">10 free questions on every exam — no account needed</span></div><button class="goprobtn" onclick="openPaywall()">Get Complete — $9.99</button></div></div>
 <div class="secttl">Choose your exam</div>
     <div class="examgrid" id="examgrid">
     <div class="catchdr">☁️ Cloud</div>
@@ -2101,7 +2115,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
         <div class="tq">Timed mode built to feel like test day, plus a domain breakdown that shows exactly what to fix.</div>
       </div>
       <div class="testi">
-        <div class="tq">28 certification exams across IT and nursing, unlocked for one $9.99 one-time price.</div>
+        <div class="tq">28 certification exams across IT and nursing — plus the video library — unlocked for one $9.99 one-time price.</div>
       </div>
     </div>
 
@@ -2117,11 +2131,12 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       </div>
     </div>
 
-    <div class="secttl">ByteBar Pro vs. free quizzes</div>
+    <div class="secttl">ByteBar Complete vs. free quizzes</div>
     <div class="panel">
       <table class="compare">
-        <tr><th></th><th>ByteBar Pro</th><th>Free quizzes</th></tr>
+        <tr><th></th><th>ByteBar Complete</th><th>Free quizzes</th></tr>
         <tr class="hl"><td>Full access — all 28 exams, one price</td><td class="y">✓</td><td class="n">10-question taste each</td></tr>
+        <tr class="hl"><td>Video library — every book, chapter by chapter</td><td class="y">✓</td><td class="n">First chapter free</td></tr>
         <tr class="hl"><td>Full timed simulations at real exam length</td><td class="y">✓</td><td class="n">–</td></tr>
         <tr><td>Hands-on terminal simulations (CKA/CKAD)</td><td class="y">✓</td><td class="n">–</td></tr>
         <tr><td>Explanation on every answer</td><td class="y">✓</td><td class="n">–</td></tr>
@@ -2138,9 +2153,9 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <div class="faqitem"><button class="fq">What score should I aim for before booking the real exam?</button><div class="fa">Consistently above 85% on timed simulations with no domain below 70%. The readiness meter on your results page tracks this for you and tells you when you're there.</div></div>
       <div class="faqitem"><button class="fq">What if I fail the real exam after using ByteBar?</button><div class="fa">Bring us your score report. We'll point you at the exact domains to rebuild and extend your access — we'd rather you pass late than pay twice.</div></div>
       <div class="faqitem"><button class="fq">Can I use it on my phone?</button><div class="fa">Yes. The simulator is fully responsive — practice on your phone, run full timed simulations on desktop. Your progress syncs to your account on each device.</div></div>
-      <div class="faqitem"><button class="fq">Is this a subscription?</button><div class="fa">No. Pro is a one-time payment of $9.99 for all 28 exams. No renewals, no expiring access — yours until you pass.</div></div>
-      <div class="faqitem"><button class="fq">Is $9.99 per exam or for all exams?</button><div class="fa">All exams. One $9.99 payment unlocks all 28 exams — full 1,000-question banks, timed and adaptive simulations, terminal tasks, everything. Others charge $99 per exam. We charge $9.99 for all of them.</div></div>
-      <div class="faqitem"><button class="fq">How is this different from free practice questions?</button><div class="fa">Depth and realism. The free taste gives you 10 questions per exam. ByteBar Pro gives you full timed simulations, an explanation for every answer, domain-level analytics, and a readiness prediction trained on your own attempts.</div></div>
+      <div class="faqitem"><button class="fq">Is this a subscription?</button><div class="fa">No. ByteBar Complete is a one-time payment of $9.99 — all 28 exams in the simulator plus the full video library. No renewals, no expiring access — yours until you pass.</div></div>
+      <div class="faqitem"><button class="fq">Is $9.99 per exam or for all exams?</button><div class="fa">All exams — and the library too. One $9.99 payment unlocks all 28 exams — full 1,000-question banks, timed and adaptive simulations, terminal tasks, everything — plus the ByteBar video library. Others charge $99 per exam. We charge $9.99 for all of it.</div></div>
+      <div class="faqitem"><button class="fq">How is this different from free practice questions?</button><div class="fa">Depth and realism. The free taste gives you 10 questions per exam. ByteBar Complete gives you full timed simulations, an explanation for every answer, domain-level analytics, the full video library, and a readiness prediction trained on your own attempts.</div></div>
     </div></div>
 
     <div class="secttl">Why simulate?</div>
@@ -2164,6 +2179,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <div class="brandsub">Exam Simulator</div>
     <div class="spacer"></div>
     <span id="modes-acctslot"><button class="acctbtn" id="modes-acctbtn" onclick="openAuth()">Sign in</button></span>
+    <a class="liblink" href="https://bytebarhq.com/library" title="ByteBar video library — watch the books chapter by chapter">📚 Library</a>
     <div class="probadge free" id="modes-probadge">Free tier</div>
   </div></div>
   <div class="wrap">
@@ -2188,7 +2204,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
         <h3>Exam Simulation</h3>
         <p id="modes-sim-p">The full question bank under real exam conditions. This is the closest thing to test day.</p>
         <ul id="sim-feats"><li>Exam-realistic questions · timer · auto-submit</li><li>Domain-level score report &amp; readiness prediction</li><li>Custom quiz builder — your domains, your rules</li><li>Performance analytics &amp; study plan</li></ul>
-        <div class="price">$9.99 <small>one-time · all 28 exams</small></div>
+        <div class="price">$9.99 <small>one-time · simulator + video library</small></div>
       </button>
       <button class="modecard hidden" id="mode-deck">
         <span class="mchip" style="--mc:#e8f1fd;">🗂</span>
@@ -2376,6 +2392,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <div><div class="brandmark">B Y T E B A R</div></div>
     <div class="brandsub">Analytics</div>
     <div class="spacer"></div>
+    <a class="liblink" href="https://bytebarhq.com/library" title="ByteBar video library — watch the books chapter by chapter">📚 Library</a>
     <span id="dash-acctslot"></span>
   </div></div>
   <div class="wrap">
@@ -2418,6 +2435,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <div><div class="brandmark">B Y T E B A R</div></div>
     <div class="brandsub">Profile</div>
     <div class="spacer"></div>
+    <a class="liblink" href="https://bytebarhq.com/library" title="ByteBar video library — watch the books chapter by chapter">📚 Library</a>
     <span id="profile-acctslot"></span>
   </div></div>
   <div class="wrap">
@@ -2456,6 +2474,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <div><div class="brandmark">B Y T E B A R</div></div>
     <div class="brandsub">Custom Quiz</div>
     <div class="spacer"></div>
+    <a class="liblink" href="https://bytebarhq.com/library" title="ByteBar video library — watch the books chapter by chapter">📚 Library</a>
     <span id="builder-acctslot"></span>
   </div></div>
   <div class="wrap">
@@ -2615,7 +2634,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <h2 id="tease-name">—</h2>
     <p id="tease-desc">—</p>
     <div class="btnrow" style="justify-content:center;margin-top:18px;gap:10px;flex-wrap:wrap;">
-      <button class="btn gold" id="tease-go" style="padding:12px 26px;font-size:15px;">Go Pro — $9.99</button>
+      <button class="btn gold" id="tease-go" style="padding:12px 26px;font-size:15px;">Get Complete — $9.99</button>
       <button class="btn ghost" id="tease-ok" style="padding:12px 26px;font-size:15px;">Later</button>
     </div>
   </div>
@@ -2631,7 +2650,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <div id="bov-prog"></div>
     <div class="xp" id="bov-xp" style="display:none;">—</div>
     <div class="btnrow" style="justify-content:center;margin-top:18px;">
-      <button class="btn gold hidden" id="bov-cta" style="padding:12px 26px;font-size:15px;">Go Pro to unlock</button>
+      <button class="btn gold hidden" id="bov-cta" style="padding:12px 26px;font-size:15px;">Get Complete to unlock</button>
       <button class="btn ghost" id="bov-ok" style="padding:12px 26px;font-size:15px;">Close</button>
     </div>
   </div>
@@ -2642,15 +2661,16 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
   <div class="sheetwrap"><div class="sheet">
     <div class="shead">
       <button class="close-x" id="pw-close" aria-label="Close">✕</button>
-      <div class="kick">ByteBar Pro</div>
+      <div class="kick">ByteBar Complete</div>
       <div class="resmascot"><span class="mascot-slot floaty" data-mascot="happy" data-size="64"></span></div>
-      <h2>ByteBar Pro</h2>
-      <p>One payment. All 28 exams. Yours forever.</p>
+      <h2>ByteBar Complete</h2>
+      <p>One payment. Simulator + video library. Yours forever.</p>
     </div>
     <div class="sbody">
       <ul class="feats">
         <li><span><b>28,000 exam-realistic questions</b> — 1,000 per exam across 28 certifications, matched to the real test's style and difficulty</span></li>
         <li><span><b>True test-day simulations</b> — real timing, real format, real pressure. Hands-on terminal tasks and adaptive NCLEX exams</span></li>
+        <li><span><b>The full video library</b> — every ByteBar book as video, chapter by chapter, so you can watch the lesson before you drill it</span></li>
         <li><span><b>Know exactly what to study</b> — domain-level score breakdowns after every attempt pinpoint your weak spots</span></li>
         <li><span><b>Learn from every question</b> — detailed explanations for right and wrong answers, so you understand the concept not just the answer</span></li>
         <li><span><b>Drill your weaknesses</b> — custom quiz builder targets the domains dragging your score down</span></li>
@@ -2660,14 +2680,14 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
         <div class="tchip">🔒 Secure checkout</div>
         <div class="tchip">✓ One-time payment, no subscription</div>
       </div>
-      <div class="priceline"><span class="was">$99 per exam elsewhere</span><span class="p">$9.99</span><span class="per">one-time · all 28 exams</span></div>
-      <button class="btn block" id="pw-buy">Get Pro — $9.99 · All 28 exams</button>
+      <div class="priceline"><span class="was">$99 per exam elsewhere</span><span class="p">$9.99</span><span class="per">one-time · simulator + video library</span></div>
+      <button class="btn block" id="pw-buy">Get Complete — $9.99 · Simulator + Library</button>
       <div class="fineprint">Secure checkout · Instant access · Yours forever<br>No subscription, no renewals.</div>
       <div class="keyrow">
         <input id="pw-key" type="text" placeholder="Enter your license key" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" style="font-family:ui-monospace,Menlo,monospace; letter-spacing:.04em;">
         <button class="btn ghost" id="pw-activate" style="padding:12px 18px; font-size:14px;">Activate</button>
       </div>
-      <div class="fineprint" style="margin-top:8px; text-align:left;">Have a key? Enter it to unlock Pro — or restore it on a new device.<br>Lost your key? It's in your Payhip purchase email.</div>
+      <div class="fineprint" style="margin-top:8px; text-align:left;">Have a key? Enter it to unlock Complete — or restore it on a new device.<br>Lost your key? It's in your Payhip purchase email.</div>
       <div class="fineprint" id="pw-msg" style="min-height:20px;"></div>
       <button class="btn ghost block" id="pw-close2" style="margin-top:10px;">Close</button>
     </div>
@@ -2677,11 +2697,11 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
 <!-- ================= WELCOME TO PRO ================= -->
 <div id="prowelcomeov" class="unlockov hidden">
   <div class="unlockcard">
-    <div class="uk">Pro activated</div>
+    <div class="uk">Complete activated</div>
     <div id="prow-mascot" class="resmascot"></div>
     <span class="ubi">🎓</span>
-    <h2>Welcome to Pro!</h2>
-    <p>All 28 exams are unlocked — full question banks, exam-realistic simulations, terminal tasks, adaptive NCLEX testing, custom quiz builder, and performance analytics. Yours forever.</p>
+    <h2>Welcome to Complete!</h2>
+    <p>All 28 exams are unlocked — full question banks, exam-realistic simulations, terminal tasks, adaptive NCLEX testing, custom quiz builder, and performance analytics — and the full video library is yours too, chapter by chapter. Yours forever.</p>
     <div class="xp">Lifetime access · No subscription</div>
     <div id="prow-note" class="hidden"></div>
     <div class="btnrow" style="justify-content:center;margin-top:18px;">
@@ -4967,6 +4987,7 @@ function renderHome(){
   });
   renderResumeBanner();
   renderStreakBanner();
+  renderLibraryPanel();
   renderPipHome();
   show("screen-home");
 }
@@ -4998,6 +5019,21 @@ function renderStreakBanner(){
     '<span class="sb-side">'+freezeBit+'<span class="sb-mascot">'+mascotSVG(mood,40)+'</span></span>';
   bar.addEventListener("click",()=>{ renderProfile(); });
   slot.appendChild(bar);
+}
+
+/* Library card (home): owners only — ByteBar Complete includes the video
+   library, and it unlocks with this same account (profiles.pro). Free users
+   get the topbar Library link only; the library's free first chapters are
+   the taste. */
+function renderLibraryPanel(){
+  const slot=$("library-slot"); if(!slot) return;
+  slot.innerHTML="";
+  if(!isPro()) return;
+  const card=document.createElement("div");
+  card.className="libcard";
+  card.innerHTML='<div class="libcard-tx">📚 Your video library is included with Complete<span>Watch the books chapter by chapter — same account, already unlocked.</span></div>'+
+    '<a class="btn libcard-btn" href="https://bytebarhq.com/library">Open the Library →</a>';
+  slot.appendChild(card);
 }
 
 /* resume banner on home */
@@ -6456,8 +6492,8 @@ function finishExam(expired){
         '<li><span class="pp-check">✓</span> Know exactly what to study — domain breakdowns pinpoint your weak spots</li>' +
         '<li><span class="pp-check">✓</span> Know when you\'re ready — readiness prediction and a custom quiz builder</li>' +
         '</ul>' +
-        '<button class="btn pp-cta" id="ub-go">Unlock Pro — ' + CONFIG.PRICE + ' one-time · all 28 exams</button>' +
-        '<div class="pp-fine">One payment for all 28 exams · Yours forever · No subscription, ever</div>' +
+        '<button class="btn pp-cta" id="ub-go">Unlock Complete — ' + CONFIG.PRICE + ' one-time · simulator + video library</button>' +
+        '<div class="pp-fine">One payment for the simulator + video library · Yours forever · No subscription, ever</div>' +
         '<div class="pp-autoacct">Your Pro account is created automatically at checkout under your checkout email — and the license key in your purchase email unlocks Pro anytime.</div>' +
         '<button class="pp-notnow" id="ub-notnow">Not now — keep exploring the free tier</button>';
       upSlot.appendChild(up);
@@ -6775,7 +6811,7 @@ function openAccountMenu(){
   const dispU = (u.indexOf("sb:")==0 && r && r.username) ? r.username : u;
   const proBadge = (r && r.pro)
     ? '<div class="acctmenu-pro">⭐ <b>Pro member</b>'+(r.proSince?' · since '+new Date(r.proSince).toLocaleDateString("en-US",{month:"short",year:"numeric"}):'')+'</div>'
-    : '<button class="acctmenu-upgrade" id="acctmenu-upgrade">⭐ <b>Go Pro</b><span>$9.99 one-time · all 28 exams, forever</span></button>';
+    : '<button class="acctmenu-upgrade" id="acctmenu-upgrade">⭐ <b>Get Complete</b><span>$9.99 one-time · simulator + video library, forever</span></button>';
   // simple action sheet via confirm-free menu overlay
   const ov=document.createElement("div"); ov.className="overlay"; ov.id="acctmenu";
   ov.innerHTML='<div class="sheetwrap"><div class="sheet"><div class="shead"><div class="kick">Account</div>'+
@@ -6891,7 +6927,7 @@ function pumpTeaseQueue(){
   tic.classList.add("coinmode");
   tic.innerHTML=coinSVG(id,{size:88,state:"locked",label:b.name});
   $("tease-name").textContent=b.name;
-  $("tease-desc").textContent="You would've earned this achievement! Go Pro to unlock it — plus "+proCount+" more Pro achievements, streak freezes, and weekly challenges.";
+  $("tease-desc").textContent="You would've earned this achievement! Get Complete to unlock it — plus "+proCount+" more Pro achievements, streak freezes, and weekly challenges.";
   $("teaseov").classList.remove("hidden");
 }
 function recordAttempt(o){
@@ -7856,14 +7892,14 @@ function renderProfile(){
       proBlock.innerHTML='<div class="procard">'+
         '<div class="procard-badge">⭐ PRO</div>'+
         '<div class="procard-title">Pro member'+(sinceTxt?' since '+sinceTxt:'')+'</div>'+
-        '<div class="procard-feats">16 exam simulations · 1,000-question banks · Terminal tasks · Custom quiz builder · Analytics · Lifetime access</div>'+
+        '<div class="procard-feats">16 exam simulations · 1,000-question banks · Terminal tasks · Custom quiz builder · Analytics · Video library · Lifetime access</div>'+
         '</div>';
       proBlock.classList.remove("hidden");
     } else {
       proBlock.innerHTML='<button class="procard locked" id="profile-procta">'+
         '<div class="procard-badge dim">Free tier</div>'+
-        '<div class="procard-title">Unlock ByteBar Pro</div>'+
-        '<div class="procard-feats">Full simulations for all 28 exams · $9.99 one-time, yours forever</div>'+
+        '<div class="procard-title">Unlock ByteBar Complete</div>'+
+        '<div class="procard-feats">Full simulations for all 28 exams + the video library · $9.99 one-time, yours forever</div>'+
         '</button>';
       proBlock.classList.remove("hidden");
       const cta=$("profile-procta");
