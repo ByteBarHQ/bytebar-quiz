@@ -347,7 +347,7 @@ ul.pp-feats li{
 
 /* ---------- buttons ---------- */
 .btn{
-  display:inline-block; border:0; border-radius:13px; padding:16px 30px; font-size:16.5px; font-weight:800;
+  display:inline-block; white-space:nowrap; border:0; border-radius:13px; padding:16px 30px; font-size:16.5px; font-weight:800;
   color:#fff; background:linear-gradient(180deg,var(--navy3),var(--navy)); cursor:pointer; font-family:inherit;
   box-shadow:0 8px 22px rgba(11,30,66,.28); transition:transform .12s;
 }
@@ -1324,6 +1324,8 @@ br.tbr{display:none;}
 .btn.ghost:active{transform:translateY(4px); box-shadow:0 0 0 #d9cba6;}
 /* stamped, chunky labels on buttons (Duolingo: 700 + wide tracking) */
 .btn{letter-spacing:.015em;}
+.lbl-short{display:none}
+@media(max-width:720px){.lbl-full{display:none}.lbl-short{display:inline}}
 
 /* --- answer options: the most-tapped element in the app --- */
 .opt{
@@ -2183,7 +2185,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <a class="nl" href="https://sim.bytebarhq.com/sim-preview/">Simulator</a>
       <a class="nl" href="#pricing">Pricing</a>
       <a class="nl" href="https://bytebarhq.com/#faq">FAQ</a>
-      <span class="lvlpill hidden" id="home-lvlpill"></span><span id="home-acctslot"><button class="acctbtn" id="home-acctbtn" onclick="openAuth()">Sign In</button></span><button class="btn btn-gold hdr-gopro" id="home-gopro" onclick="openPaywall()">Get ByteBar Complete — $9.99</button><div class="probadge free hidden" id="home-probadge">Free preview</div>
+      <span class="lvlpill hidden" id="home-lvlpill"></span><span id="home-acctslot"><button class="acctbtn" id="home-acctbtn" onclick="openAuth()">Sign In</button></span><button class="btn btn-gold hdr-gopro" id="home-gopro" onclick="openPaywall()"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button><div class="probadge free hidden" id="home-probadge">Free preview</div>
     </div>
   </div>
 </nav>
@@ -2208,7 +2210,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
         <div class="pip-tag">🌱 Hi, I'm <b>Pip</b>! Your study buddy.</div>
       </div>
       <div class="hero-ctas">
-        <button class="btn btn-gold btn-lg hdr-gopro" onclick="openPaywall()">Get ByteBar Complete — $9.99</button>
+        <button class="btn btn-gold btn-lg hdr-gopro" onclick="openPaywall()"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button>
         <a class="btn btn-primary btn-lg" href="#exams">Pick your exam ↓</a>
       </div>
       <p class="hero-note">Or start free: watch the first chapter of any book and try 10 free questions — no signup.</p>
@@ -2300,7 +2302,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
           <li><span class="ck">✓</span> Custom quiz builder &amp; analytics</li>
           <li><span class="ck">✓</span> Free future question additions</li>
           </ul>
-          <button class="btn btn-gold btn-lg hdr-gopro" style="width:100%" onclick="openPaywall()">Get ByteBar Complete — $9.99</button>
+          <button class="btn btn-gold btn-lg hdr-gopro" style="width:100%" onclick="openPaywall()"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button>
           <p class="price-note">One payment · Yours forever · No subscription, ever.</p>
           <div class="vs">They charge <b>$99 per exam, per year</b>.<br>We charge <b>$9.99 for all of them, forever</b>.</div>
         </div>
@@ -2356,7 +2358,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <a class="nl" href="https://sim.bytebarhq.com/sim-preview/">Simulator</a>
       <a class="nl" href="https://bytebarhq.com/#pricing">Pricing</a>
       <a class="nl" href="https://bytebarhq.com/#faq">FAQ</a>
-      <span id="modes-acctslot"><button class="acctbtn" id="modes-acctbtn" onclick="openAuth()">Sign In</button></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()">Get ByteBar Complete — $9.99</button><div class="probadge free hidden" id="modes-probadge">Free preview</div>
+      <span id="modes-acctslot"><button class="acctbtn" id="modes-acctbtn" onclick="openAuth()">Sign In</button></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button><div class="probadge free hidden" id="modes-probadge">Free preview</div>
     </div>
   </div>
 </nav>
@@ -2412,7 +2414,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <a class="nl" href="https://sim.bytebarhq.com/sim-preview/">Simulator</a>
       <a class="nl" href="https://bytebarhq.com/#pricing">Pricing</a>
       <a class="nl" href="https://bytebarhq.com/#faq">FAQ</a>
-      <span id="deck-acctslot"></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()">Get ByteBar Complete — $9.99</button>
+      <span id="deck-acctslot"></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button>
     </div>
   </div>
 </nav>
@@ -2442,7 +2444,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <a class="nl" href="https://sim.bytebarhq.com/sim-preview/">Simulator</a>
       <a class="nl" href="https://bytebarhq.com/#pricing">Pricing</a>
       <a class="nl" href="https://bytebarhq.com/#faq">FAQ</a>
-      <span id="brief-acctslot"></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()">Get ByteBar Complete — $9.99</button>
+      <span id="brief-acctslot"></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button>
     </div>
   </div>
 </nav>
@@ -2542,7 +2544,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <a class="nl" href="https://sim.bytebarhq.com/sim-preview/">Simulator</a>
       <a class="nl" href="https://bytebarhq.com/#pricing">Pricing</a>
       <a class="nl" href="https://bytebarhq.com/#faq">FAQ</a>
-      <span id="results-acctslot"></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()">Get ByteBar Complete — $9.99</button><div class="probadge" id="results-probadge">Complete</div>
+      <span id="results-acctslot"></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button><div class="probadge" id="results-probadge">Complete</div>
     </div>
   </div>
 </nav>
@@ -2604,7 +2606,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <a class="nl" href="https://sim.bytebarhq.com/sim-preview/">Simulator</a>
       <a class="nl" href="https://bytebarhq.com/#pricing">Pricing</a>
       <a class="nl" href="https://bytebarhq.com/#faq">FAQ</a>
-      <span id="dash-acctslot"></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()">Get ByteBar Complete — $9.99</button>
+      <span id="dash-acctslot"></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button>
     </div>
   </div>
 </nav>
@@ -2654,7 +2656,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <a class="nl" href="https://sim.bytebarhq.com/sim-preview/">Simulator</a>
       <a class="nl" href="https://bytebarhq.com/#pricing">Pricing</a>
       <a class="nl" href="https://bytebarhq.com/#faq">FAQ</a>
-      <span id="profile-acctslot"></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()">Get ByteBar Complete — $9.99</button>
+      <span id="profile-acctslot"></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button>
     </div>
   </div>
 </nav>
@@ -2701,7 +2703,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <a class="nl" href="https://sim.bytebarhq.com/sim-preview/">Simulator</a>
       <a class="nl" href="https://bytebarhq.com/#pricing">Pricing</a>
       <a class="nl" href="https://bytebarhq.com/#faq">FAQ</a>
-      <span id="builder-acctslot"></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()">Get ByteBar Complete — $9.99</button>
+      <span id="builder-acctslot"></span><button class="btn btn-gold hdr-gopro" onclick="openPaywall()"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button>
     </div>
   </div>
 </nav>
@@ -2863,7 +2865,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <h2 id="tease-name">—</h2>
     <p id="tease-desc">—</p>
     <div class="btnrow" style="justify-content:center;margin-top:18px;gap:10px;flex-wrap:wrap;">
-      <button class="btn gold" id="tease-go" style="padding:12px 26px;font-size:15px;">Get ByteBar Complete — $9.99</button>
+      <button class="btn gold" id="tease-go" style="padding:12px 26px;font-size:15px;"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button>
       <button class="btn ghost" id="tease-ok" style="padding:12px 26px;font-size:15px;">Later</button>
     </div>
   </div>
@@ -2879,7 +2881,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <div id="bov-prog"></div>
     <div class="xp" id="bov-xp" style="display:none;">—</div>
     <div class="btnrow" style="justify-content:center;margin-top:18px;">
-      <button class="btn gold hidden" id="bov-cta" style="padding:12px 26px;font-size:15px;">Get ByteBar Complete — $9.99</button>
+      <button class="btn gold hidden" id="bov-cta" style="padding:12px 26px;font-size:15px;"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button>
       <button class="btn ghost" id="bov-ok" style="padding:12px 26px;font-size:15px;">Close</button>
     </div>
   </div>
@@ -2910,7 +2912,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
         <div class="tchip">✓ One-time payment, no subscription</div>
       </div>
       <div class="priceline"><span class="was">$99 per exam elsewhere</span><span class="p">$9.99</span><span class="per">one-time · simulator + video library</span></div>
-      <button class="btn block" id="pw-buy">Get ByteBar Complete — $9.99</button>
+      <button class="btn block" id="pw-buy"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button>
       <div class="fineprint">Secure checkout · Instant access · Yours forever<br>No subscription, no renewals.</div>
       <div class="keyrow">
         <input id="pw-key" type="text" placeholder="Enter your license key" autocomplete="off" autocapitalize="characters" spellcheck="false" inputmode="text" style="font-family:ui-monospace,Menlo,monospace; letter-spacing:.04em;">
@@ -7127,7 +7129,7 @@ function finishExam(expired){
         '<li><span class="pp-check">✓</span> Know exactly what to study — domain breakdowns pinpoint your weak spots</li>' +
         '<li><span class="pp-check">✓</span> Know when you\'re ready — readiness prediction and a custom quiz builder</li>' +
         '</ul>' +
-        '<button class="btn pp-cta" id="ub-go">Get ByteBar Complete — ' + CONFIG.PRICE + '</button>' +
+        '<button class="btn pp-cta" id="ub-go"><span class="lbl-full">Get ByteBar Complete — ' + CONFIG.PRICE + '</span><span class="lbl-short">Get Complete — ' + CONFIG.PRICE + '</span></button>' +
         '<div class="pp-fine">One payment for the simulator + video library · Yours forever · No subscription, ever</div>' +
         '<div class="pp-autoacct">Your Complete account is created automatically at checkout under your checkout email — and the license key in your purchase email unlocks Complete anytime.</div>' +
         '<button class="pp-notnow" id="ub-notnow">Not now — keep exploring the free preview</button>';
