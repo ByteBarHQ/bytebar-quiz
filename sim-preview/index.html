@@ -1654,6 +1654,7 @@ br.tbr{display:none;}
 #screen-results .pipblock{margin:18px 0 4px;}
 #screen-results .pipline{font-size:21px; font-weight:800; color:var(--ink); line-height:1.42; max-width:340px;}
 .res-scoreline{font-size:15px; font-weight:800; color:var(--navy); text-align:center; margin-top:10px;}
+.res-unans{font-size:13.5px; font-weight:700; color:var(--mut); text-align:center; margin-top:6px;}
 .btnrow.res-secondary{margin-top:14px;}
 .btnrow.res-secondary .btn{flex:1; text-align:center; padding:13px 10px; font-size:15px;}
 .res-trust{margin-top:22px; font-size:14.5px; color:var(--mut); line-height:1.55; text-align:center;}
@@ -2040,6 +2041,63 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
 #bb-boot .bb-boot-txt{font-weight:800; font-size:18px; color:#0b1e42; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 #bb-boot .bb-boot-sub{font-size:14px; color:#6f695c; margin-top:6px; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
 @media(prefers-reduced-motion:reduce){#bb-boot .bb-boot-spin{animation:none}}
+
+/* ============================================================
+   PHASE 1 (2026-11-15) — persistent progress strip + results
+   reveal. One contained card under the nav; Design System v2
+   motion (cubic-bezier(.2,0,0,1), rise 480ms, fade 240ms,
+   distances <16px, nothing loops). Tasteful by design: a
+   single slim row, icons + numbers, no extra chrome.
+   ============================================================ */
+.hudwrap{max-width:1120px; margin:0 auto; padding:12px 22px 0;}
+.hudwrap-exam{max-width:1280px; margin:0 auto; padding:10px 22px 0;}
+.hudstrip{
+  display:flex; align-items:center; gap:14px;
+  background:var(--card); border:1px solid var(--line); border-radius:14px;
+  padding:9px 16px; box-shadow:0 4px 14px rgba(11,30,66,.06);
+  font-size:13.5px; color:var(--ink);
+}
+.hudstrip.hidden{display:none;}
+.hud-lvl{
+  flex:none; background:var(--navy); color:#fff; font-weight:800; font-size:12px;
+  letter-spacing:.04em; padding:5px 11px; border-radius:999px; white-space:nowrap;
+  max-width:44vw; overflow:hidden; text-overflow:ellipsis;
+}
+.hud-barwrap{flex:1 1 auto; display:flex; align-items:center; gap:10px; min-width:0;}
+.hud-bar{flex:1 1 auto; min-width:52px; height:8px; background:var(--line); border-radius:99px; overflow:hidden;}
+.hud-bar i{display:block; height:100%; width:0; border-radius:99px;
+  background:linear-gradient(90deg,var(--gold),#ffc53d);
+  transition:width .6s cubic-bezier(.2,0,0,1);}
+.hud-xptxt{flex:none; font-weight:700; color:var(--navy); white-space:nowrap; font-variant-numeric:tabular-nums;}
+.hud-tonext{color:var(--mut); font-weight:600;}
+.hud-streak{flex:none; display:inline-flex; align-items:center; gap:5px; font-weight:800; color:var(--navy); white-space:nowrap;}
+.hud-streak .flame{display:inline-flex;}
+.hud-streak .flame svg{width:17px; height:17px;}
+.hud-freeze{flex:none; font-weight:700; color:#4a7ca8; white-space:nowrap;}
+.hud-sess{flex:1 1 auto; font-weight:700; color:var(--navy); white-space:nowrap; overflow:hidden; text-overflow:ellipsis; font-variant-numeric:tabular-nums;}
+.hudstrip.sess .hud-prog{display:none;}
+.hudstrip:not(.sess) .hud-sess{display:none;}
+@media (max-width:640px){
+  .hudwrap{padding:10px 14px 0;}
+  .hudwrap-exam{padding:8px 14px 0;}
+  .hudstrip{gap:9px; padding:8px 12px; font-size:12.5px;}
+  .hud-tonext{display:none;}
+  .hud-bar{min-width:40px;}
+  .hud-lvl{padding:4px 9px; font-size:11px;}
+}
+@media (prefers-reduced-motion: reduce){
+  .hud-bar i{transition:none;}
+}
+
+/* Staged results reveal: verdict -> Pip -> score count-up -> XP
+   count-up -> record/watch. Armed only by stageResultsReveal();
+   reduced motion never arms (everything simply appears). */
+.rescard.rv-armed [data-rv]{opacity:0; transform:translateY(8px);}
+.rescard [data-rv].rv-in{opacity:1; transform:none;
+  transition:opacity .24s ease, transform .48s cubic-bezier(.2,0,0,1);}
+@media (prefers-reduced-motion: reduce){
+  .rescard [data-rv]{transition:none;}
+}
 </style>
 
 <!-- ================= HOME ================= -->
@@ -2074,6 +2132,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     </div>
   </div>
 </nav>
+  <div class="hudwrap"><div class="hudstrip hidden" data-hud="browse"><span class="hud-lvl hud-prog"></span><span class="hud-barwrap hud-prog"><span class="hud-bar"><i></i></span><span class="hud-xptxt"></span></span><span class="hud-streak hud-prog"></span><span class="hud-freeze hud-prog"></span></div></div>
   <div class="wrap home-slots">
     <div id="resume-slot"></div>
     <div id="streak-slot"></div>
@@ -2243,6 +2302,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     </div>
   </div>
 </nav>
+  <div class="hudwrap"><div class="hudstrip hidden" data-hud="browse"><span class="hud-lvl hud-prog"></span><span class="hud-barwrap hud-prog"><span class="hud-bar"><i></i></span><span class="hud-xptxt"></span></span><span class="hud-streak hud-prog"></span><span class="hud-freeze hud-prog"></span></div></div>
   <div class="wrap">
     <button class="backlink" id="modes-back">← All exams</button>
     <div class="hero" style="margin-bottom:22px;">
@@ -2298,6 +2358,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     </div>
   </div>
 </nav>
+  <div class="hudwrap"><div class="hudstrip hidden" data-hud="browse"><span class="hud-lvl hud-prog"></span><span class="hud-barwrap hud-prog"><span class="hud-bar"><i></i></span><span class="hud-xptxt"></span></span><span class="hud-streak hud-prog"></span><span class="hud-freeze hud-prog"></span></div></div>
   <div class="wrap">
     <button class="backlink" id="deck-back">← All exams</button>
     <div class="hero" style="margin-bottom:22px;">
@@ -2327,6 +2388,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     </div>
   </div>
 </nav>
+  <div class="hudwrap"><div class="hudstrip hidden" data-hud="browse"><span class="hud-lvl hud-prog"></span><span class="hud-barwrap hud-prog"><span class="hud-bar"><i></i></span><span class="hud-xptxt"></span></span><span class="hud-streak hud-prog"></span><span class="hud-freeze hud-prog"></span></div></div>
   <div class="wrap">
     <button class="backlink" id="brief-back">← Choose mode</button>
     <div class="brief">
@@ -2358,6 +2420,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <button class="endbtn" id="endbtn">End exam</button>
   </div></div>
   <div class="qtrackwrap" aria-hidden="true"><div class="qtrack"><div id="qtrackfill"></div><i class="qm" data-m="25" style="left:25%"></i><i class="qm" data-m="50" style="left:50%"></i><i class="qm" data-m="75" style="left:75%"></i></div></div>
+  <div class="hudwrap-exam"><div class="hudstrip hud-exam hidden" data-hud="exam"><span class="hud-lvl hud-prog"></span><span class="hud-barwrap hud-prog"><span class="hud-bar"><i></i></span><span class="hud-xptxt"></span></span><span class="hud-streak hud-prog"></span><span class="hud-freeze hud-prog"></span><span class="hud-sess"></span></div></div>
   <div class="exambody">
     <div class="qcard">
       <div class="qhead">
@@ -2425,21 +2488,23 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     </div>
   </div>
 </nav>
+  <div class="hudwrap"><div class="hudstrip hidden" data-hud="browse"><span class="hud-lvl hud-prog"></span><span class="hud-barwrap hud-prog"><span class="hud-bar"><i></i></span><span class="hud-xptxt"></span></span><span class="hud-streak hud-prog"></span><span class="hud-freeze hud-prog"></span></div></div>
   <div class="wrap"><div class="reswrap">
     <div class="rescard">
       <div style="font-size:13px;font-weight:800;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);" id="res-exam">Exam results</div>
-      <div><span class="passfail" id="res-passfail">–</span></div>
-      <div class="pipblock hidden" id="res-pip"></div>
-      <div class="res-scoreline hidden" id="res-scoreline"></div>
-      <div class="xpline hidden" id="res-xpline"></div>
-      <div class="recordbanner hidden" id="res-record"></div>
-      <div class="watchchap hidden" id="res-watch"></div>
+      <div data-rv="1"><span class="passfail" id="res-passfail">–</span></div>
+      <div class="pipblock hidden" id="res-pip" data-rv="2"></div>
+      <div class="res-scoreline hidden" id="res-scoreline" data-rv="3"></div>
+      <div class="res-unans hidden" id="res-unans" data-rv="3"></div>
+      <div class="xpline hidden" id="res-xpline" data-rv="4"></div>
+      <div class="recordbanner hidden" id="res-record" data-rv="5"></div>
+      <div class="watchchap hidden" id="res-watch" data-rv="6"></div>
       <div class="btnrow res-secondary" style="justify-content:center;">
         <button class="btn ghost" id="res-retake">Retake simulation</button>
         <button class="btn ghost" id="res-share">⤴ Share score</button>
       </div>
-      <div class="res-trust hidden" id="res-trust">Finding ByteBar helpful? <a href="https://www.trustpilot.com/review/bytebarhq.com" target="_blank" rel="noopener">Leave a quick review on Trustpilot</a> — it helps other candidates find us.</div>
-      <div id="res-acctnudge"></div>
+      <div class="res-trust hidden" id="res-trust" data-rv="6">Finding ByteBar helpful? <a href="https://www.trustpilot.com/review/bytebarhq.com" target="_blank" rel="noopener">Leave a quick review on Trustpilot</a> — it helps other candidates find us.</div>
+      <div id="res-acctnudge" data-rv="4"></div>
       <div class="readiness hidden" id="res-readiness">
         <h4>📊 Exam readiness</h4>
         <div class="rsub" id="res-rsub">Based on your logged attempts for this exam.</div>
@@ -2485,6 +2550,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     </div>
   </div>
 </nav>
+  <div class="hudwrap"><div class="hudstrip hidden" data-hud="browse"><span class="hud-lvl hud-prog"></span><span class="hud-barwrap hud-prog"><span class="hud-bar"><i></i></span><span class="hud-xptxt"></span></span><span class="hud-streak hud-prog"></span><span class="hud-freeze hud-prog"></span></div></div>
   <div class="wrap">
     <button class="backlink" id="dash-back">← Home</button>
     <div class="hero" style="margin-bottom:24px;">
@@ -2534,6 +2600,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     </div>
   </div>
 </nav>
+  <div class="hudwrap"><div class="hudstrip hidden" data-hud="browse"><span class="hud-lvl hud-prog"></span><span class="hud-barwrap hud-prog"><span class="hud-bar"><i></i></span><span class="hud-xptxt"></span></span><span class="hud-streak hud-prog"></span><span class="hud-freeze hud-prog"></span></div></div>
   <div class="wrap">
     <button class="backlink" id="profile-back">← Home</button>
     <div class="profilehead">
@@ -2579,6 +2646,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     </div>
   </div>
 </nav>
+  <div class="hudwrap"><div class="hudstrip hidden" data-hud="browse"><span class="hud-lvl hud-prog"></span><span class="hud-barwrap hud-prog"><span class="hud-bar"><i></i></span><span class="hud-xptxt"></span></span><span class="hud-streak hud-prog"></span><span class="hud-freeze hud-prog"></span></div></div>
   <div class="wrap">
     <button class="backlink" id="builder-back">← Home</button>
     <div class="hero" style="margin-bottom:24px;">
@@ -4572,6 +4640,7 @@ function show(id){
     if(on && !REDUCED()){ el.classList.remove("screen-enter"); void el.offsetWidth; el.classList.add("screen-enter"); }
   });
   window.scrollTo(0,0);
+  paintHud();
 }
 
 /* ================= persistent home navigation =================
@@ -4965,6 +5034,7 @@ function buddyInit(){
   coachSay(pick(COACH_OPENERS), "idle", true);
   renderStreak();
   paintTrack();
+  paintHud();
 }
 function renderStreak(){
   const pill=$("streakpill"); if(!pill) return;
@@ -4992,6 +5062,80 @@ function paintTrack(){
     m.classList.toggle("hit", pct>=parseInt(m.dataset.m,10));
   });
   return pct;
+}
+
+/* ============================================================
+   PHASE 1 (2026-11-15) — persistent progress strip.
+   One contained strip under the nav on every screen: level ·
+   XP bar to next level · day streak · banked freezes. Guests
+   (no saved record) see no strip on browse screens — the strip
+   only ever shows real progress. In the exam screen it is
+   mode-aware: live modes mirror the career strip with XP
+   projected from session earnings; a timed sim / CAT shows
+   neutral session info only (exam · question · answered) —
+   test-day pure, no game data mid-sim. No sound anywhere:
+   Cori parked the sound kit 2026-11-15.
+   ============================================================ */
+function hudFill(strip, sig, fill){
+  if(strip.dataset.sig===sig) return;
+  strip.dataset.sig=sig; fill();
+}
+function hudPaintProg(strip, lv, xp, pct, r){
+  const lvl=strip.querySelector(".hud-lvl"); if(lvl) lvl.textContent="★ "+lv.name;
+  const bar=strip.querySelector(".hud-bar i"); if(bar) bar.style.width=pct+"%";
+  const xt=strip.querySelector(".hud-xptxt");
+  if(xt) xt.innerHTML=xp.toLocaleString()+" XP"+(lv.next
+    ? ' <span class="hud-tonext">· '+(lv.next-xp).toLocaleString()+" to "+escapeHtml(lv.nextName)+"</span>"
+    : ' <span class="hud-tonext">· top level</span>');
+  const st=strip.querySelector(".hud-streak");
+  if(st){ const d=dayStreak(r); st.innerHTML=d>0?flameSVG(d)+"<b>"+d+"</b>":""; st.title=d+"-day streak"; }
+  const fz=strip.querySelector(".hud-freeze");
+  if(fz){ const f=r.streakFreeze||0; fz.textContent=f>0?"❄ ×"+f:""; fz.title="Streak freezes banked"; }
+}
+function paintHud(){
+  const r=userRec();
+  document.querySelectorAll("[data-hud]").forEach(strip=>{
+    if(strip.dataset.hud==="exam"){
+      if(!S || !S.exam){ strip.classList.add("hidden"); strip.dataset.sig=""; return; }
+      const timed = S.mode==="sim" || S.mode==="cat" || (S.mode==="custom" && S.timed);
+      if(timed){
+        const qp=$("qprog") ? $("qprog").textContent : "";
+        let ans="";
+        if(S.mode!=="cat"){
+          const a=(S.answers||[]).filter(x=>x!==null).length;
+          const fl=(S.flags||[]).filter(Boolean).length;
+          ans=" · "+a+" answered"+(fl?" · "+fl+" flagged":"");
+        }
+        strip.classList.remove("hidden"); strip.classList.add("sess");
+        hudFill(strip, "sess|"+S.exam.slug+"|"+qp+"|"+ans, ()=>{
+          const s=strip.querySelector(".hud-sess");
+          if(s) s.textContent=S.exam.code+" · "+qp+ans;
+        });
+        return;
+      }
+      if(r){
+        const proj=r.xp+(S.xpEarned||0), lv=levelFor(proj);
+        const pct=lv.next?Math.round((proj-lv.cur)/(lv.next-lv.cur)*100):100;
+        strip.classList.remove("hidden"); strip.classList.remove("sess");
+        hudFill(strip, "live|"+proj+"|"+dayStreak(r)+"|"+(r.streakFreeze||0),
+          ()=>hudPaintProg(strip, lv, proj, pct, r));
+      } else {
+        strip.classList.remove("hidden"); strip.classList.add("sess");
+        hudFill(strip, "guest|"+(S.xpEarned||0), ()=>{
+          const s=strip.querySelector(".hud-sess");
+          if(s) s.textContent="Session XP +"+(S.xpEarned||0);
+        });
+      }
+      return;
+    }
+    /* browse screens: signed-in progress only */
+    if(!r){ strip.classList.add("hidden"); strip.dataset.sig=""; return; }
+    const lv=levelFor(r.xp);
+    const pct=lv.next?Math.round((r.xp-lv.cur)/(lv.next-lv.cur)*100):100;
+    strip.classList.remove("hidden");
+    hudFill(strip, "browse|"+r.xp+"|"+dayStreak(r)+"|"+(r.streakFreeze||0),
+      ()=>hudPaintProg(strip, lv, r.xp, pct, r));
+  });
 }
 
 function buddyOnMilestone(){
@@ -5029,6 +5173,7 @@ function buddyOnAnswer(wasRight){
     renderStreak();
   }
   buddyOnMilestone();
+  paintHud();
 }
 function checkMidQuizLevel(){
   const r=userRec(); if(!r||!S) return;
@@ -5153,11 +5298,18 @@ function renderResumeBanner(){
   const r=getResume(); if(!r) return;
   const exam=EXAMS.find(e=>e.slug===r.slug);
   const label=r.mode==="sim" ? "simulation" : (r.mode==="custom" ? "custom quiz" : "practice");
-  let sub;
+  /* Progress stated plainly (audit P1-6): how many of the set are
+     answered, and which question you're on — no bare percentages.
+     Only signed-in users ever see this banner (getResume gates it). */
+  const total=r.bank.length;
+  const answeredCount=(r.mode==="sim"||(r.mode==="custom"&&r.timed))
+    ? (r.answers||[]).filter(a=>a!==null&&a!==undefined).length
+    : r.bank.filter(q=>q.__res).length;
+  let sub=answeredCount+" of "+total+" answered · on question "+(r.idx+1)+" of "+total;
   if(r.mode==="sim"){
     const ms=Math.max(0,r.deadline-Date.now());
-    sub="Q "+(r.idx+1)+" of "+r.bank.length+" · "+Math.floor(ms/60000)+":"+String(Math.floor(ms%60000/1000)).padStart(2,"0")+" left";
-  } else sub="Q "+(r.idx+1)+" of "+r.bank.length+" · untimed";
+    sub+=" · "+Math.floor(ms/60000)+":"+String(Math.floor(ms%60000/1000)).padStart(2,"0")+" left";
+  } else if(!(r.mode==="custom"&&r.timed)) sub+=" · untimed";
   const bar=document.createElement("div"); bar.className="resumebar";
   bar.innerHTML='<div class="ri">⏯</div><div class="rt"><b>Resume your '+exam.code+' '+label+'</b><span>'+sub+' — pick up right where you left off.</span></div>';
   const go=document.createElement("button"); go.className="btn"; go.textContent="Resume";
@@ -5311,6 +5463,7 @@ async function startPractice(slug){
   if(!(examFormat(slug).types.indexOf("terminal")!==-1)){
     try{ await ensureBank(slug); }catch(e){ if(window.BB&&BB.toast) BB.toast("Could not load questions \u2014 check your connection and try again."); return; }
   }
+  clearResume(); /* the mode door is the one fresh start: it replaces any saved session */
   const bank=buildPracticeBank(slug);
   S={mode:"practice",exam,bank,idx:0,score:0,misses:[],answered:false,t0:Date.now()};
   document.documentElement.style.setProperty("--qacc",exam.accent);
@@ -5472,6 +5625,7 @@ $("brief-start").addEventListener("click",async ()=>{
     try{ await ensureBank(curExam.slug); }catch(e){ if(window.BB&&BB.toast) BB.toast("Could not load questions \u2014 check your connection and try again."); return; }
   }
   if(fmt.types.indexOf("cat")!==-1){ startCAT(curExam.slug); return; }
+  clearResume(); /* fresh start from the Begin door replaces any saved session */
   const bank=buildSimBank(curExam.slug);
   S={mode:"sim",exam:curExam,bank,idx:0,score:0,misses:[],answers:new Array(bank.length).fill(null),
      flags:new Array(bank.length).fill(false),t0:Date.now(),submitted:false,
@@ -5656,7 +5810,7 @@ function renderExamChrome(){
 function paintPalette(){
   if(S.mode==="cat"){
     $("palsub").textContent="Adaptive CAT · question "+(S.idx+1)+" of "+S.cat.minQ+"–"+S.cat.maxQ;
-    $("qprog").textContent="Q "+(S.idx+1); paintTrack(); return;
+    $("qprog").textContent="Q "+(S.idx+1); paintTrack(); paintHud(); return;
   }
   const grid=$("palgrid").children;
   for(let i=0;i<grid.length;i++){
@@ -5668,6 +5822,7 @@ function paintPalette(){
   }
   $("qprog").textContent="Q "+(S.idx+1)+" / "+S.bank.length;
   paintTrack();
+  paintHud();
 }
 /* NGN case-study panel (Phase A3): the scenario stays pinned above every
    item of its study, in its own contained region — the question screen
@@ -5743,7 +5898,7 @@ function renderQ(){
     const opts=box.children;
     opts[q.answer].classList.add("correct");
     if(q.__res==="wrong"){
-      const miss=S.misses.find(m=>m.q===q);
+      const miss=S.misses.find(m=>m.q===q||(typeof m.mi==="number"&&m.mi===S.idx));
       if(miss && opts[miss.picked]) opts[miss.picked].classList.add("wrong");
     }
     showExplanation(q, q.__res==="right");
@@ -5787,7 +5942,7 @@ function renderMulti(q,box){
       const opts=box.querySelectorAll(".opt");
       q.answers.forEach(a=>opts[a].classList.add("correct"));
       if(q.__res==="wrong"||q.__res==="partial"){
-        const miss=S.misses.find(m=>m.q===q);
+        const miss=S.misses.find(m=>m.q===q||(typeof m.mi==="number"&&m.mi===S.idx));
         (miss&&miss.picked||[]).forEach(p=>{ if(opts[p]&&q.answers.indexOf(p)===-1) opts[p].classList.add("wrong"); });
       }
       showExplanationMS(q, q.__res==="right", q.__res==="partial");
@@ -5838,7 +5993,10 @@ function answerMS(q){
   q.__resScore=frac; q.__resPicked=picked;
   S.score+=frac;
   deckOnAnswer(q, wasRight);
-  showExplanationMS(q, wasRight, partial);
+  /* Phase 1 verdict beat: same breath as answer() — verdict first,
+     explanation a moment later, guarded against fast navigation. */
+  const _vIdx=S.idx;
+  setTimeout(()=>{ if(S && S.idx===_vIdx && S.answered && !S.submitted) showExplanationMS(q, wasRight, partial); }, REDUCED()?0:280);
   opts.forEach(o=>o.disabled=true);
   const chk=$("ms-check"); if(chk) chk.disabled=true;
   buddyOnAnswer(wasRight); paintPalette(); saveResume();
@@ -5850,7 +6008,7 @@ function showExplanationMS(q, wasRight, partial){
   if(wasRight){
     head='<div class="exhead"><span class="mascot">'+mascotSVG("happy",42)+'</span><span class="exic">✓</span> Correct — nice work</div>';
   } else if(partial){
-    const miss=(typeof S!=="undefined"&&S&&S.misses)?S.misses.find(m=>m.q===q):null;
+    const miss=(typeof S!=="undefined"&&S&&S.misses)?S.misses.find(m=>m.q===q||(typeof m.mi==="number"&&m.mi===S.idx)):null;
     const pk=q.__resPicked||(miss&&miss.picked)||[];
     head='<div class="exhead"><span class="mascot">'+mascotSVG("encourage",42)+'</span><span class="exic">◐</span> Partial — '+msEarned(q,pk)+' of '+(q.answers||[]).length+'</div>';
   } else {
@@ -5980,7 +6138,12 @@ function answer(i,btn){
     if(!wasRight){ btn.classList.add("wrong"); S.misses.push({q, picked:i}); q.__res="wrong"; }
     else { S.score++; q.__res="right"; }
     deckOnAnswer(q, wasRight);
-    showExplanation(q, wasRight);
+    /* Phase 1 verdict beat: the card flash, Pip's reaction and the XP
+       float land on this frame (buddyOnAnswer below); the explanation
+       follows a breath later so the verdict reads first. Guarded so a
+       fast Next tap never paints a stale explanation forward. */
+    const _vIdx=S.idx;
+    setTimeout(()=>{ if(S && S.idx===_vIdx && S.answered && !S.submitted) showExplanation(q, wasRight); }, REDUCED()?0:280);
     [...opts].forEach(o=>o.disabled=true);
     buddyOnAnswer(wasRight);
     paintPalette();
@@ -6284,6 +6447,54 @@ function weakestDomainOf(doms){
 }
 
 /* ================= results ================= */
+/* ============================================================
+   PHASE 1 (2026-11-15) — staged results reveal.
+   The verdict lands first, then Pip's line, then the score
+   counts up, then XP counts up, then the record/watch lines —
+   Design System v2 motion (one easing family, rise 480ms,
+   fade 240ms, 8px travel, nothing loops). All final values are
+   already written by finishExam before this runs; the reveal
+   only sequences their appearance. Reduced motion: never
+   armed — everything simply appears, exactly as before.
+   ============================================================ */
+function countUpText(el, from, to, dur, fmt){
+  if(!el) return;
+  if(REDUCED() || from===to){ el.textContent=fmt(to); return; }
+  const t0=performance.now();
+  const step=t=>{
+    const p=Math.min(1,(t-t0)/dur), e=1-Math.pow(1-p,3);
+    el.textContent=fmt(Math.round(from+(to-from)*e));
+    if(p<1) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+function stageResultsReveal(rv){
+  const card=document.querySelector("#screen-results .rescard");
+  if(!card || !rv) return;
+  const items=[...card.querySelectorAll("[data-rv]")];
+  if(REDUCED()){ items.forEach(el=>el.classList.add("rv-in")); return; }
+  card.classList.add("rv-armed");
+  items.forEach(el=>el.classList.remove("rv-in"));
+  const inEl=k=>{ card.querySelectorAll('[data-rv="'+k+'"]').forEach(el=>el.classList.add("rv-in")); };
+  setTimeout(()=>inEl("1"), 80);
+  setTimeout(()=>inEl("2"), 360);
+  setTimeout(()=>{
+    inEl("3");
+    const sl=$("res-scoreline");
+    if(sl && !sl.classList.contains("hidden"))
+      countUpText(sl, 0, rv.pct, 600, v=>v+"% on "+S.exam.code+" · "+fmtPts(rv.score)+" of "+rv.n+" correct");
+  }, 640);
+  setTimeout(()=>{
+    inEl("4");
+    const xl=$("res-xpline");
+    if(xl && !xl.classList.contains("hidden") && rv.gained>0)
+      countUpText(xl, 0, rv.gained, 600, v=>"+"+v.toLocaleString()+" XP earned"+(v>=rv.gained && rv.mult>1 ? " · 2x streak bonus 🔥" : ""));
+  }, 940);
+  setTimeout(()=>{ inEl("5"); inEl("6"); }, 1240);
+  /* Safety: whatever happens, everything is fully shown by 2.1s. */
+  setTimeout(()=>{ card.classList.remove("rv-armed"); items.forEach(el=>el.classList.add("rv-in")); }, 2100);
+}
+
 function finishExam(expired){
   clearInterval(timerId);
   clearResume();
@@ -6316,14 +6527,28 @@ function finishExam(expired){
     }
   });
   if(live){ score=S.score; misses.push(...S.misses);
-    /* rebuild domain stats for live modes */
+    /* Rebuild domain stats for live modes — ANSWERED questions only
+       (fix 2026-11-15): a practice set finished early used to count
+       every unreached question in its domain's total, so the results
+       Pip line and breakdown blamed domains for questions the user
+       never saw ("Domain 2 cost you 6 questions" after answering 2).
+       Unreached questions now count only in `unans` below and get
+       their own honest line on the results screen. Domains with zero
+       answered questions drop out of `doms` entirely, so every
+       consumer of this object (results breakdown, Pip/watch weakest
+       domain, free-pitch teaser, recordAttempt → domainAgg →
+       dashboard + readiness) sees answered-only math. Deferred modes
+       (sim, timed custom, CAT) are NOT touched: there an unanswered
+       question is a real exam miss by design. */
     Object.keys(doms).forEach(k=>{doms[k]={t:0,c:0};});
     S.bank.forEach((q,i)=>{
-      const d=q.domain||"General"; doms[d].t++;
-      if(q.__res) doms[d].c+=(typeof q.__resScore==="number")?q.__resScore:(q.__res==="right"?1:0);
+      const d=q.domain||"General";
+      if(q.__res){ doms[d].t++; doms[d].c+=(typeof q.__resScore==="number")?q.__resScore:(q.__res==="right"?1:0); }
       else misses.push({q, picked:null});
     });
+    Object.keys(doms).forEach(k=>{ if(!doms[k].t) delete doms[k]; });
   }
+  const unans = live ? S.bank.reduce((a,q)=>a+(q.__res?0:1),0) : 0;
   const pct=Math.round(score/n*100);
   const passMark=passPct(S.exam.slug);
   const pass=pct>=passMark;
@@ -6357,6 +6582,15 @@ function finishExam(expired){
     if(currentUser()){ sl.textContent=pct+"% on "+S.exam.code+" · "+fmtPts(score)+" of "+n+" correct"; sl.classList.remove("hidden"); }
     else sl.classList.add("hidden");
   }
+  /* Unanswered line (2026-11-15): live modes finished early name the
+     unreached questions plainly, as their own line — they are never
+     folded into a domain's losses. Deferred/sim modes never show it:
+     there the review screen already lists unanswered questions. */
+  const uaEl=$("res-unans");
+  if(uaEl){
+    if(live&&unans>0){ uaEl.textContent=unans+" question"+(unans===1?"":"s")+" left unanswered"; uaEl.classList.remove("hidden"); }
+    else uaEl.classList.add("hidden");
+  }
 
   /* Free preview guard (Cori 2026-10-18): the 10-question taste shows score only.
      Domain breakdown, missed-question review, and readiness are Pro value —
@@ -6377,7 +6611,7 @@ function finishExam(expired){
     const why=c.maxed?("after the full "+c.maxQ+" questions"):("with 95% confidence after "+c.n+" questions");
     const rEx=$("res-exam");
     if(rEx) rEx.insertAdjacentHTML("afterend",
-      '<div class="catverdict '+(decision==="pass"?"pass":"fail")+'">'+
+      '<div data-rv="2" class="catverdict '+(decision==="pass"?"pass":"fail")+'">'+
       '<div class="cvk">'+(decision==="pass"?"✓ ABOVE THE PASSING STANDARD":"✗ BELOW THE PASSING STANDARD")+'</div>'+
       '<div class="cvs">Adaptive engine decided '+why+' · ability estimate '+(c.theta>=0?"+":"")+c.theta.toFixed(2)+'</div></div>');
     const pf2=$("res-passfail");
@@ -6406,7 +6640,14 @@ function finishExam(expired){
         const p=c/t, m=t-c;
         if(p<wPct||(p===wPct&&m>wMiss)){ wd=d; wPct=p; wMiss=m; }
       });
-      if(wd) renderPipBlock(pipRes,"sympathetic",wd+" cost you "+wMiss+" question"+(wMiss===1?"":"s")+" — your misses are saved, and we'll fix them.","pip-settle",76);
+      /* Only blame a domain for questions actually missed in it
+         (2026-11-15): with answered-only domain math, an early finish
+         where everything answered was right leaves wMiss at 0 — the
+         unanswered line above carries that story instead of a false
+         "cost you 0 questions". Clear the block so no stale Pip line
+         from a previous attempt can linger. */
+      if(wd&&wMiss>0) renderPipBlock(pipRes,"sympathetic",wd+" cost you "+wMiss+" question"+(wMiss===1?"":"s")+" — your misses are saved, and we'll fix them.","pip-settle",76);
+      else { pipRes.innerHTML=""; pipRes.classList.add("hidden"); }
     }
     /* Trustpilot ask: PASS results only. The 2026-11-11 cleanup moved it
        off the not-yet screen — a pass is the right moment for the ask. */
@@ -6624,6 +6865,7 @@ function finishExam(expired){
   /* progress: record attempt, badges, readiness (logged-in users) */
   const nudge=$("res-acctnudge");
   if(nudge) nudge.innerHTML="";
+  let rvData={pct, gained:0, mult:1, score, n};
   if(currentUser()){
     const r0=userRec(), xpBefore=r0?r0.xp:0, lvlBefore=levelFor(xpBefore).name;
     const detBefore=r0?readinessDetail(r0, S.exam.slug):null;
@@ -6647,6 +6889,7 @@ function finishExam(expired){
     const r1=userRec(), lvlAfter=r1?levelFor(r1.xp).name:lvlBefore;
     renderReadinessPanel(S.exam.slug);
     const gained=rec?rec.gained:0, xpLine=$("res-xpline");
+    rvData.gained=gained; rvData.mult=(rec&&rec.mult)||1;
     if(xpLine && gained>0){
       xpLine.classList.remove("hidden");
       xpLine.textContent="+"+gained.toLocaleString()+" XP earned"+(rec&&rec.mult>1?" · 2x streak bonus 🔥":"");
@@ -6690,6 +6933,7 @@ function finishExam(expired){
   const rc=document.querySelector("#screen-results .rescard");
   if(rc){ rc.classList.toggle("passed",pass); rc.classList.toggle("failed",!pass); }
   show("screen-results");
+  stageResultsReveal(rvData);
 }
 
 /* ============================================================
@@ -6916,6 +7160,7 @@ function refreshAccount(){
     if(r){ pill.classList.remove("hidden"); pill.textContent="★ "+label; }
     else pill.classList.add("hidden");
   }
+  paintHud();
 }
 function openAccountMenu(){
   const u=currentUser(); if(!u){ openAuth(); return; }
@@ -7515,12 +7760,15 @@ function saveResume(){
   if(!S||S.submitted) return;
   if(S.mode==="cat") return; /* CAT sessions are forward-only; finish in one sitting */
   if(S.mode==="deck") return; /* deck progress saves per-answer in the deck store, never as a resume */
+  if(!currentUser()) return; /* Resume is account-gated (Cori 2026-11-15):
+     a free account counts, but guests never persist a resumable
+     session — a guest always starts fresh. */
   try{
     const data={mode:S.mode, slug:S.exam.slug, idx:S.idx, t0:S.t0, score:S.score,
-      misses:S.misses, answers:S.answers||null, flags:S.flags||null, strikes:S.strikes||null, timed:!!S.timed,
+      misses:(S.misses||[]).map(m=>({q:m.q, picked:(m.picked===undefined?null:m.picked), terminal:m.terminal?true:undefined, mi:S.bank.indexOf(m.q)})), answers:S.answers||null, flags:S.flags||null, strikes:S.strikes||null, timed:!!S.timed, streak:S.streak||0, bestStreak:S.bestStreak||0, xpEarned:S.xpEarned||0,
       minutes:S.minutes||0,
       bank:S.bank.map(q=>({q:q.q||q.task||"",options:q.options||null,answer:(q.answer!=null?q.answer:null),
-        answers:q.answers||null,sata:q.sata||null,explain:q.explain,domain:q.domain,__res:q.__res||null,
+        answers:q.answers||null,sata:q.sata||null,explain:q.explain,domain:q.domain,__res:q.__res||null,__resScore:(typeof q.__resScore==="number"?q.__resScore:null),__resPicked:q.__resPicked||null,
         caseId:q.caseId||null,caseOrd:q.caseOrd||null,caseN:q.caseN||null,caseTitle:q.caseTitle||null,scenario:q.scenario||null,
         kind:q.kind||"mcq",task:q.task||null,ctx:q.ctx||null,accept:q.accept||null,
         hints:q.hints||null,solution:q.solution||null,_revealed:!!q._revealed,_lastInput:q._lastInput||null})),
@@ -7530,6 +7778,10 @@ function saveResume(){
 }
 function clearResume(){ try{ localStorage.removeItem(resumeKey()); }catch(e){} }
 function getResume(){
+  /* Account gate (Cori 2026-11-15): resume exists only for signed-in
+     users (a free account counts). A guest's leftover key is cleared
+     on sight, never resurrected — guests always start fresh. */
+  if(!currentUser()){ try{ localStorage.removeItem("bb_resume_guest"); }catch(e){} return null; }
   try{
     const r=JSON.parse(localStorage.getItem(resumeKey())||"null");
     if(!r||!r.bank||!r.bank.length) return null;
@@ -7539,6 +7791,7 @@ function getResume(){
   }catch(e){ return null; }
 }
 function resumeExam(){
+  if(!currentUser()) return; /* account-gated — see getResume() */
   const r=getResume(); if(!r) return;
   const exam=EXAMS.find(e=>e.slug===r.slug);
   curExam=exam;
@@ -7554,6 +7807,9 @@ function resumeExam(){
   show("screen-exam"); renderExamChrome(); renderQ();
   if(simLike){ deadline=r.deadline; startTimer(true); }
   buddyInit();
+  /* buddyInit zeroes the session counters; put back the ones this
+     session had actually earned so its streak / XP story continues. */
+  if(typeof r.streak==="number"){ S.streak=r.streak; S.bestStreak=r.bestStreak||0; S.xpEarned=r.xpEarned||0; paintHud(); }
 }
 
 /* ============================================================
