@@ -4656,9 +4656,15 @@ function goHome(){
       /* Timed exam: leaving discards it — confirm first. */
       if(!confirm("Leave the exam?\n\nYour progress won't be saved.")) return;
       clearInterval(timerId); clearResume();
-    } else {
-      /* Untimed practice/custom: progress auto-saves; home offers "Resume". */
+    } else if(currentUser()){
+      /* Untimed practice/custom, signed in: progress auto-saves; home offers "Resume". */
       saveResume();
+      clearInterval(timerId);
+    } else {
+      /* Untimed practice/custom, guest: NO resume of any kind (Cori
+         2026-11-15) — leaving discards the session outright, the
+         same end state as the banner's Discard button. */
+      clearResume();
       clearInterval(timerId);
     }
     S=null;
@@ -5295,6 +5301,11 @@ function renderLibraryPanel(){
 /* resume banner on home */
 function renderResumeBanner(){
   const slot=$("resume-slot"); if(!slot) return; slot.innerHTML="";
+  /* Guests never see this bar — no resume of any kind without an
+     account (Cori 2026-11-15: "kill it for guests too"). Gated here
+     at the paint surface as well as in getResume(), so the bar
+     cannot appear for a guest even if a stale key survives. */
+  if(!currentUser()) return;
   const r=getResume(); if(!r) return;
   const exam=EXAMS.find(e=>e.slug===r.slug);
   const label=r.mode==="sim" ? "simulation" : (r.mode==="custom" ? "custom quiz" : "practice");
