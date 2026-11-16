@@ -341,6 +341,9 @@ ul.pp-feats li{
 .brief-eyebrow{font-size:11.5px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; color:var(--cyan); margin:2px 0 8px;}
 .brief-candidate{font-size:14.5px; font-weight:700; color:var(--navy); margin:0 0 10px; overflow-wrap:break-word;}
 .brief-keys{font-size:12.5px; font-weight:600; color:var(--mut); margin:14px 0 0; letter-spacing:.01em;}
+.brief-qpwrap{text-align:center; margin:12px 0 0;}
+.brief-qpwrap a{color:var(--mut); font-size:13.5px; font-weight:600; text-decoration:none;}
+.brief-qpwrap a:hover{color:var(--cyan);}
 .brief .rule{border-top:1px solid var(--line); padding:13px 0; display:flex; gap:12px; font-size:15px; line-height:1.5;}
 .brief .rule .ic{flex:none; width:30px; height:30px; border-radius:9px; background:var(--cyan-soft); color:var(--cyan); display:flex; align-items:center; justify-content:center; font-weight:800;}
 .brief .warn{background:var(--amber-soft); border:1px solid #f3d9a8; border-radius:12px; padding:13px 16px; font-size:14px; color:#7a4a06; line-height:1.55; margin:16px 0 4px;}
@@ -2157,6 +2160,35 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
   .ch-bar>div{transition:none;}
   .goal-change:active,.goaltarget:active{transform:none;}
 }
+
+/* ===== Signed-in home declutter + owner state (Cori 2026-11-15 —
+   approved preview, promoted to live). ===== */
+.todayrow{background:linear-gradient(135deg,#fffdf4,#fdf6e3); border:2px solid #f0d9a0; border-radius:18px;
+  padding:12px 16px; margin-bottom:16px; box-shadow:var(--shadow);}
+.todayrow.lit{border-color:#f0b429; background:linear-gradient(135deg,#fffdf4,#fef3d8);}
+.today-top{display:flex; align-items:center; gap:10px; flex-wrap:wrap;}
+.today-streak{display:inline-flex; align-items:center; gap:7px; background:none; border:0; font:inherit;
+  color:inherit; cursor:pointer; padding:2px 0; white-space:nowrap;}
+.today-streak .sb-flame{font-size:22px;}
+.today-side{margin-left:auto; display:inline-flex; align-items:center; gap:10px;}
+.today-goal{border:1.5px solid var(--line); background:#fff; border-radius:99px; padding:5px 12px;
+  font:inherit; font-weight:800; font-size:13.5px; color:var(--ink); white-space:nowrap; cursor:pointer;}
+.today-goal.met{border-color:#bfe6d4; background:#f4fbf7;}
+.today-pip{font-size:14px; line-height:1.45; color:var(--mut); font-weight:600; margin-top:7px;}
+.slot-moved{max-width:1120px; margin:0 auto; padding:0 22px; width:100%;}
+@media(max-width:720px){.slot-moved{padding:0 14px} .todayrow{padding:12px} .today-top{gap:8px}}
+.challacc{margin:6px 0 16px;}
+.challacc-head{width:100%; display:flex; align-items:center; flex-wrap:wrap; gap:8px; text-align:left; background:var(--card);
+  border:1.5px solid var(--line); border-radius:16px; padding:14px 16px; font:inherit; color:var(--ink);
+  cursor:pointer; box-shadow:var(--shadow);}
+.challacc-title{font-weight:800; font-size:15.5px; white-space:nowrap;}
+.challacc-sum{font-weight:600; font-size:13.5px; color:var(--mut); min-width:0; line-height:1.4;}
+.challacc-chev{margin-left:auto; color:var(--mut); font-size:14px; flex:none;}
+.challacc-body{margin-top:12px;}
+.challacc-body.hidden{display:none;}
+.chall-meta{font-size:12.5px; color:var(--mut); margin:0 0 10px; font-weight:600;}
+.avdot{position:absolute; left:-2px; bottom:-2px; width:9px; height:9px; border-radius:50%;
+  background:#f5b544; border:2px solid #fff; box-shadow:0 1px 3px rgba(0,0,0,.25);}
 </style>
 
 <!-- ================= HOME ================= -->
@@ -2470,6 +2502,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <div class="btnrow">
         <button class="btn block" id="brief-start">Begin Exam</button>
       </div>
+      <p class="brief-qpwrap hidden" id="brief-qpwrap"><a href="#" id="brief-qp">Quick practice instead →</a></p>
     </div>
   </div>
 </div>
@@ -2989,12 +3022,71 @@ window.BB = (function(){
   }
   function supa(){ return BB._supa; }
 
+  /* ---------- shared session storage (one login, Cori 2026-11-15) ----------
+     supabase-js persists its session through this adapter into cookies
+     scoped Domain=.bytebarhq.com, so a sign-in on bytebarhq.com is
+     visible on sim.bytebarhq.com and vice versa — and sign-out anywhere
+     clears the shared cookies, signing out everywhere. localStorage
+     stays as a same-origin mirror: a pre-cookie session found there
+     (with no sign-out tombstone) migrates into the cookie on first
+     read. Long values chunk across cookies (key.0, key.1, ...). */
+  function bbAuthStorage(){
+    var CHUNK = 3000, MAXAGE = 34560000, TOMB = "bb-auth-out";
+    function jar(){
+      var o = {};
+      (document.cookie || "").split(";").forEach(function(p){
+        var i = p.indexOf("="); if(i > 0) o[p.slice(0, i).trim()] = p.slice(i + 1).trim();
+      });
+      return o;
+    }
+    function put(name, value, age){
+      var s = name + "=" + value + "; Domain=.bytebarhq.com; Path=/; SameSite=Lax; Max-Age=" + age;
+      if(window.location.protocol === "https:") s += "; Secure";
+      document.cookie = s;
+    }
+    function chunked(j, key){
+      if(j[key + ".0"] === undefined) return null;
+      var v = "", i = 0;
+      while(j[key + "." + i] !== undefined){ v += j[key + "." + i]; i++; }
+      return v;
+    }
+    function clearChunks(key){
+      put(key, "", 0);
+      for(var i = 0; i < 12; i++) put(key + "." + i, "", 0);
+    }
+    var store = {
+      getItem: function(key){
+        var j = jar(), v = chunked(j, key);
+        if(v !== null){ try { return decodeURIComponent(v); } catch(e){ return null; } }
+        if(j[key] !== undefined){ try { return decodeURIComponent(j[key]); } catch(e){ return null; } }
+        var ls = null;
+        try { ls = window.localStorage.getItem(key); } catch(e){}
+        if(ls && j[TOMB] === undefined){ store.setItem(key, ls); return ls; }
+        return null;
+      },
+      setItem: function(key, value){
+        try { window.localStorage.setItem(key, value); } catch(e){}
+        put(TOMB, "", 0);
+        clearChunks(key);
+        var enc = encodeURIComponent(value);
+        if(enc.length <= CHUNK){ put(key, enc, MAXAGE); return; }
+        for(var i = 0; i < enc.length; i += CHUNK) put(key + "." + (i / CHUNK), enc.slice(i, i + CHUNK), MAXAGE);
+      },
+      removeItem: function(key){
+        try { window.localStorage.removeItem(key); } catch(e){}
+        clearChunks(key);
+        put(TOMB, "1", MAXAGE);
+      }
+    };
+    return store;
+  }
+
   /* ---------- boot: session restore + magic-link code exchange ---------- */
   BB.boot = async function(){
     try {
       const lib = await loadSupaJs();
       if(!lib){ return; } // no config or CDN blocked → local-only mode
-      BB._supa = lib.createClient(SUPACFG.url, SUPACFG.anon_key);
+      BB._supa = lib.createClient(SUPACFG.url, SUPACFG.anon_key, { auth: { storage: bbAuthStorage() } });
       BB.enabled = true;
       // PKCE magic-link return: ?code=… → exchange for a session
       try {
@@ -3387,8 +3479,14 @@ const CONFIG = {
 const FREE_EXAMS = ["az900","saa_c03","cysa_cs0_004","az104","linuxplus_xk0_006","cka","ckad","dca","terraform_004","cloudplus_cv0_004","gcp_ace","itil4","nclex_rn","nclex_pn","teas7","hesi_a2"];
 function isFreeExam(slug){ return FREE_EXAMS.indexOf(slug) !== -1; }
 /* Exam-card click router: every exam offers a free 10-question taste.
-   Pro gates the full simulation, not the card. */
+   Pro gates the full simulation, not the card. Owners (Complete) skip
+   the mode picker entirely (Cori 2026-11-15): the exam just begins —
+   straight to the simulation check-in, with Quick Practice one quiet
+   link away on that screen. This is also the ?exam= deep-link router,
+   so the site's final-exam doors land owners on the same
+   straight-to-check-in flow. */
 function examCardClick(slug){
+  if(isPro()){ renderBrief(slug); return; }
   renderModes(slug);
 }
 const EXAMS = [{"slug": "az900", "name": "Azure Fundamentals", "code": "AZ-900", "tagline": "Cloud concepts & Azure services", "accent": "#0ea5e9", "domains": ["Domain 1: Describe cloud concepts", "Domain 2: Describe Azure architecture and services", "Domain 3: Describe Azure management and governance"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Describe cloud concepts": 333, "Domain 2: Describe Azure architecture and services": 335, "Domain 3: Describe Azure management and governance": 332}}, {"slug": "az104", "name": "Azure Administrator", "code": "AZ-104", "tagline": "Azure identity, governance & compute", "accent": "#0ea5e9", "domains": ["Domain 1: Manage identities and governance in Azure", "Domain 2: Implement and manage storage", "Domain 3: Deploy and manage Azure compute resources", "Domain 4: Implement and manage virtual networking", "Domain 5: Monitor and maintain Azure resources"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Manage identities and governance in Azure": 205, "Domain 2: Implement and manage storage": 205, "Domain 3: Deploy and manage Azure compute resources": 205, "Domain 4: Implement and manage virtual networking": 195, "Domain 5: Monitor and maintain Azure resources": 190}}, {"slug": "saa_c03", "name": "AWS Solutions Architect", "code": "SAA-C03", "tagline": "Resilient, secure cloud architectures", "accent": "#fb923c", "domains": ["Domain 1: Design Resilient Architectures", "Domain 2: Design High-Performing Architectures", "Domain 3: Design Secure Architectures", "Domain 4: Design Cost-Optimized Architectures"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Design Resilient Architectures": 255, "Domain 2: Design High-Performing Architectures": 253, "Domain 3: Design Secure Architectures": 249, "Domain 4: Design Cost-Optimized Architectures": 243}}, {"slug": "sap_c03", "name": "AWS Certified Solutions Architect \u2013 Professional", "code": "SAP-C03", "tagline": "Advanced, complex cloud architectures", "accent": "#ea580c", "domains": ["Domain 1: Architecture Design and Implementation Built for the Cloud", "Domain 2: Security, Compliance, and Governance", "Domain 3: Cost-Optimized Architecture Design", "Domain 4: Resilience, Migration, and Business Continuity", "Domain 5: Operational Excellence and Automation"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Architecture Design and Implementation Built for the Cloud": 250, "Domain 2: Security, Compliance, and Governance": 250, "Domain 3: Cost-Optimized Architecture Design": 150, "Domain 4: Resilience, Migration, and Business Continuity": 150, "Domain 5: Operational Excellence and Automation": 200}}, {"slug": "cysa_cs0_004", "name": "CompTIA CySA+", "code": "CS0-004", "tagline": "Threat detection & incident response", "accent": "#f472b6", "domains": ["Domain 1: Security Operations", "Domain 2: Vulnerability Management", "Domain 3: Incident Response and Management", "Domain 4: Reporting and Communication"], "count": 1000, "display_count": 1000, "cat": "security", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Security Operations": 258, "Domain 2: Vulnerability Management": 255, "Domain 3: Incident Response and Management": 245, "Domain 4: Reporting and Communication": 242}}, {"slug": "linuxplus_xk0_006", "name": "CompTIA Linux+", "code": "XK0-006", "tagline": "Linux systems & administration", "accent": "#fbbf24", "domains": ["Domain 1: System Management", "Domain 2: Services and User Management", "Domain 3: Security", "Domain 4: Automation, Orchestration, and Scripting", "Domain 5: Troubleshooting"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: System Management": 218, "Domain 2: Services and User Management": 200, "Domain 3: Security": 188, "Domain 4: Automation, Orchestration, and Scripting": 182, "Domain 5: Troubleshooting": 212}}, {"slug": "cka", "name": "Certified Kubernetes Admin", "code": "CKA", "tagline": "K8s clusters & workloads", "accent": "#818cf8", "domains": ["Domain 1: Cluster Architecture, Installation & Configuration", "Domain 2: Workloads & Scheduling", "Domain 3: Services & Networking", "Domain 4: Storage", "Domain 5: Troubleshooting"], "count": 1000, "display_count": 1000, "cat": "devops", "terminal": true, "badge": "", "note": "", "domain_counts": {"Domain 1: Cluster Architecture, Installation & Configuration": 205, "Domain 2: Workloads & Scheduling": 195, "Domain 3: Services & Networking": 200, "Domain 4: Storage": 190, "Domain 5: Troubleshooting": 210}}, {"slug": "ckad", "name": "K8s App Developer", "code": "CKAD", "tagline": "Cloud-native app design on K8s", "accent": "#facc15", "domains": ["Domain 1: Application Environment, Configuration and Security", "Domain 2: Application Design and Build", "Domain 3: Application Deployment", "Domain 4: Services and Networking", "Domain 5: Application Observability and Maintenance"], "count": 1000, "display_count": 1000, "cat": "devops", "terminal": true, "badge": "", "note": "", "domain_counts": {"Domain 1: Application Environment, Configuration and Security": 205, "Domain 2: Application Design and Build": 200, "Domain 3: Application Deployment": 200, "Domain 4: Services and Networking": 200, "Domain 5: Application Observability and Maintenance": 195}}, {"slug": "dca", "name": "Docker Certified Associate", "code": "DCA", "tagline": "Containers, images & orchestration", "accent": "#2dd4bf", "domains": ["Domain 1: Orchestration", "Domain 2: Image Creation, Management, and Registry", "Domain 3: Installation and Configuration", "Domain 4: Networking", "Domain 5: Security", "Domain 6: Storage and Volumes"], "count": 1000, "display_count": 1000, "cat": "devops", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Orchestration": 179, "Domain 2: Image Creation, Management, and Registry": 173, "Domain 3: Installation and Configuration": 165, "Domain 4: Networking": 163, "Domain 5: Security": 159, "Domain 6: Storage and Volumes": 161}}, {"slug": "terraform_004", "name": "HashiCorp Terraform Associate", "code": "004", "tagline": "IaC workflows & HCL", "accent": "#7B42BC", "domains": ["Domain 1: IaC Concepts", "Domain 2: Terraform Fundamentals", "Domain 3: Core Terraform Workflow", "Domain 4: Terraform Configuration", "Domain 5: Terraform Modules", "Domain 6: Terraform State Management", "Domain 7: Maintain Infrastructure", "Domain 8: HCP Terraform"], "count": 1000, "display_count": 1000, "cat": "devops", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 2: Terraform Fundamentals": 110, "Domain 5: Terraform Modules": 100, "Domain 3: Core Terraform Workflow": 170, "Domain 4: Terraform Configuration": 240, "Domain 8: HCP Terraform": 90, "Domain 7: Maintain Infrastructure": 80, "Domain 6: Terraform State Management": 130, "Domain 1: IaC Concepts": 80}}, {"slug": "cloudplus_cv0_004", "name": "CompTIA Cloud+", "code": "CV0-004", "tagline": "Cloud architecture & operations", "accent": "#a78bfa", "domains": ["Domain 1: Cloud Architecture", "Domain 2: Deployment", "Domain 3: Operations", "Domain 4: Security", "Domain 5: DevOps Fundamentals", "Domain 6: Troubleshooting"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Cloud Architecture": 176, "Domain 2: Deployment": 172, "Domain 3: Operations": 170, "Domain 4: Security": 172, "Domain 5: DevOps Fundamentals": 154, "Domain 6: Troubleshooting": 156}}, {"slug": "gcp_ace", "name": "GCP Associate Engineer", "code": "GCP-ACE", "tagline": "Deploy & manage on Google Cloud", "accent": "#34d399", "domains": ["Section 1: Setting up a cloud solution environment", "Section 2: Planning and implementing a cloud solution", "Section 3: Ensuring the successful operation of a cloud solution", "Section 4: Configuring access and security"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "note": "", "domain_counts": {"Section 1: Setting up a cloud solution environment": 245, "Section 2: Planning and implementing a cloud solution": 255, "Section 3: Ensuring the successful operation of a cloud solution": 255, "Section 4: Configuring access and security": 245}}, {"slug": "itil4", "name": "ITIL 4 Foundation", "code": "ITIL-4", "tagline": "IT service management practices", "accent": "#60a5fa", "domains": ["Guiding principles (7)", "Key concepts", "Practices at a glance (8)", "Practices in detail (7)", "Service value system and dimensions"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "note": "Studying ITIL 4? It\u2019s live until Dec 31, 2027 under PeopleCert\u2019s current plan, certs earned stay valid, and it still counts toward advanced Version 5 modules. This bank matches the ITIL 4 exam.", "domain_counts": {"Practices in detail (7)": 222, "Practices at a glance (8)": 198, "Guiding principles (7)": 195, "Key concepts": 193, "Service value system and dimensions": 192}}, {"slug": "nclex_rn", "name": "NCLEX-RN", "code": "NCLEX-RN", "tagline": "RN licensure \u00b7 adaptive CAT", "accent": "#f472b6", "domains": ["Health Promotion and Maintenance", "Physiological Integrity: Basic Care and Comfort", "Physiological Integrity: Pharmacological and Parenteral Therapies", "Physiological Integrity: Physiological Adaptation", "Physiological Integrity: Reduction of Risk Potential", "Psychosocial Integrity", "Safe and Effective Care: Management of Care", "Safe and Effective Care: Safety and Infection Control"], "count": 1000, "display_count": 1000, "cat": "nursing", "terminal": false, "badge": "ADAPTIVE", "note": "", "domain_counts": {"Safe and Effective Care: Management of Care": 198, "Safe and Effective Care: Safety and Infection Control": 120, "Health Promotion and Maintenance": 79, "Psychosocial Integrity": 79, "Physiological Integrity: Basic Care and Comfort": 80, "Physiological Integrity: Pharmacological and Parenteral Therapies": 141, "Physiological Integrity: Reduction of Risk Potential": 122, "Physiological Integrity: Physiological Adaptation": 181}}, {"slug": "nclex_pn", "name": "NCLEX-PN", "code": "NCLEX-PN", "tagline": "PN licensure \u00b7 adaptive CAT", "accent": "#fb7185", "domains": ["Health Promotion and Maintenance", "Physiological Integrity: Basic Care and Comfort", "Physiological Integrity: Pharmacological Therapies", "Physiological Integrity: Physiological Adaptation", "Physiological Integrity: Reduction of Risk Potential", "Psychosocial Integrity", "Safe and Effective Care: Coordinated Care", "Safe and Effective Care: Safety and Infection Control"], "count": 1000, "display_count": 1000, "cat": "nursing", "terminal": false, "badge": "ADAPTIVE", "note": "", "domain_counts": {"Safe and Effective Care: Coordinated Care": 180, "Safe and Effective Care: Safety and Infection Control": 120, "Health Promotion and Maintenance": 80, "Psychosocial Integrity": 80, "Physiological Integrity: Basic Care and Comfort": 100, "Physiological Integrity: Pharmacological Therapies": 120, "Physiological Integrity: Reduction of Risk Potential": 98, "Physiological Integrity: Physiological Adaptation": 222}}, {"slug": "teas7", "name": "TEAS 7", "code": "TEAS 7", "tagline": "Nursing school entrance exam", "accent": "#38bdf8", "domains": ["English and Language Usage", "Mathematics", "Reading", "Science"], "count": 1000, "display_count": 1000, "cat": "nursing", "terminal": false, "badge": "", "note": "", "domain_counts": {"Reading": 280, "Mathematics": 200, "Science": 320, "English and Language Usage": 200}}, {"slug": "hesi_a2", "name": "HESI A2", "code": "HESI A2", "tagline": "Nursing admission assessment", "accent": "#818cf8", "domains": ["Anatomy and Physiology", "Biology", "Chemistry", "Grammar", "Mathematics", "Reading Comprehension", "Vocabulary"], "count": 1000, "display_count": 1000, "cat": "nursing", "terminal": false, "badge": "", "note": "", "domain_counts": {"Vocabulary": 140, "Anatomy and Physiology": 120, "Grammar": 120, "Biology": 120, "Reading Comprehension": 220, "Mathematics": 200, "Chemistry": 80}}, {"slug": "secplus_sy0_701", "name": "CompTIA Security+", "code": "SY0-701", "tagline": "Threats, architecture & operations", "accent": "#fb7185", "domains": ["Architecture/Security Design", "Governance/Risk/Compliance", "Implementation", "Operations/Incident Response", "Threats/Vulnerabilities/Mitigations"], "count": 1000, "display_count": 1000, "cat": "security", "terminal": false, "badge": "", "note": "", "domain_counts": {"Governance/Risk/Compliance": 120, "Threats/Vulnerabilities/Mitigations": 220, "Architecture/Security Design": 180, "Operations/Incident Response": 280, "Implementation": 200}}, {"slug": "netplus_n10_009", "name": "CompTIA Network+", "code": "N10-009", "tagline": "Networking fundamentals & troubleshooting", "accent": "#38bdf8", "domains": ["Network Implementations", "Network Operations", "Network Security", "Network Troubleshooting", "Networking Fundamentals"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "note": "", "domain_counts": {"Network Implementations": 200, "Network Troubleshooting": 240, "Network Security": 140, "Network Operations": 190, "Networking Fundamentals": 230}}, {"slug": "aplus_220_1101", "name": "CompTIA A+ Core 1", "code": "220-1101", "tagline": "Hardware, networking & troubleshooting", "accent": "#fbbf24", "domains": ["Hardware", "Hardware/Network Troubleshooting", "Mobile Devices", "Networking", "Virtualization/Cloud"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "note": "", "domain_counts": {"Hardware": 250, "Networking": 200, "Virtualization/Cloud": 110, "Hardware/Network Troubleshooting": 290, "Mobile Devices": 150}}, {"slug": "aplus_220_1102", "name": "CompTIA A+ Core 2", "code": "220-1102", "tagline": "Operating systems, security & procedures", "accent": "#f59e0b", "domains": ["Operating Systems", "Operational Procedures", "Security", "Software Troubleshooting"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "note": "", "domain_counts": {"Operating Systems": 310, "Security": 250, "Operational Procedures": 220, "Software Troubleshooting": 220}}, {"slug": "ccna_200_301", "name": "Cisco CCNA", "code": "200-301", "tagline": "Routing, switching & network services", "accent": "#1ba0d7", "domains": ["Domain 1: Network Fundamentals", "Domain 2: Network Access", "Domain 3: IP Connectivity", "Domain 4: IP Services", "Domain 5: Security Fundamentals", "Domain 6: Automation and Programmability"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Network Fundamentals": 200, "Domain 2: Network Access": 200, "Domain 3: IP Connectivity": 250, "Domain 4: IP Services": 100, "Domain 5: Security Fundamentals": 150, "Domain 6: Automation and Programmability": 100}}, {"slug": "pentest_pt0_003", "name": "CompTIA PenTest+", "code": "PT0-003", "tagline": "Engagement, recon, attacks & post-exploitation", "accent": "#ef4444", "domains": ["Domain 1: Engagement Management", "Domain 2: Reconnaissance and Enumeration", "Domain 3: Vulnerability Discovery and Analysis", "Domain 4: Attacks and Exploits", "Domain 5: Post-exploitation and Lateral Movement"], "count": 1000, "display_count": 1000, "cat": "security", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Engagement Management": 130, "Domain 2: Reconnaissance and Enumeration": 210, "Domain 3: Vulnerability Discovery and Analysis": 170, "Domain 4: Attacks and Exploits": 350, "Domain 5: Post-exploitation and Lateral Movement": 140}}, {"slug": "cissp", "name": "ISC2 CISSP", "code": "CISSP", "tagline": "Enterprise security, risk & architecture", "accent": "#c084fc", "domains": ["Domain 1: Security and Risk Management", "Domain 2: Asset Security", "Domain 3: Security Architecture and Engineering", "Domain 4: Communication and Network Security", "Domain 5: Identity and Access Management (IAM)", "Domain 6: Security Assessment and Testing", "Domain 7: Security Operations", "Domain 8: Software Development Security"], "count": 1000, "display_count": 1000, "cat": "security", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Security and Risk Management": 160, "Domain 2: Asset Security": 100, "Domain 3: Security Architecture and Engineering": 130, "Domain 4: Communication and Network Security": 130, "Domain 5: Identity and Access Management (IAM)": 130, "Domain 6: Security Assessment and Testing": 120, "Domain 7: Security Operations": 130, "Domain 8: Software Development Security": 100}}, {"slug": "ccsp", "name": "ISC2 CCSP", "code": "CCSP", "tagline": "Cloud security architecture & operations", "accent": "#d946ef", "domains": ["Domain 1: Cloud Concepts, Architecture and Design", "Domain 2: Cloud Data Security", "Domain 3: Cloud Platform & Infrastructure Security", "Domain 4: Cloud Application Security", "Domain 5: Cloud Security Operations", "Domain 6: Legal, Risk and Compliance"], "count": 1000, "display_count": 1000, "cat": "security", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Cloud Concepts, Architecture and Design": 170, "Domain 2: Cloud Data Security": 200, "Domain 3: Cloud Platform & Infrastructure Security": 170, "Domain 4: Cloud Application Security": 160, "Domain 5: Cloud Security Operations": 170, "Domain 6: Legal, Risk and Compliance": 130}}, {"slug": "isc2_cc", "name": "ISC2 Certified in Cybersecurity", "code": "CC", "tagline": "Entry-level cybersecurity fundamentals", "accent": "#22c55e", "domains": ["Domain 1: Security Principles", "Domain 2: Security Governance", "Domain 3: Identity and Access Management (IAM) Concepts", "Domain 4: Networking and Cloud Security Concepts", "Domain 5: Security Operations and Incident Response"], "count": 1000, "display_count": 1000, "cat": "security", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Security Principles": 240, "Domain 2: Security Governance": 173, "Domain 3: Identity and Access Management (IAM) Concepts": 200, "Domain 4: Networking and Cloud Security Concepts": 213, "Domain 5: Security Operations and Incident Response": 174}}, {"slug": "aif_c01", "name": "AWS AI Practitioner", "code": "AIF-C01", "tagline": "AI, ML & generative AI on AWS", "accent": "#ff9900", "domains": ["Domain 1: Fundamentals of AI and ML", "Domain 2: Fundamentals of Generative AI", "Domain 3: Applications of Foundation Models", "Domain 4: Guidelines for Responsible AI", "Domain 5: Security, Compliance, and Governance for AI Solutions"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Fundamentals of AI and ML": 200, "Domain 2: Fundamentals of Generative AI": 240, "Domain 3: Applications of Foundation Models": 280, "Domain 4: Guidelines for Responsible AI": 140, "Domain 5: Security, Compliance, and Governance for AI Solutions": 140}}, {"slug": "clf_c02", "name": "AWS Cloud Practitioner", "code": "CLF-C02", "tagline": "Cloud concepts, billing & AWS services", "accent": "#0891b2", "domains": ["Domain 1: Cloud Concepts", "Domain 2: Security and Compliance", "Domain 3: Cloud Technology and Services", "Domain 4: Billing, Pricing, and Support"], "count": 1000, "display_count": 1000, "cat": "cloud", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Cloud Concepts": 240, "Domain 3: Cloud Technology and Services": 340, "Domain 2: Security and Compliance": 300, "Domain 4: Billing, Pricing, and Support": 120}}, {"slug": "rhcsa_ex200", "name": "Red Hat RHCSA", "code": "EX200", "tagline": "RHEL 10 system administration", "accent": "#ee0000", "domains": ["Domain 10: Manage Software", "Domain 1: Essential Tools", "Domain 2: Shell Scripting", "Domain 3: Operating Running Systems", "Domain 4: Local Storage", "Domain 5: File Systems", "Domain 6: Deploy, Configure and Maintain Systems", "Domain 7: Basic Networking", "Domain 8: Users and Groups", "Domain 9: Security"], "count": 1000, "display_count": 1000, "cat": "systems", "terminal": false, "badge": "", "note": "", "domain_counts": {"Domain 1: Essential Tools": 130, "Domain 2: Shell Scripting": 60, "Domain 3: Operating Running Systems": 110, "Domain 4: Local Storage": 110, "Domain 5: File Systems": 110, "Domain 6: Deploy, Configure and Maintain Systems": 130, "Domain 7: Basic Networking": 90, "Domain 8: Users and Groups": 100, "Domain 9: Security": 110, "Domain 10: Manage Software": 50}}];
@@ -4798,6 +4896,16 @@ function refreshBadges(){
   const lt=$("sim-locktag"); if(lt) lt.style.display = isPro()? "none":"";
   /* Home topbar Go Pro button: free users only */
   const gb=$("home-gopro"); if(gb) gb.style.display = isPro()? "none":"";
+  /* Owner state (Cori 2026-11-15, approved preview promoted): an owner is never pitched — the pricing
+     section steps aside entirely, and EVERY Pricing link (all screens'
+     navs + the home footer, whose #pricing anchor would otherwise point
+     at the hidden section) becomes the way into the Library. Restored
+     verbatim on sign-out via data-orighref. */
+  const psSec=$("pricing"); if(psSec) psSec.style.display = isPro()? "none":"";
+  document.querySelectorAll('.nav a[href="#pricing"], .nav a[href="https://bytebarhq.com/#pricing"], #screen-home footer a[href="#pricing"], a[data-ownlink]').forEach(a=>{
+    if(isPro()){ if(!a.dataset.ownlink){ a.dataset.ownlink="1"; a.dataset.orighref=a.getAttribute("href"); } a.setAttribute("href","https://bytebarhq.com/library/"); }
+    else if(a.dataset.ownlink){ a.setAttribute("href", a.dataset.orighref||"#pricing"); delete a.dataset.ownlink; }
+  });
   document.querySelectorAll(".hdr-gopro").forEach(el=>{ el.style.display = isPro()? "none":""; });
 }
 
@@ -5349,12 +5457,13 @@ function renderHome(){
     });
   });
   renderResumeBanner();
-  renderStreakBanner();
+  renderTodayRow();
   renderGoalCard();
   renderHomeChallenges();
   renderDeckPull();
   renderLibraryPanel();
   renderPipHome();
+  applySignedInHomeOrder();
   show("screen-home");
 }
 
@@ -5388,6 +5497,68 @@ function renderStreakBanner(){
 }
 
 /* ============================================================
+   Signed-in home declutter (Cori 2026-11-15 — approved preview,
+   promoted to live). The streak banner and the
+   goal readout fold into ONE compact Today row; Pip's
+   session-open briefing line (dayBriefLine — the same real-data
+   line the exam brief uses) rides under the chips. All data and
+   mechanics are the banner's/goal's own: streak chip taps to
+   Profile exactly as the banner did; the goal chip opens the
+   same picker the goal card used (goalCardEditing + renderGoalCard).
+   Guests (no record) get nothing here, exactly as before.
+   ============================================================ */
+function renderTodayRow(){
+  const slot=$("streak-slot"); if(!slot) return;
+  slot.innerHTML="";
+  const r=userRec(); if(!r) return;
+  const s=dayStreak(r), best=r.bestStreak||0, pro=r.pro;
+  const mult=pro&&s>=7;
+  const freezeBit=pro
+    ? '<span class="sb-freeze" title="Streak freeze: miss a day, keep your streak. Earned from streak badges & level-ups.">🛡️ '+(r.streakFreeze||0)+'</span>'
+    : '<span class="sb-freeze lock" title="Complete: streak freeze saves your streak when life happens.">🛡️ 🔒</span>';
+  const gs=goalState(r);
+  const goalChip=gs.target
+    ? '<button type="button" class="today-goal'+(gs.met?" met":"")+'" id="today-goal-chip" title="Daily goal — tap to change">🎯 '+(gs.met?"Goal ✓":gs.count+"/"+gs.target)+'</button>'
+    : '<button type="button" class="today-goal" id="today-goal-chip" title="Set a daily goal">🎯 Set a goal</button>';
+  /* Pip's briefing: most-attempted exam, the same pick renderPipHome makes. */
+  const counts={}, lastD={};
+  (r.attempts||[]).forEach(at=>{ counts[at.slug]=(counts[at.slug]||0)+1; lastD[at.slug]=at.d||0; });
+  let bestSlug=null, bestN=-1, bestLast=-1;
+  Object.keys(counts).forEach(k=>{
+    if(counts[k]>bestN || (counts[k]===bestN && (lastD[k]||0)>bestLast)){ bestSlug=k; bestN=counts[k]; bestLast=lastD[k]||0; }
+  });
+  const brief=bestSlug?dayBriefLine(bestSlug):"";
+  const row=document.createElement("div");
+  row.className="todayrow"+(s>0?" lit":"");
+  row.innerHTML=
+    '<div class="today-top">'+
+      '<button type="button" class="today-streak" id="today-streak-chip"><span class="sb-flame">'+(s>0?"🔥":"🌱")+'</span><b>'+s+'-day streak</b>'+
+      (best>1?'<span class="sb-best">best '+best+'</span>':"")+
+      (mult?'<span class="sb-mult">2x XP</span>':"")+'</button>'+
+      '<span class="today-side">'+freezeBit+goalChip+'</span>'+
+    '</div>'+
+    (brief?'<div class="today-pip">'+escapeHtml(brief)+'</div>':"");
+  slot.appendChild(row);
+  const sc=row.querySelector("#today-streak-chip");
+  if(sc) sc.addEventListener("click",()=>{ renderProfile(); });
+  const gc=row.querySelector("#today-goal-chip");
+  if(gc) gc.addEventListener("click",()=>{ goalCardEditing=true; renderGoalCard();
+    const gsl=$("goal-slot"); if(gsl&&gsl.firstChild&&gsl.scrollIntoView) gsl.scrollIntoView({block:"nearest"}); });
+}
+/* Signed-in home order: Today → deck pull → exams →
+   challenges → library card → hero. Guests keep the shipped order:
+   this returns before touching anything when there is no account. */
+function applySignedInHomeOrder(){
+  if(!currentUser() || !userRec()) return;
+  const scr=$("screen-home"); if(!scr) return;
+  const hero=scr.querySelector(".hero"); if(!hero) return;
+  const exams=$("exams"), chSlot=$("home-challenges-slot"), libSlot=$("library-slot");
+  if(exams) scr.insertBefore(exams, hero);
+  if(chSlot){ chSlot.classList.add("slot-moved"); scr.insertBefore(chSlot, hero); }
+  if(libSlot){ libSlot.classList.add("slot-moved"); scr.insertBefore(libSlot, hero); }
+}
+
+/* ============================================================
    PHASE 2 (2026-11-15) — home return-loop surfaces: daily goal
    card, weekly challenges at home, misses-deck pull. Each is ONE
    contained card in the streak banner's family; signed-in only
@@ -5395,6 +5566,7 @@ function renderStreakBanner(){
    promised to a guest).
    ============================================================ */
 let goalCardEditing=false;
+let challAccOpen=false; /* accordion state: closed by default */
 /* The 10 / 25 / 50 picker, shared by the home card and Profile. */
 function goalTargetsHTML(r){
   const cur=r?(r.goalTarget||0):0;
@@ -5431,17 +5603,12 @@ function renderGoalCard(){
       goalTargetsHTML(r)+'</div>';
     wireGoalTargets(card);
   } else {
-    card.className="goalcard"+(gs.met?" met":"");
-    const left=gs.target-gs.count;
-    card.innerHTML=goalRingSVG(gs)+
-      '<div class="goal-mid"><div class="goal-top"><b>Today\'s goal</b>'+
-      '<span class="goal-state">'+gs.count+' of '+gs.target+'</span></div>'+
-      '<div class="goal-sub">'+(gs.met
-        ? "Goal met 🎉 — anything else today is bonus."
-        : left+" to go — every answered question counts.")+'</div></div>'+
-      '<button type="button" class="goal-change" id="goal-change">Change</button>';
-    const ch=card.querySelector("#goal-change");
-    if(ch) ch.addEventListener("click",()=>{ goalCardEditing=true; renderGoalCard(); });
+    /* Declutter (Cori 2026-11-15, approved preview promoted): with a
+       goal set, the progress readout lives in the Today row
+       (renderTodayRow) — no separate card. Changing the goal stays one
+       tap away (the row's goal chip, or Profile's goal row, which is
+       unchanged). */
+    return;
   }
   slot.appendChild(card);
 }
@@ -5471,11 +5638,34 @@ function renderHomeChallenges(){
   const r=userRec(); if(!r) return;
   ensureChallengeWeek(r); saveUserRec(r);
   const dl=daysLeftInWeek();
-  const dlTxt=dl>=7?"a fresh week":(dl===1?"last day":"· "+dl+" days left");
-  const head=document.createElement("div");
-  head.className="secttl home-secttl";
-  head.innerHTML='Weekly challenges <span>· fresh every Monday · 200 XP each · '+dlTxt+' · resets Monday</span>';
-  slot.appendChild(head);
+  const dlTxt=dl>=7?"a fresh week":(dl===1?"last day":dl+" days left");
+  /* Declutter (Cori 2026-11-15, approved preview promoted): challenges
+     fold into an accordion, CLOSED by default. The summary carries the
+     honest state (real in-progress count from the same record;
+     days-left from daysLeftInWeek) and the old header meta shrinks to
+     one small muted line inside the expanded section. Cards, progress
+     and gating are unchanged. */
+  const doneN=(r.challengesDone||[]).length;
+  const progN=CHALLENGES.filter(ch=>{ const v=r.challenges[ch.id]||0; return v>0 && !(r.challengesDone||[]).includes(ch.id); }).length;
+  const sumTxt=r.pro
+    ? (doneN>=CHALLENGES.length ? "all "+CHALLENGES.length+" complete" : progN+" in progress")
+    : "unlock with Complete";
+  const acc=document.createElement("div");
+  acc.className="challacc";
+  const head=document.createElement("button");
+  head.type="button";
+  head.className="challacc-head";
+  head.setAttribute("aria-expanded", challAccOpen?"true":"false");
+  head.innerHTML='<span class="challacc-title">Weekly challenges</span>'+
+    '<span class="challacc-sum">· '+sumTxt+' · '+dlTxt+'</span>'+
+    '<span class="challacc-chev">'+(challAccOpen?"▾":"▸")+'</span>';
+  head.addEventListener("click",()=>{ challAccOpen=!challAccOpen; renderHomeChallenges(); });
+  acc.appendChild(head);
+  const accBody=document.createElement("div");
+  accBody.className="challacc-body"+(challAccOpen?"":" hidden");
+  accBody.innerHTML='<p class="chall-meta">Fresh every Monday · 200 XP each · resets Monday</p>';
+  acc.appendChild(accBody);
+  slot.appendChild(acc);
   const grid=document.createElement("div");
   grid.className="challgrid";
   if(r.pro){
@@ -5498,7 +5688,7 @@ function renderHomeChallenges(){
       '<div class="ch-v">🔒</div></div>').join("");
     grid.addEventListener("click",openPaywall);
   }
-  slot.appendChild(grid);
+  accBody.appendChild(grid);
 }
 /* Deck pull (Phase 2): the mode card's "N saved questions waiting"
    line, surfaced on home for the exam whose deck was touched most
@@ -5839,6 +6029,16 @@ function renderBrief(slug, ctx){
   const r1=$("brief-rule1"); if(r1) r1.innerHTML="<b>Timer starts on Begin.</b> It can't be paused — when it hits zero, your exam submits itself.";
   const r3t=$("brief-rule3tail"); if(r3t) r3t.textContent=" Results include a domain-by-domain breakdown, so you know exactly what to study next.";
   const bc=$("brief-candidate"); if(bc) bc.textContent=candidateLabel();
+  /* Back link + Quick Practice link follow the same owner rule: owners
+     never see the mode picker, so Back from the simulation check-in
+     goes home, Back from the practice check-in returns here, and the
+     quiet practice link only exists on an owner's simulation check-in
+     (un-hidden after the taste branch below). */
+  const bbk=$("brief-back");
+  if(bbk) bbk.textContent=isPro()
+    ? (briefCtx==="taste" ? "← Back to check-in" : "← All exams")
+    : "← Choose mode";
+  const bqp=$("brief-qpwrap"); if(bqp) bqp.classList.add("hidden");
   $("brief-title").textContent=curExam.name;
   /* Per-exam note (2026-11-02): only exams whose meta carries one
      (today: ITIL 4's version-transition note, approved copy) show it.
@@ -5870,6 +6070,13 @@ function renderBrief(slug, ctx){
     if(eb) eb.textContent="Quick Practice check-in";
     if(bst) bst.textContent="Begin Practice";
     if(bk) bk.textContent=term1 ? "Keyboard: type in the terminal · Enter submits" : "Keyboard: A–D answer · X strike out";
+    /* Owner framing (Cori 2026-11-15): an owner reaches this check-in
+       from the quiet link on the simulation check-in — nothing here may
+       call it a free preview or sell Complete back to them. */
+    if(isPro()){
+      if(bp) bp.textContent="Quick Practice — untimed reps from the same bank.";
+      if(r3t) r3t.textContent=" Your score lands at the end, with a domain-by-domain breakdown.";
+    }
     /* Session open (Phase 2): for a signed-in learner, Pip's briefing
        carries the day's state in one breath (goal progress, weakest
        domain, deck due — real data only, clauses omitted when the
@@ -5881,6 +6088,10 @@ function renderBrief(slug, ctx){
       : "Your "+curExam.code+" practice is set up. "+nWord+" questions — begin when ready.","pip-hop",64);
     show("screen-brief"); return;
   }
+  /* Owners arrive at this check-in straight from the exam card (the
+     mode picker never renders for them), so Quick Practice rides along
+     as one quiet link (Cori 2026-11-15). */
+  if(bqp && isPro()) bqp.classList.remove("hidden");
   renderPipBlock(pipEl,"encourage","Your "+curExam.code+" is set up. The timer starts when you do.","pip-hop",64);
   if(fmt.types.indexOf("cat")!==-1){
     $("brief-sub").textContent=curExam.code+" · 85–150 questions · up to 5 hours · "+formatLabel(fmt);
@@ -5899,7 +6110,20 @@ function renderBrief(slug, ctx){
     : "Keyboard: A–D answer · F flag · X strike out";
   show("screen-brief");
 }
-$("brief-back").addEventListener("click",()=>renderModes(curExam.slug));
+$("brief-back").addEventListener("click",()=>{
+  /* Owners never see the mode picker: from the simulation check-in
+     Back goes home; from the Quick Practice check-in (reached via the
+     quiet link) Back returns to the simulation check-in. */
+  if(isPro()){
+    if(briefCtx==="taste"){ renderBrief(curExam.slug); return; }
+    renderHome(); return;
+  }
+  renderModes(curExam.slug);
+});
+$("brief-qp").addEventListener("click",e=>{
+  e.preventDefault();
+  renderBrief(curExam.slug,"taste");
+});
 $("brief-start").addEventListener("click",async ()=>{
   /* Pip nods you in — fire-and-forget; the nod never delays the start. */
   const pf=document.querySelector("#brief-pip .pipfig");
@@ -5963,7 +6187,7 @@ function startCAT(slug){
      minutes:300,score:0,misses:[],streak:0,bestStreak:0,answered:false,
      cat:{theta:0,info:0,n:0,minQ:85,maxQ:150,std:(slug==="nclex_pn"?-0.18:0),asked:{},decision:null,maxed:false}};
   const first=catSelectNext();
-  if(!first){ renderModes(slug); return; }
+  if(!first){ if(isPro()) renderHome(); else renderModes(slug); return; }
   S.bank.push(first); S.answers.push(null); S.flags.push(false);
   document.documentElement.style.setProperty("--qacc",exam.accent);
   $("exam-label").textContent=exam.code;
@@ -7662,7 +7886,7 @@ function refreshAccount(){
     if(r){
       const b=document.createElement("button");
       b.className="avatarbtn"+(r.pro?" pro":""); b.title=dispU+" — account"+(r.pro?" (Complete)":"");
-      b.innerHTML='<span class="avletter">'+escapeHtml(dispU.charAt(0).toUpperCase())+'</span>'+(r.pro?'<span class="avpro" aria-label="Complete member">★</span>':"");
+      b.innerHTML='<span class="avletter">'+escapeHtml(dispU.charAt(0).toUpperCase())+'</span>'+(r.pro?'<span class="avpro" aria-label="Complete member">★</span><span class="avdot" aria-hidden="true"></span>':"");
       b.addEventListener("click",openAccountMenu);
       slot.appendChild(b);
     } else {
@@ -8577,7 +8801,7 @@ function renderPipHome(){
     const n=deckCount(bestSlug);
     const b=document.createElement("button"); b.type="button"; b.className="btn ghost";
     b.textContent=n?("Review your misses ("+n+") →"):("Practice "+exam.code+" →");
-    b.addEventListener("click",()=>{ if(n) renderDeck(bestSlug); else renderModes(bestSlug); });
+    b.addEventListener("click",()=>{ if(n) renderDeck(bestSlug); else examCardClick(bestSlug); });
     actEl.appendChild(b);
   }
 }
@@ -9260,6 +9484,19 @@ document.querySelectorAll('.nav').forEach(function(nav){
   if(b&&links){ b.addEventListener('click', function(){ links.classList.toggle('open'); }); }
   if(links){ links.querySelectorAll('a').forEach(function(a){
     a.addEventListener('click', function(){ links.classList.remove('open'); }); }); }
+});
+/* Logo = Home, state-aware (Cori 2026-11-15): a signed-in learner who
+   taps the BYTEBAR logo stays in the simulator and lands on their
+   signed-in study home — the logo must never eject them to the
+   bytebarhq.com marketing homepage or a guest view. Guests keep the
+   bytebarhq.com destination. Decided at click time (currentUser covers
+   local + backend sessions), so sign-in/out needs no rewiring. */
+document.querySelectorAll('.brand').forEach(function(a){
+  a.addEventListener('click', function(e){
+    var signedIn=false;
+    try{ signedIn = !!currentUser() || !!(window.BB && BB.user); }catch(err){}
+    if(signedIn){ e.preventDefault(); goHome(); }
+  });
 });
 </script>
 </body>
