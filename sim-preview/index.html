@@ -1326,6 +1326,8 @@ br.tbr{display:none;}
 .btn{letter-spacing:.015em;}
 .lbl-short{display:none}
 @media(max-width:720px){.lbl-full{display:none}.lbl-short{display:inline}}
+.unlockcard .lbl-full{display:none}
+.unlockcard .lbl-short{display:inline}
 
 /* --- answer options: the most-tapped element in the app --- */
 .opt{
@@ -2006,7 +2008,7 @@ html,body{overscroll-behavior-x:none;}
 #screen-home .fgrid2{display:grid; grid-template-columns:1.4fr 1fr 1fr 1fr; gap:30px; margin-bottom:36px}
 @media(max-width:760px){#screen-home .fgrid2{grid-template-columns:1fr 1fr}}
 #screen-home .fcol h4{font-size:13px; font-weight:800; letter-spacing:.1em; text-transform:uppercase; color:var(--navy); margin:0 0 14px}
-#screen-home .fcol a{display:block; text-decoration:none; font-size:14.5px; color:var(--mut); padding:5px 0}
+#screen-home .fcol a:not(.btn){display:block; text-decoration:none; font-size:14.5px; color:var(--mut); padding:5px 0}
 #screen-home .fcol a:hover{color:var(--navy)}
 #screen-home .fcol a.claim{font-weight:700; color:var(--navy)}
 #screen-home .fbrand{font-weight:900; letter-spacing:.28em; color:var(--navy); font-size:16px; margin-bottom:12px}
