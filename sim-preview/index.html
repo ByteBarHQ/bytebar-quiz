@@ -2035,6 +2035,45 @@ html,body{overscroll-behavior-x:none;}
 #screen-home .copy{font-size:13px; color:var(--mut); margin-top:14px; display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px}
 
 </style>
+<style id="fixlist-20261128">
+
+/* ============ FIX LIST 2026-11-28 — stages 1/3/4/7, sim parts ============
+   A5+F4: one deep-navy hero field for guest + owner (same #screen-home hero).
+   A1+F3: slim hero — kicker + headline + one line, left-aligned, no Pip
+   stack, ONE primary action, no gold in the hero region.
+   A3+A4+F2: exam lists are compact rows — chip, name + code, one-line meta,
+   then actions (name -> meta -> actions). Exam action = solid navy,
+   book action = outline (never gold), buy = gold, next step = text link.
+   F5: sticky header fully opaque. F9+A6: .screen-title type scale. */
+.nav{background:#f6f1e6; backdrop-filter:none; -webkit-backdrop-filter:none; box-shadow:0 1px 0 var(--line), 0 8px 20px rgba(11,30,66,.07)}
+#screen-home .hero{background:linear-gradient(135deg,var(--navy) 0%,var(--navy2) 70%,var(--navy3) 100%); color:#fff; text-align:left; padding:42px 0 36px}
+#screen-home .hero::before{background:radial-gradient(700px 340px at 10% 6%, rgba(127,212,247,.16), transparent 70%), radial-gradient(560px 320px at 90% 18%, rgba(245,166,35,.10), transparent 70%)}
+#screen-home .hero-inner{text-align:left; max-width:1120px; margin:0 auto}
+#screen-home .sticker{background:rgba(255,255,255,.10); color:#7ee7f7; box-shadow:inset 0 0 0 1px rgba(255,255,255,.24); transform:none; margin-bottom:16px}
+#screen-home .hero h1{color:#fff; margin:0 0 10px}
+#screen-home .hero h1 .cy{color:#7fd4f7}
+#screen-home .hero p.def{color:#dbe5f7; margin:0 0 18px; max-width:620px}
+#screen-home .hero-ctas{justify-content:flex-start; margin-bottom:0}
+#screen-home .examgrid{grid-template-columns:1fr; gap:10px; max-width:940px}
+@media(max-width:860px){#screen-home .examgrid{grid-template-columns:1fr}}
+#screen-home .exam{flex-wrap:wrap; align-items:center; padding:12px 16px; gap:8px 12px; border-radius:14px}
+#screen-home .exam .eic{width:40px; height:40px; border-radius:11px; font-size:18px}
+#screen-home .exam .ex-name{flex:0 1 230px; min-width:150px}
+#screen-home .exam .ex-meta{flex:1 1 220px}
+#screen-home .exam .ex-doors{flex:none; margin-top:0; display:flex; gap:10px; align-items:center}
+#screen-home .ex-door{flex:none; white-space:nowrap}
+#screen-home .ex-sit{background:var(--navy); color:#fff; border:1.5px solid var(--navy); padding:10px 16px}
+#screen-home .ex-book{background:transparent; color:var(--navy); border:1.5px solid var(--navy); padding:10px 16px}
+#screen-home .exam:hover .ex-book{filter:none; background:rgba(11,30,66,.05)}
+#screen-home .exam .ex-foot{flex:none; margin-top:0}
+@media(max-width:640px){
+  #screen-home .exam .ex-name{flex:1 1 auto}
+  #screen-home .exam .ex-meta{flex:1 1 100%}
+  #screen-home .exam .ex-doors{flex:1 1 100%; margin-top:4px}
+}
+.screen-title{font-size:clamp(28px,3.6vw,42px); line-height:1.12; letter-spacing:-.02em; color:var(--navy); margin:0 0 10px; text-align:center}
+.screen-title .cy{color:var(--cyan)}
+</style>
 </head>
 <body>
 <!-- Loading state: shows immediately before JS bundle parses -->
@@ -2252,16 +2291,10 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <div class="wrap hero-inner">
       <span class="sticker">THE SIMULATOR — PROVE IT</span>
       <h1>Practice like it's <span class="cy">test day.</span></h1>
-      <p class="def">Full-length, timed exam simulations built from real exam objectives — with instant explanations and domain-level score reports that show exactly where you stand.</p>
-      <div class="hero-pip">
-        <svg class="pip-big" viewBox="0 0 96 96" role="img" aria-label="Pip, your ByteBar study buddy"><title>Pip — your study buddy</title><ellipse cx="48" cy="89" rx="26" ry="5" fill="url(#pipv3-shadG)"/><path d="M78.6,56.0C78.6,58.3 78.2,60.6 77.5,62.8C76.9,65.0 75.9,67.1 74.7,69.1C73.6,71.1 72.2,73.0 70.6,74.7C69.1,76.4 67.3,78.1 65.3,79.4C63.3,80.6 61.0,81.7 58.7,82.4C56.5,83.2 54.0,83.5 51.6,83.6C49.2,83.7 46.8,83.5 44.5,83.2C42.1,82.8 39.8,82.3 37.6,81.6C35.4,80.8 33.2,80.0 31.1,78.8C29.1,77.6 27.2,76.2 25.6,74.6C24.0,72.9 22.6,71.0 21.5,69.0C20.4,67.0 19.6,64.8 19.0,62.7C18.4,60.5 18.1,58.2 17.9,56.0C17.8,53.8 17.9,51.4 18.4,49.2C18.9,47.0 19.6,44.7 20.8,42.7C21.9,40.6 23.4,38.7 25.1,37.1C26.8,35.5 28.9,34.1 30.9,32.9C33.0,31.7 35.2,30.8 37.5,30.1C39.7,29.3 42.1,28.7 44.4,28.4C46.8,28.1 49.2,28.0 51.6,28.3C54.0,28.6 56.4,29.2 58.5,30.0C60.7,30.9 62.8,32.1 64.7,33.4C66.6,34.7 68.4,36.2 70.0,37.8C71.6,39.4 73.1,41.2 74.4,43.1C75.6,45.0 76.8,47.1 77.5,49.2C78.2,51.4 78.6,53.7 78.6,56.0Z" fill="url(#pipv3-bodyG)"/><path d="M78.6,56.0C78.6,58.3 78.2,60.6 77.5,62.8C76.9,65.0 75.9,67.1 74.7,69.1C73.6,71.1 72.2,73.0 70.6,74.7C69.1,76.4 67.3,78.1 65.3,79.4C63.3,80.6 61.0,81.7 58.7,82.4C56.5,83.2 54.0,83.5 51.6,83.6C49.2,83.7 46.8,83.5 44.5,83.2C42.1,82.8 39.8,82.3 37.6,81.6C35.4,80.8 33.2,80.0 31.1,78.8C29.1,77.6 27.2,76.2 25.6,74.6C24.0,72.9 22.6,71.0 21.5,69.0C20.4,67.0 19.6,64.8 19.0,62.7C18.4,60.5 18.1,58.2 17.9,56.0C17.8,53.8 17.9,51.4 18.4,49.2C18.9,47.0 19.6,44.7 20.8,42.7C21.9,40.6 23.4,38.7 25.1,37.1C26.8,35.5 28.9,34.1 30.9,32.9C33.0,31.7 35.2,30.8 37.5,30.1C39.7,29.3 42.1,28.7 44.4,28.4C46.8,28.1 49.2,28.0 51.6,28.3C54.0,28.6 56.4,29.2 58.5,30.0C60.7,30.9 62.8,32.1 64.7,33.4C66.6,34.7 68.4,36.2 70.0,37.8C71.6,39.4 73.1,41.2 74.4,43.1C75.6,45.0 76.8,47.1 77.5,49.2C78.2,51.4 78.6,53.7 78.6,56.0Z" fill="url(#pipv3-fp)" opacity="0.45"/><ellipse cx="17" cy="61" rx="5" ry="9" fill="url(#pipv3-bodyG)"/><ellipse cx="17" cy="61" rx="5" ry="9" fill="url(#pipv3-fp)" opacity="0.45"/><ellipse cx="79" cy="61" rx="5" ry="9" fill="url(#pipv3-bodyG)"/><ellipse cx="79" cy="61" rx="5" ry="9" fill="url(#pipv3-fp)" opacity="0.45"/><path d="M48,30 Q48,22.5 48,15" stroke="#2E8B47" stroke-width="3.2" fill="none" stroke-linecap="round"/><g><ellipse cx="41" cy="22" rx="6.5" ry="3.4" fill="url(#pipv3-leafG)" transform="rotate(-28 41 22)"/><ellipse cx="41" cy="22" rx="6.5" ry="3.4" fill="url(#pipv3-fp)" opacity="0.4" transform="rotate(-28 41 22)"/><ellipse cx="55" cy="22" rx="6.5" ry="3.4" fill="url(#pipv3-leafG)" transform="rotate(28 55 22)"/><ellipse cx="55" cy="22" rx="6.5" ry="3.4" fill="url(#pipv3-fp)" opacity="0.4" transform="rotate(28 55 22)"/></g><ellipse cx="37" cy="50" rx="4.5" ry="6.5" fill="#22304A"/><ellipse cx="59" cy="50" rx="4.5" ry="6.5" fill="#22304A"/><path d="M41,65 Q48,69.5 55,65" stroke="#22304A" stroke-width="2.6" fill="none" stroke-linecap="round"/></svg>
-        <div class="pip-tag">🌱 Hi, I'm <b>Pip</b>! Your study buddy.</div>
-      </div>
+      <p class="def">Full-length, timed exam simulations from real exam objectives — first 10 questions free on every exam, no account needed.</p>
       <div class="hero-ctas">
-        <button class="btn btn-gold btn-lg hdr-gopro" onclick="openPaywall()"><span class="lbl-full">Get ByteBar Complete — $9.99</span><span class="lbl-short">Get Complete — $9.99</span></button>
         <a class="btn btn-primary btn-lg" href="#exams">Pick your exam ↓</a>
       </div>
-      <p class="hero-note">Or start free: watch the first chapter of any book and try 10 free questions — no signup.</p>
     </div>
   </header>
   <section class="block" id="exams">
@@ -2274,56 +2307,56 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
       <div class="examcat">
         <h3>Cloud</h3>
         <div class="examgrid">
-          <div class="exam" onclick="examCardClick('az900')"><span class="eic" style="background:#0ea5e9">A</span><span><span class="enm">Azure Fundamentals</span><br><span class="ecd">AZ-900</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-az900.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Cloud concepts &amp; Azure services · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('az104')"><span class="eic" style="background:#0ea5e9">A</span><span><span class="enm">Azure Administrator</span><br><span class="ecd">AZ-104</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-az104.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Azure identity, governance &amp; compute · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('saa_c03')"><span class="eic" style="background:#fb923c">S</span><span><span class="enm">AWS Solutions Architect</span><br><span class="ecd">SAA-C03</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-saac03.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Resilient, secure cloud architectures · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('sap_c03')"><span class="eic" style="background:#ea580c">S</span><span><span class="enm">AWS Certified Solutions Architect – Professional</span><br><span class="ecd">SAP-C03</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-sapc03.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Advanced, complex cloud architectures · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('cloudplus_cv0_004')"><span class="eic" style="background:#a78bfa">C</span><span><span class="enm">CompTIA Cloud+</span><br><span class="ecd">CV0-004</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-cloudplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Cloud architecture &amp; operations · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('gcp_ace')"><span class="eic" style="background:#34d399">G</span><span><span class="enm">GCP Associate Engineer</span><br><span class="ecd">GCP-ACE</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-gcpace.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Deploy &amp; manage on Google Cloud · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('aif_c01')"><span class="eic" style="background:#ff9900">A</span><span><span class="enm">AWS AI Practitioner</span><br><span class="ecd">AIF-C01</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-aifc01.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">AI, ML &amp; generative AI on AWS · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('clf_c02')"><span class="eic" style="background:#0891b2">A</span><span><span class="enm">AWS Cloud Practitioner</span><br><span class="ecd">CLF-C02</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-clfc02.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Cloud concepts, billing &amp; AWS services · 1,000 questions · First 10 free</span></div>
+          <div class="exam" onclick="examCardClick('az900')"><span class="eic" style="background:#0ea5e9">A</span><span class="ex-name"><span class="enm">Azure Fundamentals</span><br><span class="ecd">AZ-900</span></span><span class="ex-meta">Cloud concepts &amp; Azure services · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-az900.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('az104')"><span class="eic" style="background:#0ea5e9">A</span><span class="ex-name"><span class="enm">Azure Administrator</span><br><span class="ecd">AZ-104</span></span><span class="ex-meta">Azure identity, governance &amp; compute · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-az104.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('saa_c03')"><span class="eic" style="background:#fb923c">S</span><span class="ex-name"><span class="enm">AWS Solutions Architect</span><br><span class="ecd">SAA-C03</span></span><span class="ex-meta">Resilient, secure cloud architectures · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-saac03.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('sap_c03')"><span class="eic" style="background:#ea580c">S</span><span class="ex-name"><span class="enm">AWS Certified Solutions Architect – Professional</span><br><span class="ecd">SAP-C03</span></span><span class="ex-meta">Advanced, complex cloud architectures · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-sapc03.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('cloudplus_cv0_004')"><span class="eic" style="background:#a78bfa">C</span><span class="ex-name"><span class="enm">CompTIA Cloud+</span><br><span class="ecd">CV0-004</span></span><span class="ex-meta">Cloud architecture &amp; operations · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-cloudplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('gcp_ace')"><span class="eic" style="background:#34d399">G</span><span class="ex-name"><span class="enm">GCP Associate Engineer</span><br><span class="ecd">GCP-ACE</span></span><span class="ex-meta">Deploy &amp; manage on Google Cloud · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-gcpace.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('aif_c01')"><span class="eic" style="background:#ff9900">A</span><span class="ex-name"><span class="enm">AWS AI Practitioner</span><br><span class="ecd">AIF-C01</span></span><span class="ex-meta">AI, ML &amp; generative AI on AWS · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-aifc01.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('clf_c02')"><span class="eic" style="background:#0891b2">A</span><span class="ex-name"><span class="enm">AWS Cloud Practitioner</span><br><span class="ecd">CLF-C02</span></span><span class="ex-meta">Cloud concepts, billing &amp; AWS services · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-clfc02.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
         </div>
       </div>
       <div class="examcat">
         <h3>Security</h3>
         <div class="examgrid">
-          <div class="exam" onclick="examCardClick('cysa_cs0_004')"><span class="eic" style="background:#f472b6">C</span><span><span class="enm">CompTIA CySA+</span><br><span class="ecd">CS0-004</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-cysa.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Threat detection &amp; incident response · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('secplus_sy0_701')"><span class="eic" style="background:#fb7185">S</span><span><span class="enm">CompTIA Security+</span><br><span class="ecd">SY0-701</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-secplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Threats, architecture &amp; operations · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('secplus_sy0_801')"><span class="eic" style="background:#2dd4bf">S</span><span><span class="enm">CompTIA Security+</span><br><span class="ecd">SY0-801</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-secplus801.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">V8 threats, architecture &amp; operations · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('pentest_pt0_003')"><span class="eic" style="background:#ef4444">P</span><span><span class="enm">CompTIA PenTest+</span><br><span class="ecd">PT0-003</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-pentestplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Engagement, recon, attacks &amp; post-exploitation · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('cissp')"><span class="eic" style="background:#c084fc">I</span><span><span class="enm">ISC2 CISSP</span><br><span class="ecd">CISSP</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-cissp.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Enterprise security, risk &amp; architecture · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('ccsp')"><span class="eic" style="background:#d946ef">I</span><span><span class="enm">ISC2 CCSP</span><br><span class="ecd">CCSP</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-ccsp.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Cloud security architecture &amp; operations · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('isc2_cc')"><span class="eic" style="background:#22c55e">I</span><span><span class="enm">ISC2 Certified in Cybersecurity</span><br><span class="ecd">CC</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-isc2cc.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Entry-level cybersecurity fundamentals · 1,000 questions · First 10 free</span></div>
+          <div class="exam" onclick="examCardClick('cysa_cs0_004')"><span class="eic" style="background:#f472b6">C</span><span class="ex-name"><span class="enm">CompTIA CySA+</span><br><span class="ecd">CS0-004</span></span><span class="ex-meta">Threat detection &amp; incident response · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-cysa.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('secplus_sy0_701')"><span class="eic" style="background:#fb7185">S</span><span class="ex-name"><span class="enm">CompTIA Security+</span><br><span class="ecd">SY0-701</span></span><span class="ex-meta">Threats, architecture &amp; operations · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-secplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('secplus_sy0_801')"><span class="eic" style="background:#2dd4bf">S</span><span class="ex-name"><span class="enm">CompTIA Security+</span><br><span class="ecd">SY0-801</span></span><span class="ex-meta">V8 threats, architecture &amp; operations · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-secplus801.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('pentest_pt0_003')"><span class="eic" style="background:#ef4444">P</span><span class="ex-name"><span class="enm">CompTIA PenTest+</span><br><span class="ecd">PT0-003</span></span><span class="ex-meta">Engagement, recon, attacks &amp; post-exploitation · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-pentestplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('cissp')"><span class="eic" style="background:#c084fc">I</span><span class="ex-name"><span class="enm">ISC2 CISSP</span><br><span class="ecd">CISSP</span></span><span class="ex-meta">Enterprise security, risk &amp; architecture · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-cissp.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('ccsp')"><span class="eic" style="background:#d946ef">I</span><span class="ex-name"><span class="enm">ISC2 CCSP</span><br><span class="ecd">CCSP</span></span><span class="ex-meta">Cloud security architecture &amp; operations · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-ccsp.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('isc2_cc')"><span class="eic" style="background:#22c55e">I</span><span class="ex-name"><span class="enm">ISC2 Certified in Cybersecurity</span><br><span class="ecd">CC</span></span><span class="ex-meta">Entry-level cybersecurity fundamentals · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-isc2cc.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
         </div>
       </div>
       <div class="examcat">
         <h3>DevOps & Containers</h3>
         <div class="examgrid">
-          <div class="exam" onclick="examCardClick('cka')"><span class="eic" style="background:#818cf8">K</span><span><span class="enm">Certified Kubernetes Admin</span><br><span class="ecd">CKA</span></span><span class="etb">TERMINAL</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-cka.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">K8s clusters &amp; workloads · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('ckad')"><span class="eic" style="background:#facc15">K</span><span><span class="enm">K8s App Developer</span><br><span class="ecd">CKAD</span></span><span class="etb">TERMINAL</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-ckad.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Cloud-native app design on K8s · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('dca')"><span class="eic" style="background:#2dd4bf">D</span><span><span class="enm">Docker Certified Associate</span><br><span class="ecd">DCA</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-dca.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Containers, images &amp; orchestration · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('terraform_004')"><span class="eic" style="background:#7B42BC">T</span><span><span class="enm">HashiCorp Terraform Associate</span><br><span class="ecd">004</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-terraform.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">IaC workflows &amp; HCL · 1,000 questions · First 10 free</span></div>
+          <div class="exam" onclick="examCardClick('cka')"><span class="eic" style="background:#818cf8">K</span><span class="ex-name"><span class="enm">Certified Kubernetes Admin</span><br><span class="ecd">CKA</span></span><span class="etb">TERMINAL</span><span class="ex-meta">K8s clusters &amp; workloads · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-cka.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('ckad')"><span class="eic" style="background:#facc15">K</span><span class="ex-name"><span class="enm">K8s App Developer</span><br><span class="ecd">CKAD</span></span><span class="etb">TERMINAL</span><span class="ex-meta">Cloud-native app design on K8s · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-ckad.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('dca')"><span class="eic" style="background:#2dd4bf">D</span><span class="ex-name"><span class="enm">Docker Certified Associate</span><br><span class="ecd">DCA</span></span><span class="ex-meta">Containers, images &amp; orchestration · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-dca.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('terraform_004')"><span class="eic" style="background:#7B42BC">T</span><span class="ex-name"><span class="enm">HashiCorp Terraform Associate</span><br><span class="ecd">004</span></span><span class="ex-meta">IaC workflows &amp; HCL · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-terraform.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
         </div>
       </div>
       <div class="examcat">
         <h3>Systems & Service</h3>
         <div class="examgrid">
-          <div class="exam" onclick="examCardClick('linuxplus_xk0_006')"><span class="eic" style="background:#fbbf24">L</span><span><span class="enm">CompTIA Linux+</span><br><span class="ecd">XK0-006</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-linuxplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Linux systems &amp; administration · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('itil4')"><span class="eic" style="background:#60a5fa">I</span><span><span class="enm">ITIL 4 Foundation</span><br><span class="ecd">ITIL-4</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-itil4.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">IT service management practices · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('netplus_n10_009')"><span class="eic" style="background:#38bdf8">N</span><span><span class="enm">CompTIA Network+</span><br><span class="ecd">N10-009</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-networkplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Networking fundamentals &amp; troubleshooting · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('aplus_220_1101')"><span class="eic" style="background:#fbbf24">A</span><span><span class="enm">CompTIA A+ Core 1</span><br><span class="ecd">220-1101</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-aplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Hardware, networking &amp; troubleshooting · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('aplus_220_1102')"><span class="eic" style="background:#f59e0b">A</span><span><span class="enm">CompTIA A+ Core 2</span><br><span class="ecd">220-1102</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-aplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Operating systems, security &amp; procedures · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('ccna_200_301')"><span class="eic" style="background:#1ba0d7">C</span><span><span class="enm">Cisco CCNA</span><br><span class="ecd">200-301</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-ccna.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Routing, switching &amp; network services · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('rhcsa_ex200')"><span class="eic" style="background:#ee0000">R</span><span><span class="enm">Red Hat RHCSA</span><br><span class="ecd">EX200</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-rhcsa.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">RHEL 10 system administration · 1,000 questions · First 10 free</span></div>
+          <div class="exam" onclick="examCardClick('linuxplus_xk0_006')"><span class="eic" style="background:#fbbf24">L</span><span class="ex-name"><span class="enm">CompTIA Linux+</span><br><span class="ecd">XK0-006</span></span><span class="ex-meta">Linux systems &amp; administration · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-linuxplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('itil4')"><span class="eic" style="background:#60a5fa">I</span><span class="ex-name"><span class="enm">ITIL 4 Foundation</span><br><span class="ecd">ITIL-4</span></span><span class="ex-meta">IT service management practices · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-itil4.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('netplus_n10_009')"><span class="eic" style="background:#38bdf8">N</span><span class="ex-name"><span class="enm">CompTIA Network+</span><br><span class="ecd">N10-009</span></span><span class="ex-meta">Networking fundamentals &amp; troubleshooting · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-networkplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('aplus_220_1101')"><span class="eic" style="background:#fbbf24">A</span><span class="ex-name"><span class="enm">CompTIA A+ Core 1</span><br><span class="ecd">220-1101</span></span><span class="ex-meta">Hardware, networking &amp; troubleshooting · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-aplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('aplus_220_1102')"><span class="eic" style="background:#f59e0b">A</span><span class="ex-name"><span class="enm">CompTIA A+ Core 2</span><br><span class="ecd">220-1102</span></span><span class="ex-meta">Operating systems, security &amp; procedures · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-aplus.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('ccna_200_301')"><span class="eic" style="background:#1ba0d7">C</span><span class="ex-name"><span class="enm">Cisco CCNA</span><br><span class="ecd">200-301</span></span><span class="ex-meta">Routing, switching &amp; network services · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-ccna.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('rhcsa_ex200')"><span class="eic" style="background:#ee0000">R</span><span class="ex-name"><span class="enm">Red Hat RHCSA</span><br><span class="ecd">EX200</span></span><span class="ex-meta">RHEL 10 system administration · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-rhcsa.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
         </div>
       </div>
       <div class="examcat">
         <h3>Nursing</h3>
         <div class="examgrid">
-          <div class="exam" onclick="examCardClick('nclex_rn')"><span class="eic" style="background:#f472b6">N</span><span><span class="enm">NCLEX-RN</span><br><span class="ecd">NCLEX-RN</span></span><span class="etb">ADAPTIVE</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-nclexrn.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">RN licensure · adaptive CAT · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('nclex_pn')"><span class="eic" style="background:#fb7185">N</span><span><span class="enm">NCLEX-PN</span><br><span class="ecd">NCLEX-PN</span></span><span class="etb">ADAPTIVE</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-nclexpn.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">PN licensure · adaptive CAT · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('teas7')"><span class="eic" style="background:#38bdf8">T</span><span><span class="enm">TEAS 7</span><br><span class="ecd">TEAS 7</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-teas7.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Nursing school entrance exam · 1,000 questions · First 10 free</span></div>
-          <div class="exam" onclick="examCardClick('hesi_a2')"><span class="eic" style="background:#818cf8">H</span><span><span class="enm">HESI A2</span><br><span class="ecd">HESI A2</span></span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-hesia2.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span><span class="ex-meta">Nursing admission assessment · 1,000 questions · First 10 free</span></div>
+          <div class="exam" onclick="examCardClick('nclex_rn')"><span class="eic" style="background:#f472b6">N</span><span class="ex-name"><span class="enm">NCLEX-RN</span><br><span class="ecd">NCLEX-RN</span></span><span class="etb">ADAPTIVE</span><span class="ex-meta">RN licensure · adaptive CAT · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-nclexrn.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('nclex_pn')"><span class="eic" style="background:#fb7185">N</span><span class="ex-name"><span class="enm">NCLEX-PN</span><br><span class="ecd">NCLEX-PN</span></span><span class="etb">ADAPTIVE</span><span class="ex-meta">PN licensure · adaptive CAT · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-nclexpn.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('teas7')"><span class="eic" style="background:#38bdf8">T</span><span class="ex-name"><span class="enm">TEAS 7</span><br><span class="ecd">TEAS 7</span></span><span class="ex-meta">Nursing school entrance exam · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-teas7.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
+          <div class="exam" onclick="examCardClick('hesi_a2')"><span class="eic" style="background:#818cf8">H</span><span class="ex-name"><span class="enm">HESI A2</span><br><span class="ecd">HESI A2</span></span><span class="ex-meta">Nursing admission assessment · 1,000 questions · First 10 free</span><span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="https://bytebarhq.com/library/book-hesia2.html" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span></div>
         </div>
       </div>
       </div>
@@ -2418,7 +2451,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <button class="backlink" id="modes-back">← All exams</button>
     <div class="hero" style="margin-bottom:22px;">
       <div class="resmascot"><span class="mascot-slot floaty" data-mascot="idle" data-size="58"></span></div>
-      <h1 id="modes-title" style="font-size:32px;"></h1>
+      <h2 class="screen-title" id="modes-title"></h2>
       <p id="modes-sub"></p>
       <div id="modes-qbar-slot" style="max-width:420px;margin:0 auto;"></div>
     </div>
@@ -2473,7 +2506,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
   <div class="wrap">
     <button class="backlink" id="deck-back">← All exams</button>
     <div class="hero" style="margin-bottom:22px;">
-      <h1 id="deck-title" style="font-size:30px;">Your misses</h1>
+      <h2 class="screen-title" id="deck-title">Your misses</h2>
       <p id="deck-sub"></p>
     </div>
     <div class="pipblock hidden" id="deck-pip"></div>
@@ -2667,7 +2700,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     <button class="backlink" id="dash-back">← Home</button>
     <div class="hero" style="margin-bottom:24px;">
       <div class="resmascot"><span class="mascot-slot floaty" data-mascot="idle" data-size="66"></span></div>
-      <h1 style="font-size:32px;">Your performance <span class="cy">analytics</span></h1>
+      <h2 class="screen-title">Your performance <span class="cy">analytics</span></h2>
       <p>Trends, weak spots, and a study plan — generated from every attempt you've logged.</p>
     </div>
     <div class="pipblock hidden" id="dash-pip"></div>
@@ -2763,7 +2796,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
   <div class="wrap">
     <button class="backlink" id="builder-back">← Home</button>
     <div class="hero" style="margin-bottom:24px;">
-      <h1 style="font-size:32px;">Build your <span class="cy">own drill</span></h1>
+      <h2 class="screen-title">Build your <span class="cy">own drill</span></h2>
       <p>Target exactly what you need: pick an exam, choose the domains, set the length. Timed for pressure, untimed for learning.</p>
     </div>
     <div class="buildercard">
@@ -2790,7 +2823,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
         </select>
       </div>
       <div class="btnrow" style="margin-top:20px;">
-        <button class="btn gold block" id="builder-start">Start custom quiz</button>
+        <button class="btn block" id="builder-start">Start custom quiz</button>
       </div>
       <div class="fineprint" id="builder-msg" style="min-height:20px;"></div>
     </div>
@@ -2874,7 +2907,7 @@ setTimeout(function(){ var b=document.getElementById('bb-boot'); if(b && !b.clas
     </div>
     <div class="btnrow" style="justify-content:center;margin-top:18px;gap:10px;">
       <button class="btn ghost" id="rev-back">Back to exam</button>
-      <button class="btn gold" id="rev-submit">Submit exam</button>
+      <button class="btn" id="rev-submit">Submit exam</button>
     </div>
   </div>
 </div>
@@ -5567,15 +5600,14 @@ function renderHome(){
       const bookUrl = bookUrlFor(e.slug);
       d.innerHTML =
         '<span class="eic" style="background:'+e.accent+'">'+(EXAM_LETTERS[e.slug]||e.code.charAt(0))+'</span>'+
-        '<span><span class="enm">'+e.name+'</span><br><span class="ecd">'+e.code+'</span></span>'+
+        '<span class="ex-name"><span class="enm">'+e.name+'</span><br><span class="ecd">'+e.code+'</span></span>'+
         term+cbadge+
-        /* Paired doors (Cori 2026-11-18, P8 at the one-home promote):
-           "Watch the book" is a full gold door beside "Take the final
-           exam" — same size, same weight — never a quiet link under
-           the exam button. */
+        '<span class="ex-meta">'+e.tagline+' · <span class="qcount">'+QCOUNT_DISPLAY.toLocaleString("en-US")+' questions</span> · '+(pro?"Timed simulation · Score report":"First 10 free")+'</span>'+
+        /* Fix list 2026-11-28 (A3/A4/F2): compact row — name -> meta ->
+           actions. One primary action (exam, solid navy); the book action
+           is an outline door, never gold. */
         '<span class="ex-doors"><span class="ex-door ex-sit">Take the final exam</span><a class="ex-door ex-book" href="'+bookUrl+'" target="_blank" rel="noopener" onclick="event.stopPropagation()">Watch the book</a></span>'+
-        rmeter+
-        '<span class="ex-meta">'+e.tagline+' · <span class="qcount">'+QCOUNT_DISPLAY.toLocaleString("en-US")+' questions</span> · '+(pro?"Timed simulation · Score report":"First 10 free")+'</span>';
+        rmeter;
       d.addEventListener("click",()=>examCardClick(e.slug));
       d.addEventListener("keydown",(ev)=>{ if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); examCardClick(e.slug); } });
       grid.appendChild(d);
@@ -7700,7 +7732,7 @@ function finishExam(expired){
         '<div class="pp-teaser-locked"><div class="pp-teaser-blur">' + blurredBars + '</div>' +
         '<div class="pp-teaser-pill">Unlock Complete to see exactly what to study next</div></div></div>' +
         '<ul class="pp-feats">' +
-        '<li><span class="pp-check">✓</span> 29,000 questions — 1,000 per exam, matched to the real test</li>' +
+        '<li><span class="pp-check">✓</span> 30,000 questions — 1,000 per exam, matched to the real test</li>' +
         '<li><span class="pp-check">✓</span> More than multiple choice — hands-on terminal tasks and adaptive NCLEX exams</li>' +
         '<li><span class="pp-check">✓</span> Know exactly what to study — domain breakdowns pinpoint your weak spots</li>' +
         '<li><span class="pp-check">✓</span> Know when you\'re ready — readiness prediction and a custom quiz builder</li>' +
@@ -9112,9 +9144,9 @@ function renderDashboard(){
   const streak=dayStreak(r);
   const examsDone=Object.keys(r.examsDone).length;
   const stats=[
-    {v: examsDone+'<span style="font-size:16px;color:var(--mut);">/29</span>', l:"Exams completed",
+    {v: examsDone+'<span style="font-size:16px;color:var(--mut);">/30</span>', l:"Exams completed",
      icon:sic('<circle cx="12" cy="8" r="6"/><path d="M15.5 13l1.5 8-5-3-5 3 1.5-8"/>',"#0b8fc4"),
-     bar:examsDone/29*100, barc:"#0b8fc4"},
+     bar:examsDone/30*100, barc:"#0b8fc4"},
     {v: r.qAnswered.toLocaleString(), l:"Questions answered",
      icon:sic('<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>',"#0d9d6c")},
     {v:(n?avg+"%":"—"), l:"Avg score (last 10)",
@@ -9243,7 +9275,7 @@ function renderProfile(){
       proBlock.innerHTML='<div class="procard">'+
         '<div class="procard-badge">⭐ COMPLETE</div>'+
         '<div class="procard-title">Complete member'+(sinceTxt?' since '+sinceTxt:'')+'</div>'+
-        '<div class="procard-feats">29 exam simulations · 1,000-question banks · Terminal tasks · Custom quiz builder · Analytics · Video library · Lifetime access</div>'+
+        '<div class="procard-feats">30 exam simulations · 1,000-question banks · Terminal tasks · Custom quiz builder · Analytics · Video library · Lifetime access</div>'+
         '</div>';
       proBlock.classList.remove("hidden");
     } else {
